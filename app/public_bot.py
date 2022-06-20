@@ -1,9 +1,6 @@
-import os
-from telegram.ext import Updater, MessageHandler, Filters
-from telegram.ext import CommandHandler
-from App import get_info
+from helpers.bots_imports import *
 
-telegram_bot_token = "5506915007:AAFQOzBkBo-KrT3m4z-lyK5SE_HUJcc5gwg"
+telegram_bot_token = config('PUBLIC_BOT_API_KEY')
 
 updater = Updater(token=telegram_bot_token, use_context=True)
 dispatcher = updater.dispatcher
