@@ -2,9 +2,6 @@ from helpers.bots_imports import *
 
 telegram_bot_token = config('ADMIN_BOT_API_KEY')
 
-bot = telegram.Bot(token=telegram_bot_token)
-bot.setWebhook(f"https://{'biggestbuybot'}.herokuapp.com/{telegram_bot_token}")
-
 updater = Updater(token=telegram_bot_token, use_context=True)
 dispatcher = updater.dispatcher
 
@@ -80,10 +77,10 @@ dispatcher.add_handler(CommandHandler("start", start))
 dispatcher.add_handler(MessageHandler(Filters.text, get_word_info))
 
 
-# updater.start_webhook(listen="0.0.0.0",
-#                       port=int(8080),
-#                       url_path=telegram_bot_token,
-#                       webhook_url=f"https://{'biggestbuybot'}.herokuapp.com/{telegram_bot_token}"
-#                       )
+updater.start_webhook(listen="0.0.0.0",
+                      port=int(os.environ.get('PORT', 5000)),
+                      url_path=telegram_bot_token,
+                      webhook_url=f"https://{'biggestbuybot'}.herokuapp.com/{telegram_bot_token}"
+)
 
 updater.idle()
