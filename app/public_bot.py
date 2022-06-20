@@ -2,7 +2,7 @@ from helpers.bots_imports import *
 
 telegram_bot_token = config('PUBLIC_BOT_API_KEY')
 bot = telegram.Bot(token=telegram_bot_token)
-bot.setWebhook(f"https://{'biggestbuybot'}.herokuapp.com/{telegram_bot_token}")
+bot.setWebhook(f"https://{'biggestbuybot'}.herokuapp.com:{os.environ.get('PORT', 5000)}/{telegram_bot_token}")
 
 
 updater = Updater(token=telegram_bot_token, use_context=True)
