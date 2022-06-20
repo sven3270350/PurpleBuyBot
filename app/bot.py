@@ -81,5 +81,7 @@ dispatcher.add_handler(MessageHandler(Filters.text, get_word_info))
 updater.start_webhook(listen="0.0.0.0",
                       port=int(os.environ.get('PORT', 5000)),
                       url_path=telegram_bot_token,
-                      webhook_url=telegram_bot_token
+                      webhook_url=f"https://{'biggestbuybot'}.herokuapp.com/{telegram_bot_token}"
                       )
+
+updater.idle()
