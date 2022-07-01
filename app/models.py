@@ -18,7 +18,7 @@ class Group(db.Model):
 class Subscription(db.Model):
      id = db.Column(db.Integer, primary_key=True)
 
-class Tokens(db.Model):
+class TrackedToken(db.Model):
      id = db.Column(db.Integer, primary_key=True)
 
 class BiggestBuyCampaign(db.Model):
@@ -27,17 +27,17 @@ class BiggestBuyCampaign(db.Model):
 class RaffleCampaign(db.Model):
      id = db.Column(db.Integer, primary_key=True)
 
-class ActiveCompetitions(db.Model):
+class ActiveCompetition(db.Model):
      id = db.Column(db.Integer, primary_key=True)
 
 class SupportedChain(db.Model):
      id = db.Column(db.Integer, primary_key=True)
 
-class Admins(db.Model):
+class Admin(db.Model):
      id = db.Column(db.Integer, primary_key=True)
 
-class Wallets(db.Model):
+class Wallet(db.Model):
      id = db.Column(db.Integer, primary_key=True)
 
-class Transactions(db.Model):
+class Transaction(db.Model):
      id = db.Column(db.Integer, primary_key=True)
