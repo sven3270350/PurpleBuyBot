@@ -16,25 +16,28 @@ class Group(db.Model):
 
 
 class Subscription(db.Model):
-    pass
+     id = db.Column(db.Integer, primary_key=True)
 
 class Tokens(db.Model):
-    pass
+     id = db.Column(db.Integer, primary_key=True)
 
 class BiggestBuyCampaign(db.Model):
-    pass
+     id = db.Column(db.Integer, primary_key=True)
 
 class RaffleCampaign(db.Model):
-    pass
+     id = db.Column(db.Integer, primary_key=True)
 
 class ActiveCompetitions(db.Model):
-    pass
+     id = db.Column(db.Integer, primary_key=True)
 
 class SupportedChain(db.Model):
-    pass
+     id = db.Column(db.Integer, primary_key=True)
 
 class Admins(db.Model):
-    pass
+     id = db.Column(db.Integer, primary_key=True)
 
 class Wallets(db.Model):
-    pass
+     id = db.Column(db.Integer, primary_key=True)
+
+class Transactions(db.Model):
+     id = db.Column(db.Integer, primary_key=True)
