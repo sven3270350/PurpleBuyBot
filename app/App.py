@@ -2,11 +2,15 @@ import os
 import requests
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from decouple import config
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = config('DATABASE_URL')
 db = SQLAlchemy(app)
+
+migrate = Migrate(app, db)
 
 
 @app.route('/')
