@@ -1,4 +1,4 @@
-from .app import db
+from app import db
 
 
 class Group(db.Model):
@@ -33,7 +33,7 @@ class Subscription(db.Model):
     __tablename__ = 'subscription'
     id = db.Column(db.Integer, primary_key=True)
     group_id = db.Column(db.String(80), db.ForeignKey('group.group_id'))
-    wallet_id = db.Column(db.String(80), db.ForeignKey('wallet.wallet_id'))
+    wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'))
     start_date = db.Column(db.DateTime, default=db.func.now())
     end_date = db.Column(db.DateTime)
     subscription_type = db.Column(db.String(80))
@@ -88,9 +88,9 @@ class BiggestBuyCampaign(db.Model):
     campaign_status = db.Column(db.String(80))
     campaing_winner = db.Column(db.String(100))
     minimum_buy_amount = db.Column(db.Integer)
-    prize = db.Column(db.string(30))
+    prize = db.Column(db.String(30))
     transactions = db.relationship(
-        'Transaction', backref='biggest_buy_campaign', lazy='dynamic')
+        'BiggestBuyTransaction', backref='biggest_buy_campaign', lazy='dynamic')
 
     def __init__(self, group_id, start_time, end_time, count_down, campaign_status, campaing_winner, minimum_buy_amount, prize):
         self.group_id = group_id
@@ -116,9 +116,9 @@ class RaffleCampaign(db.Model):
     campaign_status = db.Column(db.String(80))
     campaing_winner = db.Column(db.String(100))
     minimum_buy_amount = db.Column(db.Integer)
-    prize = db.Column(db.string(30))
+    prize = db.Column(db.String(30))
     transactions = db.relationship(
-        'Transaction', backref='raffle_campaign', lazy='dynamic')
+        'RaffleTransaction', backref='raffle_campaign', lazy='dynamic')
 
     def __init__(self, group_id, start_time, end_time, count_down, campaign_status, campaing_winner, minimum_buy_amount, prize):
         self.group_id = group_id
@@ -187,24 +187,50 @@ class Wallet(db.Model):
         return '<Wallet %r>' % self.wallet_address
 
 
-class Transaction(db.Model):
-    __tablename__ = 'transaction'
+class BiggestBuyTransaction(db.Model):
+    __tablename__ = 'biggest_buy_transaction'
     id = db.Column(db.Integer, primary_key=True)
-    campaign_type = db.Column(db.String(80))
-    campaign_id = db.Column(db.String(80))
+    biggest_buy_campaign_id = db.Column(
+        db.Integer, db.ForeignKey('biggest_buy_campaign.id'))
     buyer_address = db.Column(db.String(100))
     buyer_amount = db.Column(db.Integer)
     transaction_link = db.Column(db.String(100))
+    transaction_chain = db.Column(db.String(20))
+    group_id = db.Column(db.String(80), db.ForeignKey('group.group_id'))
 
-    def __init__(self, campaign_type, campaign_id, buyer_address, buyer_amount, transaction_link):
-        self.campaign_type = campaign_type
-        self.campaign_id = campaign_id
+    def __init__(self, biggest_buy_campaign_id, buyer_address, buyer_amount, transaction_link, transaction_chain, group_id):
+        self.biggest_buy_campaign_id = biggest_buy_campaign_id
         self.buyer_address = buyer_address
         self.buyer_amount = buyer_amount
         self.transaction_link = transaction_link
+        self.transaction_chain = transaction_chain
+        self.group_id = group_id
 
     def __repr__(self):
-        return '<Transaction %r>' % self.id
+        return '<BiggestBuyTransaction %r>' % f"{self.group_id}_{self.biggest_buy_campaign_id}_{self.id}"
+
+
+class RaffleTransaction(db.Model):
+    __tablename__ = 'raffle_transaction'
+    id = db.Column(db.Integer, primary_key=True)
+    raffle_campaign_id = db.Column(
+        db.Integer, db.ForeignKey('raffle_campaign.id'))
+    buyer_address = db.Column(db.String(100))
+    buyer_amount = db.Column(db.Integer)
+    transaction_link = db.Column(db.String(100))
+    transaction_chain = db.Column(db.String(20))
+    group_id = db.Column(db.String(80), db.ForeignKey('group.group_id'))
+
+    def __init__(self, raffle_campaign_id, buyer_address, buyer_amount, transaction_link, transaction_chain, group_id):
+        self.raffle_campaign_id = raffle_campaign_id
+        self.buyer_address = buyer_address
+        self.buyer_amount = buyer_amount
+        self.transaction_link = transaction_link
+        self.transaction_chain = transaction_chain
+        self.group_id = group_id
+
+    def __repr__(self):
+        return '<RaffleTransaction %r>' % f"{self.group_id}_{self.raffle_campaign_id}_{self.id}"
 
 
 token_chains = db.Table('token_chains',
