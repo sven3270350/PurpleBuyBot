@@ -86,19 +86,19 @@ class BiggestBuyCampaign(db.Model):
     end_time = db.Column(db.DateTime)
     count_down = db.Column(db.Integer)
     campaign_status = db.Column(db.String(80))
-    campaing_winner = db.Column(db.String(100))
+    campaign_winner = db.Column(db.String(100))
     minimum_buy_amount = db.Column(db.Integer)
     prize = db.Column(db.String(30))
     transactions = db.relationship(
         'BiggestBuyTransaction', backref='biggest_buy_campaign', lazy='dynamic')
 
-    def __init__(self, group_id, start_time, end_time, count_down, campaign_status, campaing_winner, minimum_buy_amount, prize):
+    def __init__(self, group_id, start_time, end_time, count_down, campaign_status, campaign_winner, minimum_buy_amount, prize):
         self.group_id = group_id
         self.start_time = start_time
         self.end_time = end_time
         self.count_down = count_down
         self.campaign_status = campaign_status
-        self.campaing_winner = campaing_winner
+        self.campaign_winner = campaign_winner
         self.minimum_buy_amount = minimum_buy_amount
         self.prize = prize
 
@@ -114,19 +114,19 @@ class RaffleCampaign(db.Model):
     end_time = db.Column(db.DateTime)
     count_down = db.Column(db.Integer)
     campaign_status = db.Column(db.String(80))
-    campaing_winner = db.Column(db.String(100))
+    campaign_winner = db.Column(db.String(100))
     minimum_buy_amount = db.Column(db.Integer)
     prize = db.Column(db.String(30))
     transactions = db.relationship(
         'RaffleTransaction', backref='raffle_campaign', lazy='dynamic')
 
-    def __init__(self, group_id, start_time, end_time, count_down, campaign_status, campaing_winner, minimum_buy_amount, prize):
+    def __init__(self, group_id, start_time, end_time, count_down, campaign_status, campaign_winner, minimum_buy_amount, prize):
         self.group_id = group_id
         self.start_time = start_time
         self.end_time = end_time
         self.count_down = count_down
         self.campaign_status = campaign_status
-        self.campaing_winner = campaing_winner
+        self.campaign_winner = campaign_winner
         self.minimum_buy_amount = minimum_buy_amount
         self.prize = prize
 
