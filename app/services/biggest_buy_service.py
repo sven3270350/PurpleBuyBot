@@ -7,7 +7,7 @@ class BiggestBuyService:
     # get campaigns transactions
     # get campaigns winners
 
-    def create_campaign(self, group_id, start_time, end_time, count_down, campaign_status, campaing_winner, minimum_buy_amount, prize):
+    def create_campaign(self, group_id, start_time, end_time, count_down, campaign_status,  campaign_winner, minimum_buy_amount, prize):
         pass
 
     def get_all_campaigns(self):
