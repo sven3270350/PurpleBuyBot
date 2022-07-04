@@ -5,3 +5,8 @@ class SchedularService:
 
     def schedule_campaign(self, group_id, campaign_type, start_time):
         pass
+
+    def get_scheduled_campaigns(self):
+        pass
+
+    
