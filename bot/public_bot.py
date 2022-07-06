@@ -1,4 +1,10 @@
+from telegram import Update, ParseMode
+from telegram.ext import CallbackContext
+from services.bot_service import BotService
+from services.biggest_buy_service import BiggestBuyService
+from services.bot_service import BotService
 from helpers.bots_imports import *
+from helpers.templates import start_template, help_template
 
 telegram_bot_token = config('PUBLIC_BOT_API_KEY')
 telegram_admin_bot_token = config('ADMIN_BOT_API_KEY')
@@ -11,14 +17,88 @@ updater = Updater(token=telegram_bot_token, use_context=True)
 dispatcher = updater.dispatcher
 
 
-# set up the introductory statement for the bot when the /start command is invoked
-def start(update, context):
+def start(update: Update, context: CallbackContext):
     chat_id = update.effective_chat.id
-    context.bot.send_message(chat_id=chat_id, text="Hello there. Provide any English word and I will give you a bunch "
-                                                   "of information about it.")
+    chat_title = update.effective_chat.title
+    username = update.effective_user.username
+
+    # db
+    if (BotService().create_new_bot_user(chat_id, chat_title, username)):
+        context.bot.send_message(chat_id=chat_id, text=start_template,
+                                 parse_mode=ParseMode.HTML)
+    else:
+        context.bot.send_message(chat_id=chat_id, text="Error creating new bot user.",
+                                 parse_mode=ParseMode.HTML)
 
 
-# obtain the information of the word provided and format before presenting.
+def help(update: Update, context: CallbackContext):
+    update.message.reply_text(help_template,
+                              parse_mode=ParseMode.HTML)
+
+
+def add_tokens(update: Update, context: CallbackContext):
+    chat_id = update.effective_chat.id
+    context.bot.send_message(chat_id=chat_id, text=help_template,
+                             parse_mode=ParseMode.HTML)
+
+
+def remove_tokens(update: Update, context: CallbackContext):
+    chat_id = update.effective_chat.id
+    context.bot.send_message(chat_id=chat_id, text=help_template,
+                             parse_mode=ParseMode.HTML)
+
+
+def start_buy_contest(update: Update, context: CallbackContext):
+    chat_id = update.effective_chat.id
+    context.bot.send_message(chat_id=chat_id, text=help_template,
+                             parse_mode=ParseMode.HTML)
+
+
+def start_raffle_contest(update: Update, context: CallbackContext):
+    chat_id = update.effective_chat.id
+    context.bot.send_message(chat_id=chat_id, text=help_template,
+                             parse_mode=ParseMode.HTML)
+
+
+def subscribe(update: Update, context: CallbackContext):
+    chat_id = update.effective_chat.id
+    context.bot.send_message(chat_id=chat_id, text=help_template,
+                             parse_mode=ParseMode.HTML)
+
+
+def chains(update: Update, context: CallbackContext):
+    supported_chains = BotService().get_supported_chains()
+    message = '<b>Supported Chains:</b>\n\n'
+
+    if len(supported_chains) == 0:
+        message += '<i>No supported chains found.</i>'
+    else:
+        # loop through the supported chains and add them to the message with numbered list
+        for chain in supported_chains:
+            message += f'{chain.chain_name}\n'
+    update.message.reply_text(message, parse_mode=ParseMode.HTML)
+
+
+def list_tracked_tokens(update: Update, context: CallbackContext):
+    chat_id = update.effective_chat.id
+    tracked_tokens = BotService().get_tracked_tokens(chat_id)
+    message = "<b>You're Tracking:</b>\n\n"
+
+    if len(tracked_tokens) == 0:
+        message += '<i>You currently are not tracking any tokens.</i>\n'
+        message += '<i>Use the /add_tokens command to add tokens to your list.</i>'
+
+    else:
+        # loop through the supported chains and add them to the message with numbered list
+        for token in tracked_tokens:
+            message += f'''
+            <b>{token.token_symbol} on {token.token_name}</b>
+            <i>({token.token_address})</i>
+            <i>({token.pair_address})</i>
+            '''
+    update.message.reply_text(message, parse_mode=ParseMode.HTML)
+
+
 def get_word_info(update, context):
     # get the word info
     word_info = get_info(update.message.text)
@@ -75,11 +155,14 @@ def get_word_info(update, context):
     update.message.reply_text(message)
 
 
-# run the start function when the user invokes the /start command
+# handlers for the commands
 dispatcher.add_handler(CommandHandler("start", start))
+dispatcher.add_handler(CommandHandler("help", help))
+dispatcher.add_handler(CommandHandler("chains", chains))
+dispatcher.add_handler(CommandHandler("tracked_tokens", list_tracked_tokens))
 
 # invoke the get_word_info function when the user sends a message
 # that is not a command.
-dispatcher.add_handler(MessageHandler(Filters.text, get_word_info))
+# dispatcher.add_handler(MessageHandler(Filters.text, get_word_info))
 updater.start_polling()
 updater.idle()
