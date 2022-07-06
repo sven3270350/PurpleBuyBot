@@ -1,13 +1,11 @@
 from app import db
-from sqlalchemy.orm import backref
-
 
 class Group(db.Model):
     __tablename__ = 'group'
     id = db.Column(db.Integer, primary_key=True)
     group_id = db.Column(db.String(80), unique=True)
-    group_title = db.Column(db.String(120))
-    username = db.Column(db.String(120))
+    group_title = db.Column(db.Text)
+    username = db.Column(db.Text)
     sign_up_date = db.Column(db.DateTime, default=db.func.now())
     subscriptions = db.relationship(
         'Subscription', backref='group', lazy='dynamic')
@@ -18,13 +16,14 @@ class Group(db.Model):
     raffle_campaigns = db.relationship(
         'RaffleCampaign', backref='group', lazy='dynamic')
     active_competition = db.relationship(
-        'ActiveCompetition', backref=backref('group', uselist=False), lazy='dynamic')
+        'ActiveCompetition', back_populates="group", uselist=False)
     wallet = db.relationship(
-        'Wallet', backref=backref('group', uselist=False), lazy='dynamic')
+        'Wallet', back_populates="group", uselist=False)
 
-    def __init__(self, group_id, group_link):
+    def __init__(self, group_id, group_title, username):
         self.group_id = group_id
-        self.group_link = group_link
+        self.group_title = group_title
+        self.username = username
         self.sign_up_date = db.func.now()
 
     def __repr__(self):
@@ -142,6 +141,7 @@ class ActiveCompetition(db.Model):
     group_id = db.Column(db.String(80), db.ForeignKey('group.group_id'))
     competition_type = db.Column(db.String(80))
     competition_id = db.Column(db.String(80))
+    group = db.relationship("Group", back_populates="active_competition")
 
     def __init__(self, group_id, competition_type, competition_id):
         self.group_id = group_id
@@ -179,6 +179,7 @@ class Wallet(db.Model):
     wallet_address = db.Column(db.String(100))
     wallet_private_key = db.Column(db.String(100))
     group_id = db.Column(db.String(80), db.ForeignKey('group.group_id'))
+    group = db.relationship("Group", back_populates="wallet")
 
     def __init__(self, wallet_address, wallet_private_key):
         self.wallet_address = wallet_address
