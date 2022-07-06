@@ -1,11 +1,13 @@
 from app import db
+from sqlalchemy.orm import backref
 
 
 class Group(db.Model):
     __tablename__ = 'group'
     id = db.Column(db.Integer, primary_key=True)
     group_id = db.Column(db.String(80), unique=True)
-    group_link = db.Column(db.String(120), unique=True)
+    group_title = db.Column(db.String(120))
+    username = db.Column(db.String(120))
     sign_up_date = db.Column(db.DateTime, default=db.func.now())
     subscriptions = db.relationship(
         'Subscription', backref='group', lazy='dynamic')
@@ -16,9 +18,9 @@ class Group(db.Model):
     raffle_campaigns = db.relationship(
         'RaffleCampaign', backref='group', lazy='dynamic')
     active_competition = db.relationship(
-        'ActiveCompetition', backref=db.backref('group', uselist=False), lazy='dynamic')
+        'ActiveCompetition', backref=backref('group', uselist=False), lazy='dynamic')
     wallet = db.relationship(
-        'Wallet', backref=db.backref('group', uselist=False), lazy='dynamic')
+        'Wallet', backref=backref('group', uselist=False), lazy='dynamic')
 
     def __init__(self, group_id, group_link):
         self.group_id = group_id
@@ -178,10 +180,9 @@ class Wallet(db.Model):
     wallet_private_key = db.Column(db.String(100))
     group_id = db.Column(db.String(80), db.ForeignKey('group.group_id'))
 
-    def __init__(self, wallet_address, wallet_private_key, group_id):
+    def __init__(self, wallet_address, wallet_private_key):
         self.wallet_address = wallet_address
         self.wallet_private_key = wallet_private_key
-        self.group_id = group_id
 
     def __repr__(self):
         return '<Wallet %r>' % self.wallet_address
