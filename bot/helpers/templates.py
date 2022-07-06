@@ -7,10 +7,11 @@ Follow these simple steps to get started:
 1) /help - Show supported commands
 2) /add_token - Add the token to be monitored requires token address
 3) /remove_token - Remove monitored token
-4) /start_buy_contest - Initiate a biggest buy contest
-5) /raffle_on - Start raffle buy contest
-6) /subscribe - Subscribe to premium to remove ads
-7) /chains - Show a list of supported chains
+4) /tracked_tokens - List tracked tokens
+5) /start_buy_contest - Initiate a biggest buy contest
+6) /raffle_on - Start raffle buy contest
+7) /subscribe - Subscribe to premium to remove ads
+8) /chains - Show a list of supported chains
 
 <b>Adding a token:</b>
 Use command /add_token {token_address} or just /add_token then follow the prompt to complete
@@ -32,10 +33,11 @@ Follow these simple steps to get started:
 1) /help - Show supported commands
 2) /add_token - Add the token to be monitored requires token address
 3) /remove_token - Remove monitored token
-4) /start_buy_contest - Initiate a biggest buy contest
-5) /raffle_on - Start raffle buy contest
-6) /subscribe - Subscribe to premium to remove ads
-7) /chains - Show a list of supported chains
+4) /tracked_tokens - List tracked tokens
+5) /start_buy_contest - Initiate a biggest buy contest
+6) /raffle_on - Start raffle buy contest
+7) /subscribe - Subscribe to premium to remove ads
+8) /chains - Show a list of supported chains
 
 <b>Adding a token:</b>
 Use command /add_token {token_address} or just /add_token then follow the prompt to complete
