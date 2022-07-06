@@ -1,14 +1,17 @@
 import configparser
 import os
+from pathlib import Path
 
 PATH_TO_APP_CFG = os.path.join(os.path.dirname(
-    os.path.abspath(__file__)), 'app.cfg')
-
+    Path(__file__).parent.parent), 'app.cfg')
 
 class AppConfigs:
     def __init__(self):
         self._config = configparser.RawConfigParser()
         self._config.read([PATH_TO_APP_CFG])
+
+    def get_secret_key(self):
+        return self._config.get("SECRETS", "secret_key")
 
     def get_explorer(self, chain_id):
         chain_id = int(chain_id)
