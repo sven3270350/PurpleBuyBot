@@ -40,10 +40,10 @@ Follow these simple steps to get started:
 /chains - Show a list of supported chains
 
 <b>Adding a token:</b>
-Use command /add_token [token_address] or just /add_token then follow the prompt to complete
+Use command /add_token then follow the prompt to complete
 
 <b>Removing a token:</b>
-Use command /remove_token [token_address] or just /remove_token
+Use command /remove_token and select the token to remove
 
 <b>Run Contest:</b>
 To run a Buy contest, use /stat_buy_contest and follow the prompt
@@ -67,16 +67,56 @@ help_template = '''
 /chains - Show a list of supported chains
 
 <b>Adding a token:</b>
-Use command /add_token [token_address] or just /add_token then follow the prompt to complete
+Use command /add_token then follow the prompt to complete
 
 <b>Removing a token:</b>
-Use command /remove_token [token_address] or just /remove_token
+Use command /remove_token and select the token to remove
 
 <b>Run Contest:</b>
 To run a Buy contest, use /stat_buy_contest and follow the prompt
 For Raffle contests, use /raffle_on and follow the prompt
 
 <i>Note: Only one contest (Buy or Raffle) can be active per period.</i>
+'''
+
+not_group_admin_template = '''
+<i>❌ You are not an <b>admin</b> of this group.</>
+'''
+
+add_token_chain_select_template = '''
+<b> Select your token's chain: </b>
+
+<b>Note:</b> You can only add tokens from supported chains.
+Run /chains to see a list of supported chains, Dex and pair.
+
+<i>Group: <b>{group_title}</b></i>
+'''
+
+add_token_dex_select_template = '''
+<b> Select your token's Dex: </b>
+
+Use /chains to see a list of supported chains, Dex and pair.
+
+<i>Group: <b>{group_title}</b></i>
+'''
+
+add_token_pair_select_template = '''
+<b> Select your Pair: </b>
+
+Run /chains to see a list of supported chains, Dex and pair.
+
+<i>Group: <b>{group_title}</b></i>
+'''
+
+add_token_confirmation_template = '''
+<b>Confirmation you setup</b>
+
+<i>Add token for: <b>{group_title}</b></i>
+
+Selected chain: <b>{chain}</b>
+Selected dex: <b>{dex}</b>
+Selected pair: <b>{pair}</b>
+token address: <b>{token_address}</b>
 '''
 
 biggest_buy_winners_template = '''
