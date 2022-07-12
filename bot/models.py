@@ -66,13 +66,8 @@ class TrackedToken(db.Model):
         'SupportedChain', secondary='token_chains', backref='tracked_token')
     group_id = db.Column(db.String(80), db.ForeignKey('group.group_id'))
 
-    def __init__(self, token_address, token_name, token_symbol, token_decimals, pair_address, chain, group_id):
+    def __init__(self, token_address, group_id):
         self.token_address = token_address
-        self.token_name = token_name
-        self.token_symbol = token_symbol
-        self.token_decimals = token_decimals
-        self.pair_address = pair_address
-        self.chain = chain
         self.group_id = group_id
 
     def __repr__(self):
