@@ -28,6 +28,7 @@ def help(update: Update, context: CallbackContext):
         update.message.reply_text(help_template,
                                   parse_mode=ParseMode.HTML)
 
+
 def add_tokens(update: Update, context: CallbackContext):
     chat_id = update.effective_chat.id
     message = update.message.text
@@ -124,11 +125,10 @@ def chains(update: Update, context: CallbackContext):
 # handlers for start commands
 dispatcher.add_handler(CommandHandler(
     "start", StartBot().start_added_bot_to_group, Filters.regex(ADD_BOT_TO_GROUP)))
-
 dispatcher.add_handler(CommandHandler(
     "start", StartBot().start_as_group_owner, pass_args=True, filters=Filters.regex("/start -(\d{3,})")))
-
 dispatcher.add_handler(CommandHandler("start", StartBot().start))
+
 # handlers for the commands
 dispatcher.add_handler(CommandHandler("help", help))
 dispatcher.add_handler(CommandHandler("add_token", add_tokens))
