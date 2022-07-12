@@ -43,6 +43,7 @@ class StartBot:
     def start_as_group_owner(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
         group_id = context.args[0]
+        group_title = context.bot.get_chat(group_id).title
 
         context.chat_data['group_id'] = group_id
 
@@ -50,7 +51,7 @@ class StartBot:
 
         if is_private_chat(update):
             if is_group_admin(update, context):
-                update.message.reply_text(text=start_template(self.bot_name),
+                update.message.reply_text(text=start_template(group_title),
                                           parse_mode=ParseMode.HTML)
             else:
                 update.message.reply_text(text="<i>❌ You are not an admin of this group.</>",
