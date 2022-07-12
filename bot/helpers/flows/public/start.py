@@ -1,4 +1,4 @@
-from telegram.ext import CallbackContext
+from telegram.ext import CallbackContext, Dispatcher, CommandHandler, Filters
 from telegram.utils import helpers
 from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from services.bot_service import BotService
@@ -50,11 +50,18 @@ class StartBot:
 
         if is_private_chat(update):
             if is_group_admin(update, context):
-                update.message.reply_text(text=start_template,
+                update.message.reply_text(text=start_template(self.bot_name),
                                           parse_mode=ParseMode.HTML)
             else:
                 update.message.reply_text(text="<i>❌ You are not an admin of this group.</>",
-                                        parse_mode=ParseMode.HTML)
+                                          parse_mode=ParseMode.HTML)
+
+    def call_start_handlers(self, dispatcher: Dispatcher):
+        dispatcher.add_handler(CommandHandler(
+            "start", self.start_added_bot_to_group, Filters.regex(ADD_BOT_TO_GROUP)))
+        dispatcher.add_handler(CommandHandler(
+            "start", self.start_as_group_owner, pass_args=True, filters=Filters.regex("/start -(\d{3,})")))
+        dispatcher.add_handler(CommandHandler("start", self.start))
 
     def __response_for_group(self, update: Update):
         url = helpers.create_deep_linked_url(
