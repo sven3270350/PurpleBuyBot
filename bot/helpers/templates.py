@@ -54,17 +54,17 @@ For Raffle contests, use /raffle_on and follow the prompt
 
 
 help_template = '''
-Follow these simple steps to get started:
+<i>Make sure you start bot from your special group link</i>
 
 <b>Supported Commands:</b>
-1) /help - Show supported commands
-2) /add_token - Add the token to be monitored requires token address
-3) /remove_token - Remove monitored token
-4) /tracked_tokens - List tracked tokens
-5) /start_buy_contest - Initiate a biggest buy contest
-6) /raffle_on - Start raffle buy contest
-7) /subscribe - Subscribe to premium to remove ads
-8) /chains - Show a list of supported chains
+/help - Show supported commands
+/add_token - Add the token to be monitored requires token address
+/remove_token - Remove monitored token
+/tracked_tokens - List tracked tokens
+/start_buy_contest - Initiate a biggest buy contest
+/raffle_on - Start raffle buy contest
+/subscribe - Subscribe to premium to remove ads
+/chains - Show a list of supported chains
 
 <b>Adding a token:</b>
 Use command /add_token [token_address] or just /add_token then follow the prompt to complete
