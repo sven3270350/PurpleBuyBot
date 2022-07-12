@@ -3,7 +3,7 @@ from telegram.utils import helpers
 from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from services.bot_service import BotService
 from helpers.utils import is_private_chat, is_group_admin
-from helpers.templates import start_template, start_template_private, start_added_to_group
+from helpers.templates import start_template, start_template_private, start_added_to_group, not_group_admin_template
 from constants import ADD_BOT_TO_GROUP
 
 
@@ -52,7 +52,7 @@ class StartBot:
                 update.message.reply_text(text=start_template(group_title),
                                           parse_mode=ParseMode.HTML)
             else:
-                update.message.reply_text(text="<i>❌ You are not an admin of this group.</>",
+                update.message.reply_text(text=not_group_admin_template,
                                           parse_mode=ParseMode.HTML)
 
     def call_start_handlers(self, dispatcher: Dispatcher):
