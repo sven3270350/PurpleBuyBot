@@ -78,3 +78,23 @@ For Raffle contests, use /raffle_on and follow the prompt
 
 <i>Note: Only one contest (Buy or Raffle) can be active per period.</i>
 '''
+
+biggest_buy_winners_template = '''
+<b>🎉Biggest Buy Competition Started</b>
+
+🕓 Start 11:10:00 UTC
+⏳ Ends in 1 hours 16 min 34 sec
+⬇️ Minimum Buy 0.10 BNB
+
+🥇 0x46b0…1974 ➖ 1.2 BNB
+🥈 0xc351…4bf7 ➖ 0.75 BNB
+🥉 0x7171…4ee6 ➖ 0.7 BNB
+4️⃣ 0xdfd0…4815 ➖ 0.54 BNB
+5️⃣ 0x3fa6…d50a ➖ 0.5 BNB
+
+🎖 Biggest Buy 0x46b0…1974 ➖ 1.2 BNB
+
+——
+
+Buy Grimacecoin 🥰
+'''
