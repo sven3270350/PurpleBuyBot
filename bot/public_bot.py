@@ -1,8 +1,9 @@
+from helpers.flows.public.add_token import AddToken
+from helpers.flows.public.start import StartBot
 from helpers.bots_imports import *
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
-from helpers.flows.public.start import StartBot
-from models import db, TrackedToken
+from models import db, TrackedToken, SupportedChain, SupportedExchange, SupportedPairs
 from helpers.utils import extract_params, is_private_chat
 from services.bot_service import BotService
 from services.biggest_buy_service import BiggestBuyService
@@ -109,7 +110,8 @@ def subscribe(update: Update, context: CallbackContext):
 
 
 def chains(update: Update, context: CallbackContext):
-    supported_chains = BotService().get_supported_chains()
+    supported_chains: list[SupportedChain] = BotService(
+    ).get_supported_chains()
     message = '<b>Supported Chains:</b>\n\n'
 
     if len(supported_chains) == 0:
@@ -117,16 +119,29 @@ def chains(update: Update, context: CallbackContext):
     else:
         # loop through the supported chains and add them to the message with numbered list
         for chain in supported_chains:
-            message += f'{chain.chain_name}\n'
+            message += f'<b>{chain.chain_name}</b>\n'
+
+            dexes: list[SupportedExchange] = BotService(
+            ).get_supported_dexes(chain.id)
+            pairs: list[SupportedPairs] = BotService(
+            ).get_supported_pairs(chain.id)
+
+            message += "⮕ <i><b>Dex: </b>" + \
+                ("{}, " * len(dexes)).format(*
+                                            [dex.exchange_name for dex in dexes]) + "</i>\n"
+            message += "⮕ <i><b>Pair: </b>" + ("{}, " * len(pairs)).format(
+                *[pair.pair_name for pair in pairs]) + "</i>\n\n"
+
     update.message.reply_text(message, parse_mode=ParseMode.HTML)
 
 
 # call handlers for start commands
 StartBot().call_start_handlers(dispatcher)
+AddToken(dispatcher)
 
 # handlers for the commands
 dispatcher.add_handler(CommandHandler("help", help))
-dispatcher.add_handler(CommandHandler("add_token", add_tokens))
+# dispatcher.add_handler(CommandHandler("add_token", add_tokens))
 dispatcher.add_handler(CommandHandler("remove_tokens", remove_tokens))
 dispatcher.add_handler(CommandHandler("tracked_tokens", list_tracked_tokens))
 dispatcher.add_handler(CommandHandler("buy_contest", start_buy_contest))
