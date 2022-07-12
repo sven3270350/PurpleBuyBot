@@ -1,5 +1,6 @@
 from app import db
 
+
 class Group(db.Model):
     __tablename__ = 'group'
     id = db.Column(db.Integer, primary_key=True)
@@ -151,7 +152,30 @@ class SupportedChain(db.Model):
     __tablename__ = 'supported_chain'
     id = db.Column(db.Integer, primary_key=True)
     chain_name = db.Column(db.String(20))
-    chain_id = db.Column(db.String(20))
+    chain_id = db.Column(db.Integer, unique=True, nullable=False)
+    exchanges = db.relationship(
+        'SupportedExchange', backref='supported_chain')
+    pairs = db.relationship(
+        'SupportedPairs', backref='supported_chain')
+
+
+class SupportedExchange(db.Model):
+    __tablename__ = 'supported_exchange'
+    id = db.Column(db.Integer, primary_key=True)
+    exchange_name = db.Column(db.String(20))
+    router_address = db.Column(db.String(100), unique=True, nullable=False)
+    chain_id = db.Column(
+        db.Integer, db.ForeignKey('supported_chain.id'))
+
+
+class SupportedPairs(db.Model):
+    __tablename__ = 'supported_pairs'
+    id = db.Column(db.Integer, primary_key=True)
+    pair_name = db.Column(db.String(20))
+    pair_address = db.Column(db.String(100), unique=True, nullable=False)
+    chain_id = db.Column(
+        db.Integer, db.ForeignKey('supported_chain.id'))
+
 
 
 class Admin(db.Model):
