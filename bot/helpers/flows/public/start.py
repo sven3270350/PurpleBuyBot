@@ -47,8 +47,6 @@ class StartBot:
 
         context.chat_data['group_id'] = group_id
 
-        print(f"Chat data: {context.chat_data.get('group_id', None)}")
-
         if is_private_chat(update):
             if is_group_admin(update, context):
                 update.message.reply_text(text=start_template(group_title),
