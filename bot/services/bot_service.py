@@ -1,6 +1,6 @@
 from xmlrpc.client import Boolean
 from services.web3_service import Web3Service
-from models import db, Group, Wallet, SupportedChain, TrackedToken
+from models import db, Group, Wallet, SupportedChain, TrackedToken, SupportedExchange, SupportedPairs
 from telegram.ext import CallbackContext
 
 
@@ -34,6 +34,14 @@ class BotService:
     def get_supported_chains(self):
         chains = SupportedChain.query.all()
         return chains
+
+    def get_supported_dexes(self, chain_index):
+        dex = SupportedExchange.query.filter_by(chain_id=chain_index).all()
+        return dex
+
+    def get_supported_pairs(self, chain_index):
+        pairs = SupportedPairs.query.filter_by(chain_id=chain_index).all()
+        return pairs
 
     def get_tracked_tokens(self, group_id):
         tokens = TrackedToken.query.filter_by(group_id=str(group_id)).all()
