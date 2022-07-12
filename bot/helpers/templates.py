@@ -23,11 +23,11 @@ Follow these simple steps
 '''
 
 
-def start_template(bot_name): return f'''
+def start_template(group_title): return f'''
 
 Follow these simple steps to get started:
 
-<i>Group: @{bot_name}</i>
+<i>Group: <b>{group_title}</b></i>
 
 <b>Supported Commands:</b>
 /help - Show supported commands
