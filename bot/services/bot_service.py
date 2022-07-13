@@ -31,17 +31,30 @@ class BotService:
                   for admin in context.bot.get_chat_administrators(chat_id)]
         return user_id in admins
 
-    def get_supported_chains(self):
-        chains = SupportedChain.query.all()
-        return chains
+    def get_supported_chains(self, chain_id=None):
+
+        if chain_id is None:
+            chains = SupportedChain.query.all()
+            return chains
+        else:
+            chains = SupportedChain.query.filter_by(chain_id=chain_id).first()
+            return chains
 
     def get_supported_dexes(self, chain_index):
         dex = SupportedExchange.query.filter_by(chain_id=chain_index).all()
         return dex
 
+    def get_supported_dex_by_id(self, dex_id):
+        dex = SupportedExchange.query.filter_by(id=dex_id).first()
+        return dex
+
     def get_supported_pairs(self, chain_index):
         pairs = SupportedPairs.query.filter_by(chain_id=chain_index).all()
         return pairs
+
+    def get_supported_pair_by_id(self, pair_id):
+        pair = SupportedPairs.query.filter_by(id=pair_id).first()
+        return pair
 
     def get_tracked_tokens(self, group_id):
         tokens = TrackedToken.query.filter_by(group_id=str(group_id)).all()
