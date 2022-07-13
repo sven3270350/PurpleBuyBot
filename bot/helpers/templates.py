@@ -29,16 +29,6 @@ Follow these simple steps to get started:
 
 <i>Group: <b>{group_title}</b></i>
 
-<b>Supported Commands:</b>
-/help - Show supported commands
-/add_token - Add the token to be monitored requires token address
-/remove_token - Remove monitored token
-/tracked_tokens - List tracked tokens
-/start_buy_contest - Initiate a biggest buy contest
-/raffle_on - Start raffle buy contest
-/subscribe - Subscribe to premium to remove ads
-/chains - Show a list of supported chains
-
 <b>Adding a token:</b>
 Use command /add_token then follow the prompt to complete
 
@@ -109,7 +99,7 @@ Run /chains to see a list of supported chains, Dex and pair.
 '''
 
 add_token_confirmation_template = '''
-<b>Confirmation you setup</b>
+<b>Confirm your setup</b>
 
 <i>Add token for: <b>{group_title}</b></i>
 
@@ -117,6 +107,8 @@ Selected chain: <b>{chain}</b>
 Selected dex: <b>{dex}</b>
 Selected pair: <b>{pair}</b>
 token address: <b>{token_address}</b>
+
+use /cancel to restart
 '''
 
 biggest_buy_winners_template = '''
