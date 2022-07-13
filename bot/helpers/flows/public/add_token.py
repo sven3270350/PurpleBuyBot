@@ -3,7 +3,8 @@ from eth_utils import is_address
 from telegram.ext import CallbackContext, Dispatcher, CommandHandler, ConversationHandler, MessageHandler, CallbackQueryHandler, Filters
 from telegram.utils import helpers
 from telegram import ForceReply, Update, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
-from models import SupportedChain, SupportedExchange, SupportedPairs
+from services.web3_service import Web3Service
+from models import db, SupportedChain, SupportedExchange, SupportedPairs, TrackedToken
 from services.bot_service import BotService
 from helpers.utils import is_private_chat, is_group_admin
 from helpers.templates import add_token_confirmation_template,  not_group_admin_template, add_token_chain_select_template, add_token_dex_select_template, add_token_pair_select_template
@@ -69,11 +70,18 @@ class AddToken:
                 chain: SupportedChain = BotService().get_supported_chains(chain_id)
                 supported_dexes: list[SupportedExchange] = chain.exchanges
 
+                if (BotService().is_token_set_for_chain(chat_data.get('group_id', None), chain_id)):
+                    update.callback_query.message.reply_text(
+                        text="❌ Token already set for this chain. Remove the token first")
+                    return ConversationHandler.END
+
                 context.chat_data['chain'] = chain
 
                 if len(supported_dexes) == 0:
-                    update.callback_query.answer(text="<i> ❌ No supported DEXes found. </i>",
-                                                 parse_mode=ParseMode.HTML)
+                    context.bot.edit_message_reply_markup(
+                        chain_id=self.chatid, message_id=message_id)
+                    update.callback_query.message.reply_text(text="<i> ❌ No supported DEXes found. </i>",
+                                                             parse_mode=ParseMode.HTML)
                     return ConversationHandler.END
                 else:
                     buttons = [[InlineKeyboardButton(
@@ -168,14 +176,29 @@ class AddToken:
         if token_address and is_address(token_address):
             context.chat_data['token_address'] = token_address
 
-            button = [[InlineKeyboardButton(
-                text='Proceed', callback_data="confirm")]]
+            try:
+                token_name, symbol, decimal, pair_address = Web3Service(
+                ).get_token_info(token_address, pair.pair_address, dex.factory_address, chain.chain_id)
 
-            update.message.reply_text(text=add_token_confirmation_template.format(
-                group_title=group_title, chain=chain.chain_name, dex=dex.exchange_name, pair=pair.pair_name, token_address=token_address
-            ),
-                parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(button))
-            return CONFIRM
+                chat_data['token_details'] = {
+                    'token_name': token_name,
+                    'symbol': symbol,
+                    'decimal': decimal,
+                    'pair_address': pair_address
+                }
+
+                button = [[InlineKeyboardButton(
+                    text='Proceed', callback_data="confirm")]]
+
+                update.message.reply_text(text=add_token_confirmation_template.format(
+                    group_title=group_title, chain=chain.chain_name, dex=dex.exchange_name, pair=f'{symbol}/{pair.pair_name}', token_address=token_name
+                ),
+                    parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(button))
+                return CONFIRM
+            except Exception as e:
+                update.message.reply_text(text=f"<i> ❌ <b>{token_address}</b> is not a valid token. Enter a valid token address </i>",
+                                          parse_mode=ParseMode.HTML)
+                return CONFIRM
         else:
             update.message.reply_text(text="<i>❌ Invalid token address. Enter a valid address </i>",
                                       parse_mode=ParseMode.HTML)
@@ -187,14 +210,37 @@ class AddToken:
 
         print(chat_data)
 
-        # save the token to db
+        try:
+            # save the token to db
+            tracked_tokens = TrackedToken(
+                token_address=chat_data['token_address'],
+                token_name=chat_data['token_details']['token_name'],
+                token_symbol=chat_data['token_details']['symbol'],
+                token_decimals=chat_data['token_details']['decimal'],
+                pair_address=chat_data['token_details']['pair_address'],
+                group_id=chat_data['group_id'],
+                chain=[chat_data['chain']]
+            )
 
-        # send confirmation
+            db.session.add(tracked_tokens)
+            db.session.commit()
 
-        return ConversationHandler.END
+            del context.chat_data
+            context.chat_data['group_id'] = chat_data['group_id']
+
+            print(context.chat_data)
+
+            context.bot.send_message(chat_id=self.chatid, text=f"<i>✅ Token <b>{chat_data['token_details']['token_name']}</b> added successfully </i>",
+                                     parse_mode=ParseMode.HTML)
+            return ConversationHandler.END
+        except Exception as e:
+            print(e)
+            context.bot.send_message(chat_id=self.chatid, text=f"<i> ❌ Error adding token, Try again later.</i>",
+                                     parse_mode=ParseMode.HTML)
+            return ConversationHandler.END
 
     def __cancel_add_token(self, update: Update, context: CallbackContext) -> int:
-        update.message.reply_text(text="<i>❌ Cancelled. </i>                                   ",
+        update.message.reply_text(text="<i>❌ Add Token Cancelled. </i>",
                                   parse_mode=ParseMode.HTML)
         return ConversationHandler.END
 
