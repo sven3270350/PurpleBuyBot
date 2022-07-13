@@ -82,3 +82,31 @@ class Web3Service:
             # get pair address
             pair_address = token.pair_address
             pass
+
+    # given token1 address, token2 address, and chain return the token1 name, token1 symbol, token1 decimal and pair address
+
+    def get_token_info(self, token1_address, pair_token1, factory_address, chain):
+        provider = AppConfigs().get_provider(chain)
+        web3 = Web3(Web3.HTTPProvider(provider))
+
+        token0 = Web3.toChecksumAddress(token1_address)
+        token1 = Web3.toChecksumAddress(pair_token1)
+        factory_add = Web3.toChecksumAddress(factory_address)
+
+        # get token1 name, symbol, decimal
+        token = web3.eth.contract(
+            address=token1_address, abi=AppConfigs().get_erc20_abi()
+        )
+
+        token1_name = token.functions.name().call()
+        token1_symbol = token.functions.symbol().call()
+        token1_decimal = token.functions.decimals().call()
+
+       # get pair address
+        factory = web3.eth.contract(
+            address=factory_add, abi=AppConfigs().get_factory_abi()
+        )
+
+        pair_address = factory.functions.getPair(token0, token1).call()
+
+        return token1_name, token1_symbol, token1_decimal, pair_address
