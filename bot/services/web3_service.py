@@ -95,7 +95,7 @@ class Web3Service:
 
         # get token1 name, symbol, decimal
         token = web3.eth.contract(
-            address=token1_address, abi=AppConfigs().get_erc20_abi()
+            address=token0, abi=AppConfigs().get_erc20_abi()
         )
 
         token1_name = token.functions.name().call()
