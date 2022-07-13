@@ -1,4 +1,4 @@
-from app import db
+from bot.app import db
 
 
 class Group(db.Model):
@@ -164,6 +164,7 @@ class SupportedExchange(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     exchange_name = db.Column(db.String(20))
     router_address = db.Column(db.String(100), unique=True, nullable=False)
+    factory_address = db.Column(db.String(100), unique=True, nullable=False)
     chain_id = db.Column(
         db.Integer, db.ForeignKey('supported_chain.id'))
 
@@ -175,7 +176,6 @@ class SupportedPairs(db.Model):
     pair_address = db.Column(db.String(100), unique=True, nullable=False)
     chain_id = db.Column(
         db.Integer, db.ForeignKey('supported_chain.id'))
-
 
 
 class Admin(db.Model):
