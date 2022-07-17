@@ -1,6 +1,7 @@
 from services.web3_service import Web3Service
-from models import db, Group, Wallet, SupportedChain, TrackedToken, SupportedExchange, SupportedPairs
+from models import db, Group, Wallet, SupportedChain, TrackedToken, SupportedExchange, SupportedPairs, token_chains, token_pairs, token_dexs
 from telegram.ext import CallbackContext
+from telegram import Update, ParseMode
 
 
 class BotService:
@@ -66,3 +67,40 @@ class BotService:
             return True
         else:
             return False
+
+    def get_tracked_tokens_by_group_id(self, group_id):
+        stmt = f'''
+        SELECT
+        tk.group_id,  tk.token_name, tk.token_address,
+        tk.token_symbol,
+        CONCAT(tk.token_symbol, '/', sp.pair_name ) as pair_symbol,
+        sc.chain_name, sc.chain_id,
+        sp.pair_name, sp.pair_address,
+        se.exchange_name, se.router_address
+        FROM public.tracked_token tk
+        JOIN public.token_chains tc
+        ON tk.id = tc.token_id
+        JOIN public.supported_chain sc
+        ON sc.id = tc.chain_id
+        JOIN public.token_pairs tp
+        ON tk.id = tp.token_id
+        JOIN public.supported_pairs sp
+        ON sp.id = tp.pair_id
+        JOIN public.token_dexs td
+        ON tk.id = td.token_id
+        JOIN public.supported_exchange se
+        ON se.id = td.exchange_id
+        WHERE tk.group_id = '{group_id}';
+        '''
+        return list(db.engine.execute(stmt))
+
+    def is_group_in_focus(self, update: Update, context: CallbackContext):
+        group_id = context.chat_data.get('group_id', None)
+
+        if group_id is None:
+            update.message.reply_text(
+                text="<i> ❌ No group in focus; use group link first. </i>",
+                parse_mode=ParseMode.HTML)
+            return False
+
+        return True
