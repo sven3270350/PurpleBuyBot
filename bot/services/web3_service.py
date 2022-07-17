@@ -110,10 +110,13 @@ class Web3Service:
         pair_address = factory.functions.getPair(token0, token1).call()
 
         # get reserves and check if token0 is greater than 0
-        pair = web3.eth.contract(
-            address=pair_address, abi=AppConfigs().get_pair_abi()
-        )
-
-        (token0_reserve, token1_reserve) = pair.functions.getReserves().call()
-
-        return token1_name, token1_symbol, token1_decimal, pair_address, int(token0_reserve) > 0
+        try:
+            pair = web3.eth.contract(
+                address=pair_address, abi=AppConfigs().get_pair_abi()
+            )
+            (token0_reserve, token1_reserve,
+             _blockTimestampLast) = pair.functions.getReserves().call()
+            return token1_name, token1_symbol, token1_decimal, pair_address, int(token0_reserve) > 0
+        except Exception as e:
+            print(e)
+            return token1_name, token1_symbol, token1_decimal, pair_address, False
