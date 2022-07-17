@@ -1,3 +1,5 @@
+from functools import wraps
+from telegram import (ChatAction)
 from telegram import Update
 from telegram.ext import CallbackContext
 import json
@@ -35,6 +37,18 @@ def is_private_chat(update: Update):
     Checks if the chat is a private chat.
     """
     return update.effective_chat.type == 'private'
+
+
+def send_typing_action(func):
+    """Sends typing action while processing func command."""
+
+    @wraps(func)
+    def command_func(self, update, context, *args, **kwargs):
+        context.bot.send_chat_action(
+            chat_id=update.effective_message.chat_id, action=ChatAction.TYPING)
+        return func(self, update, context,  *args, **kwargs)
+
+    return command_func
 
 
 # def is_valid_token_address(token_address, chain_id):
