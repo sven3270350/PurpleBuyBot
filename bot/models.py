@@ -1,4 +1,6 @@
 from bot.app import db
+from sqlalchemy_utils import create_view
+from sqlalchemy import Column, select
 
 
 class Group(db.Model):
@@ -65,11 +67,11 @@ class TrackedToken(db.Model):
     pair_address = db.Column(db.String(100))
     chain = db.relationship(
         'SupportedChain', secondary='token_chains', backref='tracked_token')
+    pair = db.relationship(
+        'SupportedPairs', secondary='token_chains', backref='tracked_token')
+    dex = db.relationship(
+        'SupportedExchange', secondary='token_chains', backref='tracked_token')
     group_id = db.Column(db.String(80), db.ForeignKey('group.group_id'))
-
-    def __init__(self, token_address, group_id):
-        self.token_address = token_address
-        self.group_id = group_id
 
     def __repr__(self):
         return '<TrackedToken %r>' % self.token_name
@@ -166,7 +168,7 @@ class SupportedExchange(db.Model):
     router_address = db.Column(db.String(100), unique=True, nullable=False)
     factory_address = db.Column(db.String(100), unique=True, nullable=False)
     chain_id = db.Column(
-        db.Integer, db.ForeignKey('supported_chain.id'))
+        db.Integer, db.ForeignKey('supported_chain.chain_id'))
 
 
 class SupportedPairs(db.Model):
@@ -175,7 +177,7 @@ class SupportedPairs(db.Model):
     pair_name = db.Column(db.String(20))
     pair_address = db.Column(db.String(100), unique=True, nullable=False)
     chain_id = db.Column(
-        db.Integer, db.ForeignKey('supported_chain.id'))
+        db.Integer, db.ForeignKey('supported_chain.chain_id'))
 
 
 class Admin(db.Model):
@@ -254,10 +256,25 @@ class RaffleTransaction(db.Model):
         return '<RaffleTransaction %r>' % f"{self.group_id}_{self.raffle_campaign_id}_{self.id}"
 
 
+#  Association tables
 token_chains = db.Table('token_chains',
                         db.metadata,
                         db.Column('token_id', db.Integer,
                                   db.ForeignKey('tracked_token.id')),
                         db.Column('chain_id', db.Integer,
-                                  db.ForeignKey('supported_chain.id'))
+                                  db.ForeignKey('supported_chain.id')),
+                        db.Column('pair_id', db.Integer,
+                                  db.ForeignKey('supported_pairs.id')),
+                        db.Column('exchange_id', db.Integer,
+                                  db.ForeignKey('supported_exchange.id'))
                         )
+
+
+# views
+
+# tacked token view
+# tracked_token_view_statement = select(
+#     [TrackedToken.id.label('tracked_token_id'), TrackedToken.token_name, TrackedToken.token_address, TrackedToken.token_symbol, TrackedToken.group_id, SupportedChain.chain_name]).select_from(
+#         SupportedChain.__tablename__.outerjoin(
+#             TrackedToken, SupportedChain.chain_id == TrackedToken.chain.chain_id)
+# )
