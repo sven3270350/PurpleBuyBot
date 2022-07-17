@@ -1,4 +1,4 @@
-from bot.app import db
+from app import db
 from sqlalchemy_utils import create_view
 from sqlalchemy import Column, select
 
@@ -265,6 +265,7 @@ token_chains = db.Table('token_chains',
                                   db.ForeignKey('supported_chain.id'))
                         )
 
+
 token_dexs = db.Table('token_dexs',
                       db.metadata,
                       db.Column('token_id', db.Integer,
@@ -273,19 +274,12 @@ token_dexs = db.Table('token_dexs',
                                 db.ForeignKey('supported_exchange.id'))
                       )
 
+
 token_pairs = db.Table('token_pairs',
-                      db.metadata,
-                      db.Column('token_id', db.Integer,
-                                db.ForeignKey('tracked_token.id')),
-                      db.Column('pair_id', db.Integer,
-                                db.ForeignKey('supported_pairs.id')),
-                      )
+                       db.metadata,
+                       db.Column('token_id', db.Integer,
+                                 db.ForeignKey('tracked_token.id')),
+                       db.Column('pair_id', db.Integer,
+                                 db.ForeignKey('supported_pairs.id')),
+                       )
 
-# views
-
-# tacked token view
-# tracked_token_view_statement = select(
-#     [TrackedToken.id.label('tracked_token_id'), TrackedToken.token_name, TrackedToken.token_address, TrackedToken.token_symbol, TrackedToken.group_id, SupportedChain.chain_name]).select_from(
-#         SupportedChain.__tablename__.outerjoin(
-#             TrackedToken, SupportedChain.chain_id == TrackedToken.chain.chain_id)
-# )
