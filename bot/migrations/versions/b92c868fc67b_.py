@@ -1,8 +1,8 @@
-"""initial
+"""empty message
 
-Revision ID: ffffc9461c26
+Revision ID: b92c868fc67b
 Revises: 
-Create Date: 2022-07-06 02:30:14.458774
+Create Date: 2022-07-17 18:30:56.167463
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ffffc9461c26'
+revision = 'b92c868fc67b'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -27,8 +27,8 @@ def upgrade():
     op.create_table('group',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('group_id', sa.String(length=80), nullable=True),
-    sa.Column('group_title', sa.String(length=120), nullable=True),
-    sa.Column('username', sa.String(length=120), nullable=True),
+    sa.Column('group_title', sa.Text(), nullable=True),
+    sa.Column('username', sa.Text(), nullable=True),
     sa.Column('sign_up_date', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('group_id')
@@ -36,8 +36,9 @@ def upgrade():
     op.create_table('supported_chain',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('chain_name', sa.String(length=20), nullable=True),
-    sa.Column('chain_id', sa.String(length=20), nullable=True),
-    sa.PrimaryKeyConstraint('id')
+    sa.Column('chain_id', sa.Integer(), nullable=False),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('chain_id')
     )
     op.create_table('active_competition',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -72,6 +73,26 @@ def upgrade():
     sa.Column('prize', sa.String(length=30), nullable=True),
     sa.ForeignKeyConstraint(['group_id'], ['group.group_id'], ),
     sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('supported_exchange',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('exchange_name', sa.String(length=20), nullable=True),
+    sa.Column('router_address', sa.String(length=100), nullable=False),
+    sa.Column('factory_address', sa.String(length=100), nullable=False),
+    sa.Column('chain_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['chain_id'], ['supported_chain.chain_id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('factory_address'),
+    sa.UniqueConstraint('router_address')
+    )
+    op.create_table('supported_pairs',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('pair_name', sa.String(length=20), nullable=True),
+    sa.Column('pair_address', sa.String(length=100), nullable=False),
+    sa.Column('chain_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['chain_id'], ['supported_chain.chain_id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('pair_address')
     )
     op.create_table('tracked_token',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -133,7 +154,11 @@ def upgrade():
     op.create_table('token_chains',
     sa.Column('token_id', sa.Integer(), nullable=True),
     sa.Column('chain_id', sa.Integer(), nullable=True),
+    sa.Column('pair_id', sa.Integer(), nullable=True),
+    sa.Column('exchange_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['chain_id'], ['supported_chain.id'], ),
+    sa.ForeignKeyConstraint(['exchange_id'], ['supported_exchange.id'], ),
+    sa.ForeignKeyConstraint(['pair_id'], ['supported_pairs.id'], ),
     sa.ForeignKeyConstraint(['token_id'], ['tracked_token.id'], )
     )
     # ### end Alembic commands ###
@@ -147,6 +172,8 @@ def downgrade():
     op.drop_table('biggest_buy_transaction')
     op.drop_table('wallet')
     op.drop_table('tracked_token')
+    op.drop_table('supported_pairs')
+    op.drop_table('supported_exchange')
     op.drop_table('raffle_campaign')
     op.drop_table('biggest_buy_campaign')
     op.drop_table('active_competition')
