@@ -1,9 +1,23 @@
 import configparser
 import os
+import json
 from pathlib import Path
 
 PATH_TO_APP_CFG = os.path.join(os.path.dirname(
     Path(__file__).parent.parent), 'app.cfg')
+
+PATH_TO_ERC_20_ABI = os.path.join(os.path.dirname(
+    Path(__file__)), "erc20abi.json"
+)
+
+PATH_TO_FACTORY_ABI = os.path.join(os.path.dirname(
+    Path(__file__)), "factoryAbi.json"
+)
+
+PATH_TO_PAIR_ABI = os.path.join(os.path.dirname(
+    Path(__file__)), "pairAbi.json"
+)
+
 
 class AppConfigs:
     def __init__(self):
@@ -38,6 +52,18 @@ class AppConfigs:
             338: "CROTestnet",
         }
         return chain_name[chain_id]
+
+    def get_erc20_abi(self):
+        with open(PATH_TO_ERC_20_ABI) as AbiData:
+            return json.dumps(json.loads(AbiData.read()))
+
+    def get_factory_abi(self):
+        with open(PATH_TO_FACTORY_ABI) as AbiData:
+            return json.dumps(json.loads(AbiData.read()))
+
+    def get_pair_abi(self):
+        with open(PATH_TO_PAIR_ABI) as AbiData:
+            return json.dumps(json.loads(AbiData.read()))
 
     def get_provider(self, chain_id):
         chain_id = int(chain_id)
