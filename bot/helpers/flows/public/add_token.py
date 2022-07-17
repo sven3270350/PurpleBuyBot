@@ -25,6 +25,8 @@ class AddToken:
             update.message.reply_text(
                 text="<i> ❌ No group in focus; use group link first. </i>",
                 parse_mode=ParseMode.HTML)
+            
+            self.__reset_chat_data(context)
             return ConversationHandler.END
 
         context.chat_data['group_title'] = context.bot.get_chat(group_id).title
@@ -40,6 +42,8 @@ class AddToken:
                     update.message.reply_text(
                         text="<i> ❌ No supported chains found. </i>",
                         parse_mode=ParseMode.HTML)
+                    
+                    self.__reset_chat_data(context)
                     return ConversationHandler.END
                 else:
                     buttons = [[InlineKeyboardButton(
@@ -73,6 +77,8 @@ class AddToken:
                 if (BotService().is_token_set_for_chain(chat_data.get('group_id', None), chain_id)):
                     update.callback_query.message.reply_text(
                         text="❌ Token already set for this chain. Remove the token first")
+                    
+                    self.__reset_chat_data(context)
                     return ConversationHandler.END
 
                 context.chat_data['chain'] = chain
@@ -82,6 +88,8 @@ class AddToken:
                         chain_id=self.chatid, message_id=message_id)
                     update.callback_query.message.reply_text(text="<i> ❌ No supported DEXes found. </i>",
                                                              parse_mode=ParseMode.HTML)
+                    
+                    self.__reset_chat_data(context)
                     return ConversationHandler.END
                 else:
                     buttons = [[InlineKeyboardButton(
@@ -177,8 +185,14 @@ class AddToken:
             context.chat_data['token_address'] = token_address
 
             try:
-                token_name, symbol, decimal, pair_address = Web3Service(
+                token_name, symbol, decimal, pair_address, is_valid_pair = Web3Service(
                 ).get_token_info(token_address, pair.pair_address, dex.factory_address, chain.chain_id)
+
+                if not is_valid_pair:
+                    update.message.reply_text(text="<i> ❌ The pair selected has no liquidity. </i>",
+                                              parse_mode=ParseMode.HTML)
+                    
+                    return PAIR
 
                 chat_data['token_details'] = {
                     'token_name': token_name,
@@ -219,7 +233,9 @@ class AddToken:
                 token_decimals=chat_data['token_details']['decimal'],
                 pair_address=chat_data['token_details']['pair_address'],
                 group_id=chat_data['group_id'],
-                chain=[chat_data['chain']]
+                chain=[chat_data['chain']],
+                pair=[chat_data['pair']],
+                dex=[chat_data['dex']]
             )
 
             db.session.add(tracked_tokens)
@@ -232,16 +248,22 @@ class AddToken:
 
             context.bot.send_message(chat_id=self.chatid, text=f"<i>✅ Token <b>{chat_data['token_details']['token_name']}</b> added successfully </i>",
                                      parse_mode=ParseMode.HTML)
+            
+            self.__reset_chat_data(context)
             return ConversationHandler.END
         except Exception as e:
             print(e)
             context.bot.send_message(chat_id=self.chatid, text=f"<i> ❌ Error adding token, Try again later.</i>",
                                      parse_mode=ParseMode.HTML)
+
+            self.__reset_chat_data(context)
             return ConversationHandler.END
 
     def __cancel_add_token(self, update: Update, context: CallbackContext) -> int:
         update.message.reply_text(text="<i>❌ Add Token Cancelled. </i>",
                                   parse_mode=ParseMode.HTML)
+
+        self.__reset_chat_data(context)
         return ConversationHandler.END
 
     def __add_handlers(self):
@@ -282,6 +304,11 @@ class AddToken:
 
             )
         )
+
+    def __reset_chat_data(self, context: CallbackContext):
+        group_id = context.chat_data.get('group_id', None)
+        context.chat_data.clear()
+        context.chat_data['group_id'] = group_id
 
     def __extract_params(self, update: Update, context: CallbackContext):
         self.chattype = update.effective_chat.type
