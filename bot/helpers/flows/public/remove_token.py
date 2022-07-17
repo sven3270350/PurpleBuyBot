@@ -1,9 +1,3 @@
-# TODO: /remove_tokens -> Steps
-# 1. List all tracked tokens
-# 2. Allow user to select token to delete
-# 3. Show confirmation message
-# 4. Delete from DB
-
 from telegram.ext import CallbackContext
 from telegram.utils import helpers
 from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
