@@ -1,4 +1,3 @@
-from xmlrpc.client import Boolean
 from services.web3_service import Web3Service
 from models import db, Group, Wallet, SupportedChain, TrackedToken, SupportedExchange, SupportedPairs
 from telegram.ext import CallbackContext
@@ -6,7 +5,7 @@ from telegram.ext import CallbackContext
 
 class BotService:
 
-    def create_new_bot_user(self, chat_id, chat_title, username) -> Boolean:
+    def create_new_bot_user(self, chat_id, chat_title, username) -> bool:
 
         try:
             group_instance = Group(chat_id, chat_title, username)
@@ -60,11 +59,10 @@ class BotService:
         tokens = TrackedToken.query.filter_by(group_id=str(group_id)).all()
         return tokens
 
-    def add_token_for_group(self, group_id, token_address):
-
-        # get token symbol, decimal and name from the token address
-        # save the token to the database
-
-        # get pair address from the token address
-        # reply with round pair address
-        pass
+    def is_token_set_for_chain(self, group_id, chain_id):
+        tokens = TrackedToken.query.filter(TrackedToken.group_id == str(
+            group_id), TrackedToken.chain.any(SupportedChain.chain_id == chain_id)).all()
+        if tokens:
+            return True
+        else:
+            return False
