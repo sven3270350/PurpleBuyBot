@@ -2,13 +2,14 @@ from telegram.ext import CallbackContext, Dispatcher, CommandHandler, Filters
 from telegram.utils import helpers
 from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from services.bot_service import BotService
-from helpers.utils import is_private_chat, is_group_admin
+from helpers.utils import is_private_chat, is_group_admin, send_typing_action
 from helpers.templates import start_template, start_template_private, start_added_to_group, not_group_admin_template
 from constants import ADD_BOT_TO_GROUP
 
 
 class StartBot:
 
+    @send_typing_action
     def start(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
 
@@ -24,6 +25,7 @@ class StartBot:
         else:
             self.__response_for_group(update)
 
+    @send_typing_action
     def start_added_bot_to_group(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
         if not is_private_chat(update):
@@ -40,6 +42,7 @@ class StartBot:
                     update.message.reply_text(text="<i>❌ Error creating new bot user. Try again later</>",
                                               parse_mode=ParseMode.HTML)
 
+    @send_typing_action
     def start_as_group_owner(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
         group_id = context.args[0]
@@ -49,6 +52,12 @@ class StartBot:
 
         if is_private_chat(update):
             if is_group_admin(update, context):
+
+                if not BotService().is_registered_group(group_id):
+                    update.message.reply_text(
+                        text='<i>❌ Group is not registered. Use /start to get started.</>', parse_mode=ParseMode.HTML)
+                    return
+
                 update.message.reply_text(text=start_template(group_title),
                                           parse_mode=ParseMode.HTML)
             else:
