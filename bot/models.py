@@ -68,9 +68,9 @@ class TrackedToken(db.Model):
     chain = db.relationship(
         'SupportedChain', secondary='token_chains', backref='tracked_token')
     pair = db.relationship(
-        'SupportedPairs', secondary='token_chains', backref='tracked_token')
+        'SupportedPairs', secondary='token_pairs', backref='tracked_token')
     dex = db.relationship(
-        'SupportedExchange', secondary='token_chains', backref='tracked_token')
+        'SupportedExchange', secondary='token_dexs', backref='tracked_token')
     group_id = db.Column(db.String(80), db.ForeignKey('group.group_id'))
 
     def __repr__(self):
@@ -262,13 +262,24 @@ token_chains = db.Table('token_chains',
                         db.Column('token_id', db.Integer,
                                   db.ForeignKey('tracked_token.id')),
                         db.Column('chain_id', db.Integer,
-                                  db.ForeignKey('supported_chain.id')),
-                        db.Column('pair_id', db.Integer,
-                                  db.ForeignKey('supported_pairs.id')),
-                        db.Column('exchange_id', db.Integer,
-                                  db.ForeignKey('supported_exchange.id'))
+                                  db.ForeignKey('supported_chain.id'))
                         )
 
+token_dexs = db.Table('token_dexs',
+                      db.metadata,
+                      db.Column('token_id', db.Integer,
+                                db.ForeignKey('tracked_token.id')),
+                      db.Column('exchange_id', db.Integer,
+                                db.ForeignKey('supported_exchange.id'))
+                      )
+
+token_pairs = db.Table('token_pairs',
+                      db.metadata,
+                      db.Column('token_id', db.Integer,
+                                db.ForeignKey('tracked_token.id')),
+                      db.Column('pair_id', db.Integer,
+                                db.ForeignKey('supported_pairs.id')),
+                      )
 
 # views
 
