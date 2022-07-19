@@ -29,7 +29,7 @@ class RemoveToken:
 
             if len(tracked_tokens) == 0:
                 message += '<i>You currently are not tracking any tokens.</i>\n'
-                message += '<i>Use the /add_tokens command to add tokens to your list.</i>'
+                message += '<i>Use the /add_token command to add tokens to your list.</i>'
 
             else:
                 # loop through the supported chains and add them to the message with numbered list
