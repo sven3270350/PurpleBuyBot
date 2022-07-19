@@ -111,6 +111,20 @@ token address: <b>{token_address}</b>
 use /cancel to restart
 '''
 
+remove_token_confirmation_template = '''
+<b>Confirm your setup</b>
+
+<i>Remove token for: <b>{group_title}</b></i>
+
+Selected token: <b>{token_name}</b>
+Token address: <b>{token_address}</b>
+Chain: <b>{chain_name}</b>
+
+Click Confirm to remove token
+
+use /cancel to restart
+'''
+
 biggest_buy_winners_template = '''
 <b>🎉Biggest Buy Competition Started</b>
 
