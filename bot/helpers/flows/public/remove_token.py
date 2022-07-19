@@ -2,10 +2,9 @@ from telegram.ext import CallbackContext, Dispatcher, ConversationHandler, Comma
 from telegram.utils import helpers
 from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from services.bot_service import BotService
-from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data
+from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin
 from helpers.templates import remove_token_confirmation_template
 from models import TrackedToken
-from helpers.flows.public.add_token import AddToken
 
 SELECT, CONFIRM, COMMIT = range(3)
 
@@ -58,7 +57,7 @@ class RemoveToken:
                 return ConversationHandler.END
 
             if not is_group_admin(update, context):
-                return AddToken().__not_group_admin(update, context)
+                return not_group_admin(update)
 
             # list tracked tokens
             tracked_tokens: list[TrackedToken] = BotService(
@@ -97,7 +96,7 @@ class RemoveToken:
         message_id = update.callback_query.message.message_id
 
         if not is_group_admin(update, context):
-            return AddToken().__not_group_admin(update, context)
+            return not_group_admin(update)
 
         update.callback_query.answer()
         query = update.callback_query.data
@@ -127,7 +126,7 @@ class RemoveToken:
         message_id = update.callback_query.message.message_id
 
         if not is_group_admin(update, context):
-            return AddToken().__not_group_admin(update, context)
+            return not_group_admin(update)
         # BotService().delete_tracked_token(token_id)
 
         update.callback_query.answer()
