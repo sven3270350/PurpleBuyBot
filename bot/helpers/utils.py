@@ -1,11 +1,12 @@
 from functools import wraps
 from telegram import (ChatAction)
-from telegram import Update
-from telegram.ext import CallbackContext
+from telegram import Update, ParseMode
+from telegram.ext import CallbackContext, ConversationHandler
 import json
 from web3 import HTTPProvider, Web3
 from services.bot_service import BotService
 from helpers.app_config import AppConfigs
+from helpers.templates import not_group_admin_template
 
 
 def erc20Abi():
@@ -51,18 +52,14 @@ def send_typing_action(func):
     return command_func
 
 
-# def is_valid_token_address(token_address, chain_id):
-#     """
-#     Checks if the address is valid token.
-#     """
-#     erc_20_abi = erc20Abi()
-#     try:
-#         web3 = Web3(HTTPProvider(
-#             AppConfigs().get_provider(chain_id)
-#         ))
-#         contract = web3.eth.contract(address=token_address, abi=erc_20_abi)
-#         return bool(contract.functions.name().call())
+def reset_chat_data(context: CallbackContext):
+    group_id = context.chat_data.get('group_id', None)
+    context.chat_data.clear()
+    context.chat_data['group_id'] = group_id
 
-#     except Exception as e:
-#         print(f"Error checking if token is valid: {e}")
-#         return False
+
+def not_group_admin(update: Update, context: CallbackContext):
+    update.message.reply_text(text=not_group_admin_template,
+                              parse_mode=ParseMode.HTML)
+    reset_chat_data(context)
+    return ConversationHandler.END
