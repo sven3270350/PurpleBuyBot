@@ -1,11 +1,11 @@
 from eth_utils import is_address
 from telegram.ext import CallbackContext, Dispatcher, CommandHandler, ConversationHandler, MessageHandler, CallbackQueryHandler, Filters
-from telegram import  Update, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from services.web3_service import Web3Service
 from models import db, SupportedChain, SupportedExchange, SupportedPairs, TrackedToken
 from services.bot_service import BotService
-from helpers.utils import is_private_chat, is_group_admin, send_typing_action
-from helpers.templates import add_token_confirmation_template,  not_group_admin_template, add_token_chain_select_template, add_token_dex_select_template
+from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin
+from helpers.templates import add_token_confirmation_template, add_token_chain_select_template, add_token_dex_select_template
 
 DEX, PAIR, ADDRESS, CONFIRM = range(4)
 
@@ -25,7 +25,7 @@ class AddToken:
 
         if is_private_chat(update):
             if not BotService().is_group_in_focus(update, context):
-                self.__reset_chat_data(context)
+                reset_chat_data(context)
                 return ConversationHandler.END
 
             if is_group_admin(update, context):
@@ -38,7 +38,7 @@ class AddToken:
                         text="<i> ❌ No supported chains found. </i>",
                         parse_mode=ParseMode.HTML)
 
-                    self.__reset_chat_data(context)
+                    reset_chat_data(context)
                     return ConversationHandler.END
                 else:
                     buttons = [[InlineKeyboardButton(
@@ -49,9 +49,11 @@ class AddToken:
                             group_title=chat_data.get('group_title', None)
                         ), reply_markup=InlineKeyboardMarkup(buttons), parse_mode=ParseMode.HTML)
             else:
-                return self.__not_group_admin(update, context)
+                return not_group_admin(update, context)
 
-        return DEX
+            return DEX
+
+        return ConversationHandler.END
 
     @send_typing_action
     def __select_dex(self, update: Update, context: CallbackContext) -> int:
@@ -72,7 +74,7 @@ class AddToken:
                 update.callback_query.message.reply_text(
                     text="❌ Token already set for this chain. Remove the token first")
 
-                self.__reset_chat_data(context)
+                reset_chat_data(context)
                 return ConversationHandler.END
 
             context.chat_data['chain'] = chain
@@ -83,7 +85,7 @@ class AddToken:
                 update.callback_query.message.reply_text(text="<i> ❌ No supported DEXes found. </i>",
                                                          parse_mode=ParseMode.HTML)
 
-                self.__reset_chat_data(context)
+                reset_chat_data(context)
                 return ConversationHandler.END
             else:
                 buttons = [[InlineKeyboardButton(
@@ -93,7 +95,7 @@ class AddToken:
                     group_title=chat_data.get('group_title', None)
                 ), chat_id=self.chatid, message_id=message_id, reply_markup=InlineKeyboardMarkup(buttons), parse_mode=ParseMode.HTML)
         else:
-            return self.__not_group_admin(update, context)
+            return not_group_admin(update, context)
 
         return PAIR
 
@@ -127,7 +129,7 @@ class AddToken:
                     group_title=chat_data.get('group_title', None)
                 ), chat_id=self.chatid, message_id=message_id, reply_markup=InlineKeyboardMarkup(buttons), parse_mode=ParseMode.HTML)
         else:
-            return self.__not_group_admin(update, context)
+            return not_group_admin(update, context)
 
         return ADDRESS
 
@@ -150,7 +152,7 @@ class AddToken:
 
             return CONFIRM
         else:
-            return self.__not_group_admin(update, context)
+            return not_group_admin(update, context)
 
     @send_typing_action
     def __enter_token_address(self, update: Update, context: CallbackContext) -> int:
@@ -161,7 +163,7 @@ class AddToken:
             context.bot.send_message(chat_id=self.chatid, text="<i>Enter token address: </i>",
                                      parse_mode=ParseMode.HTML)
         else:
-            return self.__not_group_admin(update, context)
+            return not_group_admin(update, context)
         return CONFIRM
 
     @send_typing_action
@@ -189,7 +191,7 @@ class AddToken:
                         update.message.reply_text(text="<i> ❌ The pair selected has no liquidity. </i>",
                                                   parse_mode=ParseMode.HTML)
 
-                        self.__reset_chat_data(context)
+                        reset_chat_data(context)
                         return ConversationHandler.END
 
                     chat_data['token_details'] = {
@@ -217,7 +219,7 @@ class AddToken:
                                           parse_mode=ParseMode.HTML)
                 return CONFIRM
         else:
-            return self.__not_group_admin(update, context)
+            return not_group_admin(update, context)
 
     @send_typing_action
     def __save_config(self, update: Update, context: CallbackContext) -> int:
@@ -246,24 +248,24 @@ class AddToken:
                 context.bot.send_message(chat_id=self.chatid, text=f"<i>✅ Token <b>{chat_data['token_details']['token_name']}</b> added successfully </i>",
                                          parse_mode=ParseMode.HTML)
 
-                self.__reset_chat_data(context)
+                reset_chat_data(context)
                 return ConversationHandler.END
             except Exception as e:
                 print(e)
                 context.bot.send_message(chat_id=self.chatid, text=f"<i> ❌ Error adding token, Try again later.</i>",
                                          parse_mode=ParseMode.HTML)
 
-                self.__reset_chat_data(context)
+                reset_chat_data(context)
                 return ConversationHandler.END
         else:
-            return self.__not_group_admin(update, context)
+            return not_group_admin(update, context)
 
     @send_typing_action
     def __cancel_add_token(self, update: Update, context: CallbackContext) -> int:
         update.message.reply_text(text="<i>❌ Add Token Cancelled. </i>",
                                   parse_mode=ParseMode.HTML)
 
-        self.__reset_chat_data(context)
+        reset_chat_data(context)
         return ConversationHandler.END
 
     def __add_handlers(self):
@@ -304,17 +306,6 @@ class AddToken:
 
             )
         )
-
-    def __reset_chat_data(self, context: CallbackContext):
-        group_id = context.chat_data.get('group_id', None)
-        context.chat_data.clear()
-        context.chat_data['group_id'] = group_id
-
-    def __not_group_admin(self, update: Update, context: CallbackContext):
-        update.message.reply_text(text=not_group_admin_template,
-                                  parse_mode=ParseMode.HTML)
-        self.__reset_chat_data(context)
-        return ConversationHandler.END
 
     def __extract_params(self, update: Update, context: CallbackContext):
         self.chattype = update.effective_chat.type
