@@ -48,6 +48,10 @@ class BotService:
         dex = SupportedExchange.query.filter_by(id=dex_id).first()
         return dex
 
+    def get_tracked_token_by_id(self, token_id):
+        token = TrackedToken.query.filter_by(id=token_id).first()
+        return token
+
     def get_supported_pairs(self, chain_index):
         pairs = SupportedPairs.query.filter_by(chain_id=chain_index).all()
         return pairs
@@ -93,6 +97,32 @@ class BotService:
         WHERE tk.group_id = '{group_id}';
         '''
         return list(db.engine.execute(stmt))
+
+    def get_tracked_tokens_for_removal(self, group_id):
+        stmt = f'''
+        SELECT
+        tk.id, tk.token_name,
+        sc.chain_name
+        FROM public.tracked_token tk
+        JOIN public.token_chains tc
+        ON tk.id = tc.token_id
+        JOIN public.supported_chain sc
+        ON sc.id = tc.chain_id
+        WHERE tk.group_id = '{group_id}';
+        '''
+
+        return list(db.engine.execute(stmt))
+
+    def delete_tracked_token(self, token_id):
+        try:
+            token = TrackedToken.query.filter_by(id=token_id).first()
+            token.chain = []
+            db.session.delete(token)
+            db.session.commit()
+            return True
+        except Exception as e:
+            print(f"Error deleting tracked token: {e}")
+            return False
 
     def is_group_in_focus(self, update: Update, context: CallbackContext):
         group_id = context.chat_data.get('group_id', None)
