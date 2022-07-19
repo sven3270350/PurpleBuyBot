@@ -9,6 +9,10 @@ from constants import ADD_BOT_TO_GROUP
 
 class StartBot:
 
+    def __init__(self, dispatcher: Dispatcher):
+        self.dispatcher = dispatcher
+        self.__add_handlers()
+
     @send_typing_action
     def start(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
@@ -64,7 +68,7 @@ class StartBot:
                 update.message.reply_text(text=not_group_admin_template,
                                           parse_mode=ParseMode.HTML)
 
-    def call_start_handlers(self, dispatcher: Dispatcher):
+    def __add_handlers(self, dispatcher: Dispatcher):
         dispatcher.add_handler(CommandHandler(
             "start", self.start_added_bot_to_group, Filters.regex(ADD_BOT_TO_GROUP)))
         dispatcher.add_handler(CommandHandler(
