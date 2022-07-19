@@ -68,12 +68,12 @@ class StartBot:
                 update.message.reply_text(text=not_group_admin_template,
                                           parse_mode=ParseMode.HTML)
 
-    def __add_handlers(self, dispatcher: Dispatcher):
-        dispatcher.add_handler(CommandHandler(
+    def __add_handlers(self):
+        self.dispatcher.add_handler(CommandHandler(
             "start", self.start_added_bot_to_group, Filters.regex(ADD_BOT_TO_GROUP)))
-        dispatcher.add_handler(CommandHandler(
+        self.dispatcher.add_handler(CommandHandler(
             "start", self.start_as_group_owner, pass_args=True, filters=Filters.regex("/start -(\d{3,})")))
-        dispatcher.add_handler(CommandHandler("start", self.start))
+        self.dispatcher.add_handler(CommandHandler("start", self.start))
 
     def __response_for_group(self, update: Update):
         url = helpers.create_deep_linked_url(
