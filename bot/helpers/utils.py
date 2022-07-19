@@ -42,11 +42,11 @@ def is_private_chat(update: Update):
 
 def send_typing_action(func):
     """Sends typing action while processing func command."""
-
     @wraps(func)
     def command_func(self, update, context, *args, **kwargs):
-        context.bot.send_chat_action(
-            chat_id=update.effective_message.chat_id, action=ChatAction.TYPING)
+        if is_private_chat(update):
+            context.bot.send_chat_action(
+                chat_id=update.effective_message.chat_id, action=ChatAction.TYPING)
         return func(self, update, context,  *args, **kwargs)
 
     return command_func
