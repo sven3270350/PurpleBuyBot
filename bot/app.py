@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from decouple import config
 
+# from bot.helpers.app_config import AppConfigs
 from helpers.app_config import AppConfigs
 
 uri = config('DATABASE_URL')

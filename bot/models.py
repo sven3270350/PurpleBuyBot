@@ -1,3 +1,4 @@
+# from bot.app import db
 from app import db
 from sqlalchemy_utils import create_view
 from sqlalchemy import Column, select
@@ -38,23 +39,51 @@ class Subscription(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     group_id = db.Column(db.String(80), db.ForeignKey('group.group_id'))
     wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'))
-    start_date = db.Column(db.DateTime, default=db.func.now())
-    end_date = db.Column(db.DateTime)
-    subscription_type = db.Column(db.String(80))
-    subscription_status = db.Column(db.String(80))
+    subscription_type_id = db.Column(
+        db.Integer, db.ForeignKey('subscription_type.id'))
+    payment_chain_id = db.Column(
+        db.Integer, db.ForeignKey('supported_chain.id'))
     tx_hash = db.Column(db.String(120), unique=True)
-
-    def __init__(self, group_id, wallet_id, start_date, end_date, subscription_type, subscription_status, tx_hash):
-        self.group_id = group_id
-        self.wallet_id = wallet_id
-        self.start_date = start_date
-        self.end_date = end_date
-        self.subscription_type = subscription_type
-        self.subscription_status = subscription_status
-        self.tx_hash = tx_hash
 
     def __repr__(self):
         return '<Subscription %r>' % f"{self.group_id}_{self.id}"
+
+
+class SubscriptionType(db.Model):
+    __tablename__ = 'subscription_type'
+    id = db.Column(db.Integer, primary_key=True)
+    subscription_type = db.Column(db.String(80))
+    usd_price = db.Column(db.Float)
+
+    def __repr__(self):
+        return '<SubscriptionType %r>' % self.subscription_type
+
+
+class WeeklySubscription(db.Model):
+    __tablename__ = 'weekly_subscription'
+    id = db.Column(db.Integer, primary_key=True)
+    subscription_type_id = db.Column(
+        db.Integer, db.ForeignKey('subscription_type.id'))
+    subscription_id = db.Column(db.Integer, db.ForeignKey('subscription.id'))
+    number_of_weeks = db.Column(db.Integer)
+    start_date = db.Column(db.DateTime, default=db.func.now())
+    end_date = db.Column(db.DateTime)
+
+    def __repr__(self):
+        return '<WeeklySubscription %r>' % f"{self.subscription_id}_{self.id}"
+
+
+class OneTimeSubscription(db.Model):
+    __tablename__ = 'one_time_subscription'
+    id = db.Column(db.Integer, primary_key=True)
+    subscription_type_id = db.Column(
+        db.Integer, db.ForeignKey('subscription_type.id'))
+    subscription_id = db.Column(db.Integer, db.ForeignKey('subscription.id'))
+    start_date = db.Column(db.DateTime, default=db.func.now())
+    end_date = db.Column(db.String(4), default="None")
+
+    def __repr__(self):
+        return '<OneTimeSubscription %r>' % f"{self.subscription_id}_{self.id}"
 
 
 class TrackedToken(db.Model):
@@ -282,4 +311,3 @@ token_pairs = db.Table('token_pairs',
                        db.Column('pair_id', db.Integer,
                                  db.ForeignKey('supported_pairs.id')),
                        )
-
