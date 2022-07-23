@@ -1,8 +1,5 @@
 # from bot.app import db
 from app import db
-from sqlalchemy_utils import create_view
-from sqlalchemy import Column, select
-
 
 class Group(db.Model):
     __tablename__ = 'group'
@@ -44,6 +41,10 @@ class Subscription(db.Model):
     payment_chain_id = db.Column(
         db.Integer, db.ForeignKey('supported_chain.id'))
     tx_hash = db.Column(db.String(120), unique=True)
+    start_date = db.Column(db.DateTime, default=db.func.now())
+    end_date = db.Column(db.DateTime)
+    number_of_countable_subscriptions = db.Column(db.Integer)
+    is_life_time_subscription = db.Column(db.Boolean)
 
     def __repr__(self):
         return '<Subscription %r>' % f"{self.group_id}_{self.id}"
@@ -57,33 +58,6 @@ class SubscriptionType(db.Model):
 
     def __repr__(self):
         return '<SubscriptionType %r>' % self.subscription_type
-
-
-class WeeklySubscription(db.Model):
-    __tablename__ = 'weekly_subscription'
-    id = db.Column(db.Integer, primary_key=True)
-    subscription_type_id = db.Column(
-        db.Integer, db.ForeignKey('subscription_type.id'))
-    subscription_id = db.Column(db.Integer, db.ForeignKey('subscription.id'))
-    number_of_weeks = db.Column(db.Integer)
-    start_date = db.Column(db.DateTime, default=db.func.now())
-    end_date = db.Column(db.DateTime)
-
-    def __repr__(self):
-        return '<WeeklySubscription %r>' % f"{self.subscription_id}_{self.id}"
-
-
-class OneTimeSubscription(db.Model):
-    __tablename__ = 'one_time_subscription'
-    id = db.Column(db.Integer, primary_key=True)
-    subscription_type_id = db.Column(
-        db.Integer, db.ForeignKey('subscription_type.id'))
-    subscription_id = db.Column(db.Integer, db.ForeignKey('subscription.id'))
-    start_date = db.Column(db.DateTime, default=db.func.now())
-    end_date = db.Column(db.String(4), default="None")
-
-    def __repr__(self):
-        return '<OneTimeSubscription %r>' % f"{self.subscription_id}_{self.id}"
 
 
 class TrackedToken(db.Model):
@@ -120,16 +94,6 @@ class BiggestBuyCampaign(db.Model):
     transactions = db.relationship(
         'BiggestBuyTransaction', backref='biggest_buy_campaign', lazy='dynamic')
 
-    def __init__(self, group_id, start_time, end_time, count_down, campaign_status, campaign_winner, minimum_buy_amount, prize):
-        self.group_id = group_id
-        self.start_time = start_time
-        self.end_time = end_time
-        self.count_down = count_down
-        self.campaign_status = campaign_status
-        self.campaign_winner = campaign_winner
-        self.minimum_buy_amount = minimum_buy_amount
-        self.prize = prize
-
     def __repr__(self):
         return '<BiggestBuyCampaign %r>' % f"{self.group_id}_{self.id}"
 
@@ -147,16 +111,6 @@ class RaffleCampaign(db.Model):
     prize = db.Column(db.String(30))
     transactions = db.relationship(
         'RaffleTransaction', backref='raffle_campaign', lazy='dynamic')
-
-    def __init__(self, group_id, start_time, end_time, count_down, campaign_status, campaign_winner, minimum_buy_amount, prize):
-        self.group_id = group_id
-        self.start_time = start_time
-        self.end_time = end_time
-        self.count_down = count_down
-        self.campaign_status = campaign_status
-        self.campaign_winner = campaign_winner
-        self.minimum_buy_amount = minimum_buy_amount
-        self.prize = prize
 
     def __repr__(self):
         return '<RaffleCampaign %r>' % f"{self.group_id}_{self.id}"
