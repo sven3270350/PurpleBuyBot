@@ -144,3 +144,63 @@ biggest_buy_winners_template = '''
 
 Buy Grimacecoin 🥰
 '''
+
+
+active_subscription_template = '''
+<b> Active Premium Subscription</b>
+
+You are currently subscribed to {package}
+
+<i>Started: <b>{start_date}</b></i>
+<i>Ends: <b>{end_date}</b></i>
+'''
+
+no_active_subscription_template = '''
+<b> Subscribe </>
+
+Get our ads-free experience by subscribing to our premium package.
+
+<i>Select a package below:</i>
+'''
+
+
+weekly_subscription_template = '''
+<b> Weekly Subscription</b>
+
+Type the number of weeks you want to subscribe to.
+
+<i>Leave blank for 1 week</i>
+'''
+
+subscription_confirmation_template = '''
+<b>Confirm</b>
+
+You have selected the {package} package.
+
+Total cost: {total_cost}
+
+<i>Select payment Chain to proceed</i>
+'''
+
+subscription__payment_template = '''
+<b>Payment</b>
+
+Pay {total_cost} to {payment_address}.
+
+<i> Use /subscribe to check payment status</i>
+'''
+
+check_payment_template = '''
+<b>Check Payment</b>
+
+Select your payment chain and enter transaction hash.
+'''
+
+payment_status_template = '''
+<b>Payment Status</b>
+
+Transaction hash: <b>{transaction_hash}</b>
+Chain: <b>{chain_name}</b>
+
+<i>{status_message}</i>
+'''
