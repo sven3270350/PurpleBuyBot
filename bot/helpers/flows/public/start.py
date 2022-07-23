@@ -14,7 +14,7 @@ class StartBot:
         self.__add_handlers()
 
     @send_typing_action
-    def start(self, update: Update, context: CallbackContext):
+    def __start(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
 
         if is_private_chat(update):
@@ -30,7 +30,7 @@ class StartBot:
             self.__response_for_group(update)
 
     @send_typing_action
-    def start_added_bot_to_group(self, update: Update, context: CallbackContext):
+    def __start_added_bot_to_group(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
         if not is_private_chat(update):
 
@@ -47,7 +47,7 @@ class StartBot:
                                               parse_mode=ParseMode.HTML)
 
     @send_typing_action
-    def start_as_group_owner(self, update: Update, context: CallbackContext):
+    def __start_as_group_owner(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
         group_id = context.args[0]
         group_title = context.bot.get_chat(group_id).title
@@ -70,10 +70,10 @@ class StartBot:
 
     def __add_handlers(self):
         self.dispatcher.add_handler(CommandHandler(
-            "start", self.start_added_bot_to_group, Filters.regex(ADD_BOT_TO_GROUP)))
+            "start", self.__start_added_bot_to_group, Filters.regex(ADD_BOT_TO_GROUP)))
         self.dispatcher.add_handler(CommandHandler(
-            "start", self.start_as_group_owner, pass_args=True, filters=Filters.regex("/start -(\d{3,})")))
-        self.dispatcher.add_handler(CommandHandler("start", self.start))
+            "start", self.__start_as_group_owner, pass_args=True, filters=Filters.regex("/start -(\d{3,})")))
+        self.dispatcher.add_handler(CommandHandler("start", self.__start))
 
     def __response_for_group(self, update: Update):
         url = helpers.create_deep_linked_url(
