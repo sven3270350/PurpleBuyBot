@@ -1,23 +1,45 @@
-SELECT 
-tk.id, tk.token_name, tk.token_address, 
-tk.token_symbol, tk.group_id, 
-CONCAT(tk.token_symbol, '/', sp.pair_name ) as pair_symbol,
-sc.chain_name, sc.chain_id,
-sp.pair_name, sp.pair_address,
-se.exchange_name, se.router_address
-FROM public.tracked_token tk
-JOIN public.token_chains tc
-ON tk.id = tc.token_id
-JOIN public.supported_chain sc
-ON sc.id = tc.chain_id
-JOIN public.token_pairs tp
-ON tk.id = tp.token_id
-JOIN public.supported_pairs sp
-ON sp.id = tp.pair_id
-JOIN public.token_dexs td
-ON tk.id = td.token_id
-JOIN public.supported_exchange se
-ON se.id = td.exchange_id;
+-- SELECT 
+-- tk.group_id,  tk.token_name, tk.token_address, 
+-- tk.token_symbol, 
+-- CONCAT(tk.token_symbol, '/', sp.pair_name ) as pair_symbol,
+-- sc.chain_name, sc.chain_id,
+-- sp.pair_name, sp.pair_address,
+-- se.exchange_name, se.router_address
+-- FROM public.tracked_token tk
+-- JOIN public.token_chains tc
+-- ON tk.id = tc.token_id
+-- JOIN public.supported_chain sc
+-- ON sc.id = tc.chain_id
+-- JOIN public.token_pairs tp
+-- ON tk.id = tp.token_id
+-- JOIN public.supported_pairs sp
+-- ON sp.id = tp.pair_id
+-- JOIN public.token_dexs td
+-- ON tk.id = td.token_id
+-- JOIN public.supported_exchange se
+-- ON se.id = td.exchange_id
+-- WHERE tk.group_id = '-1001743891337';
+
+
+-- SELECT 
+-- ss.start_date,  ss.end_date, ss.subscription_type, 
+-- sc.chain_name, sc.chain_id,
+-- sp.pair_name, sp.pair_address,
+-- se.exchange_name, se.router_address
+-- FROM public.tracked_token tk
+-- JOIN public.token_chains tc
+-- ON tk.id = tc.token_id
+-- JOIN public.supported_chain sc
+-- ON sc.id = tc.chain_id
+-- JOIN public.token_pairs tp
+-- ON tk.id = tp.token_id
+-- JOIN public.supported_pairs sp
+-- ON sp.id = tp.pair_id
+-- JOIN public.token_dexs td
+-- ON tk.id = td.token_id
+-- JOIN public.supported_exchange se
+-- ON se.id = td.exchange_id
+-- WHERE tk.group_id = '-1001743891337';
 
 
 
@@ -49,7 +71,12 @@ ON se.id = td.exchange_id;
 -- ('USDT', '0x66e428c3f67a68878562e79A0234c1F83c208770', 25),
 -- ('USDC', '0xc21223249CA28397B4B6541dfFaEcC539BfF0c59', 25);
 
--- select(
---     [TrackedToken.id.label('tracked_token_id'), TrackedToken.token_name, TrackedToken.token_address, TrackedToken.token_symbol, TrackedToken.group_id, SupportedChain.chain_name]).select_from(
---         SupportedChain.__tablename__.outerjoin(TrackedToken, SupportedChain.chain_id==TrackedToken.chain.chain_id)
---     )
+
+-- INSERT INTO PUBLIC.subscription_type
+-- (subscription_type, usd_price)
+-- VALUES
+-- ('Weekly', 10.99),
+-- ('Lifetime', 300.99);
+
+
+
