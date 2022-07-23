@@ -1,3 +1,4 @@
+from helpers.flows.public.subscription import Subscription
 from helpers.flows.public.remove_token import RemoveToken
 from helpers.flows.public.add_token import AddToken
 from helpers.flows.public.start import StartBot
@@ -5,9 +6,6 @@ from helpers.flows.public.general import GeneralHandler
 from helpers.bots_imports import *
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
-from models import SupportedChain, SupportedExchange, SupportedPairs
-from helpers.utils import is_private_chat
-from services.bot_service import BotService
 from services.bot_service import BotService
 from helpers.templates import help_template
 
@@ -40,16 +38,19 @@ def subscribe(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=chat_id, text=help_template,
                              parse_mode=ParseMode.HTML)
 
+
 # call handlers for start commands
 StartBot(dispatcher)
 AddToken(dispatcher)
 RemoveToken(dispatcher)
+Subscription(dispatcher)
 GeneralHandler(dispatcher)
+
 
 # handlers for the commands
 dispatcher.add_handler(CommandHandler("buy_contest", start_buy_contest))
 dispatcher.add_handler(CommandHandler("raffle_contest", start_raffle_contest))
-dispatcher.add_handler(CommandHandler("subscribe", subscribe))
+
 
 #
 updater.start_polling()
