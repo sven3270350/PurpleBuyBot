@@ -147,7 +147,7 @@ Buy Grimacecoin 🥰
 
 
 active_subscription_template = '''
-<b> Active Premium Subscription</b>
+<b> Active Premium Subscription ({group_title}</b>
 
 You are currently subscribed to {package}
 
@@ -156,7 +156,7 @@ You are currently subscribed to {package}
 '''
 
 no_active_subscription_template = '''
-<b> Subscribe </>
+<b> Subscribe ({group_title}) </>
 
 Get our ads-free experience by subscribing to our premium package.
 
