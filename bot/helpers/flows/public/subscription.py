@@ -1,17 +1,9 @@
-# TODO: /subscribe -> Steps
-# 1. List available subscriptions plans
-# 2. Allow user to select preferred subscription
-# 3. Show wallet address for user
-# 4. Allow user to confirm transaction
-# 5. Check unique address for payment
-# 6. Update user’s subscription
-
 from telegram.ext import CallbackContext, Dispatcher, ConversationHandler, CommandHandler, CallbackQueryHandler
 from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from services.bot_service import BotService
 from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin
-from helpers.templates import remove_token_confirmation_template
-from models import TrackedToken
+from helpers.templates import remove_token_confirmation_template, no_active_subscription_template, active_subscription_template
+from models import TrackedToken, Subscription as SubscriptionModel, SubscriptionType
 
 SELECT, CONFIRM, COMMIT = range(3)
 
@@ -39,29 +31,46 @@ class Subscription:
                 return not_group_admin(update)
 
             # show currect subscription plan
+            active_subscriptions: list[SubscriptionModel] = BotService(
+            ).get_active_active_subscription_by_group_id(group_id)
 
-            tracked_tokens: list[TrackedToken] = BotService(
-            ).get_tracked_tokens_for_removal(group_id)
+            if len(active_subscriptions) > 0:
+                active_subscription: SubscriptionModel = active_subscriptions[0]
 
-            if len(tracked_tokens) == 0:
+                # show current subscription plan
                 update.message.reply_text(
-                    text="<i> ❌ No token is being tracked. Use /add_token to get started. </i>",
+                    text=active_subscription_template.format(
+                        group_title=chat_data[
+                            'group_title'],
+                        package=f'{active_subscription.subscription_type} {"({active_subscription.total}}"}',
+                        start_date=active_subscription.start_date,
+                        end_date=active_subscription.end_date
+                    ),
                     parse_mode=ParseMode.HTML)
 
-                reset_chat_data(context)
                 return ConversationHandler.END
             else:
-                # list tracked tokens
+
+                # show sumbscription plans
+                plans: list[SubscriptionType] = BotService(
+                ).get_subscription_plans()
+
                 keyboard = []
-                for token in tracked_tokens:
+                for plan in plans:
                     keyboard.append(
                         [InlineKeyboardButton(
-                            f"{token.token_name} on {token.chain_name}",
-                            callback_data=f"remove_token:{token.id}")])
+                            f"{plan.subscription_type} (${plan.usd_price})",
+                            callback_data=f"subscription_type:{plan.id}")])
+
+                check_payment_button = InlineKeyboardButton(
+                    "Check payment",
+                    callback_data=f"check_payment:{group_id}")
+                keyboard.append([check_payment_button])
 
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 update.message.reply_text(
-                    text=f"<i>Select a token to remove <b>({chat_data['group_title']})</b>:</i>",
+                    text=no_active_subscription_template.format(
+                        group_title=chat_data['group_title']),
                     reply_markup=reply_markup,
                     parse_mode=ParseMode.HTML)
 
@@ -101,7 +110,6 @@ class Subscription:
             reply_markup=InlineKeyboardMarkup([[button]]))
         return CONFIRM
 
-    
     @send_typing_action
     def __check_payment_status(self, update: Update, context: CallbackContext) -> int:
         pass
@@ -137,14 +145,12 @@ class Subscription:
         return ConversationHandler.END
 
     def __add_handlers(self):
-        self.dispatcher.add_handler(CommandHandler(
-            "tracked_tokens", self.__list_tracked_tokens))
         self.dispatcher.add_handler(ConversationHandler(
             entry_points=[CommandHandler('subscribe', self.__subscribe)],
             states={
-                SELECT: [CallbackQueryHandler(self.__select_token_to_remove, pattern='^remove_token:\d+')],
+                SELECT: [CallbackQueryHandler(self.__select_subscription, pattern='^remove_token:\d+')],
                 CONFIRM: [CallbackQueryHandler(
-                    self.__confirm_token_removal, pattern='^confirm_removal:\d+')]
+                    self.__confirm_subscripton, pattern='^confirm_removal:\d+')]
             },
             fallbacks=[CommandHandler('cancel', self.__cancel_remove_token)],
             conversation_timeout=300,
