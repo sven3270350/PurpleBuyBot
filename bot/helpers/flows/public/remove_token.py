@@ -15,12 +15,14 @@ class RemoveToken:
 
     @send_typing_action
     def __list_tracked_tokens(self, update: Update, context: CallbackContext):
-        group_id = context.chat_data.get('group_id', None)
-        group_title = context.bot.get_chat(group_id).title
+        self.__extract_params(update, context)
 
         if is_private_chat(update):
             if not BotService().is_group_in_focus(update, context):
                 return
+
+            group_id = context.chat_data.get('group_id', None)
+            group_title = context.bot.get_chat(group_id).title
 
             tracked_tokens: list[TrackedToken] = BotService(
             ).get_tracked_tokens_by_group_id(group_id)
@@ -44,16 +46,15 @@ class RemoveToken:
     @send_typing_action
     def __remove_token(self, update: Update, context: CallbackContext) -> int:
         self.__extract_params(update, context)
-        group_id = context.chat_data.get('group_id', None)
-
-        context.chat_data['group_title'] = context.bot.get_chat(group_id).title
-
-        chat_data: dict = context.chat_data
-
+        
         if is_private_chat(update):
             if not BotService().is_group_in_focus(update, context):
                 reset_chat_data(context)
                 return ConversationHandler.END
+            
+            group_id = context.chat_data.get('group_id', None)
+            context.chat_data['group_title'] = context.bot.get_chat(group_id).title
+            chat_data: dict = context.chat_data
 
             if not is_group_admin(update, context):
                 return not_group_admin(update)

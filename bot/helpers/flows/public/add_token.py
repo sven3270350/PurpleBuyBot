@@ -18,15 +18,17 @@ class AddToken:
     @send_typing_action
     def __add_token(self, update: Update, context: CallbackContext) -> int:
         self.__extract_params(update, context)
-        group_id = context.chat_data.get('group_id', None)
-
-        context.chat_data['group_title'] = context.bot.get_chat(group_id).title
-        chat_data: dict = context.chat_data
 
         if is_private_chat(update):
             if not BotService().is_group_in_focus(update, context):
                 reset_chat_data(context)
                 return ConversationHandler.END
+
+            group_id = context.chat_data.get('group_id', None)
+
+            context.chat_data['group_title'] = context.bot.get_chat(
+                group_id).title
+            chat_data: dict = context.chat_data
 
             if is_group_admin(update, context):
                 # list avaialbe chains as buttons
