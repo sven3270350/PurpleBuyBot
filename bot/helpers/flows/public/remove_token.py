@@ -14,7 +14,7 @@ class RemoveToken:
         self.__add_handlers()
 
     @send_typing_action
-    def list_tracked_tokens(self, update: Update, context: CallbackContext):
+    def __list_tracked_tokens(self, update: Update, context: CallbackContext):
         group_id = context.chat_data.get('group_id', None)
         group_title = context.bot.get_chat(group_id).title
 
@@ -42,7 +42,7 @@ class RemoveToken:
             update.message.reply_text(message, parse_mode=ParseMode.HTML)
 
     @send_typing_action
-    def remove_token(self, update: Update, context: CallbackContext) -> int:
+    def __remove_token(self, update: Update, context: CallbackContext) -> int:
         self.__extract_params(update, context)
         group_id = context.chat_data.get('group_id', None)
 
@@ -89,7 +89,7 @@ class RemoveToken:
         return ConversationHandler.END
 
     @send_typing_action
-    def select_token_to_remove(self, update: Update, context: CallbackContext) -> int:
+    def __select_token_to_remove(self, update: Update, context: CallbackContext) -> int:
         self.__extract_params(update, context)
         chat_data = context.chat_data
         message_id = update.callback_query.message.message_id
@@ -120,7 +120,7 @@ class RemoveToken:
             reply_markup=InlineKeyboardMarkup([[button]]))
         return CONFIRM
 
-    def confirm_token_removal(self, update: Update, context: CallbackContext):
+    def __confirm_token_removal(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
         message_id = update.callback_query.message.message_id
 
@@ -152,13 +152,13 @@ class RemoveToken:
 
     def __add_handlers(self):
         self.dispatcher.add_handler(CommandHandler(
-            "tracked_tokens", self.list_tracked_tokens))
+            "tracked_tokens", self.__list_tracked_tokens))
         self.dispatcher.add_handler(ConversationHandler(
-            entry_points=[CommandHandler('remove_token', self.remove_token)],
+            entry_points=[CommandHandler('remove_token', self.__remove_token)],
             states={
-                SELECT: [CallbackQueryHandler(self.select_token_to_remove, pattern='^remove_token:\d+')],
+                SELECT: [CallbackQueryHandler(self.__select_token_to_remove, pattern='^remove_token:\d+')],
                 CONFIRM: [CallbackQueryHandler(
-                    self.confirm_token_removal, pattern='^confirm_removal:\d+')]
+                    self.__confirm_token_removal, pattern='^confirm_removal:\d+')]
             },
             fallbacks=[CommandHandler('cancel', self.__cancel_remove_token)],
             conversation_timeout=300,
