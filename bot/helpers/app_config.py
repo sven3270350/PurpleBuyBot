@@ -78,3 +78,17 @@ class AppConfigs:
         key = explorers[chain_id]
 
         return self._config.get("WEB3_PROVIDER", key)
+
+    def get_cg_id(self, chain_id):
+        chain_id = int(chain_id)
+        explorers = {
+            1: "ethid",
+            56: "bscid",
+            25: "croid",
+            3: "ethid",
+            97: "bscid",
+            338: "croid",
+        }
+        key = explorers[chain_id]
+
+        return self._config.get("COINGECKO_IDs", key)
