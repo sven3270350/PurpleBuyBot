@@ -262,7 +262,7 @@ class Subscription:
         if transaction_hash and BotService().is_tx_hash_unique(transaction_hash):
 
             if not chain:
-                update.callback_query.edit_message_text(
+                update.message.reply_text(
                     text="No supported chains found",
                     parse_mode=ParseMode.HTML)
 
@@ -293,7 +293,7 @@ class Subscription:
 
                 # if payment_status.status == 'success':
                 #     # payment successful
-                #     update.callback_query.edit_message_text(
+                #     update.callback_query.message.edit_text(
                 #         text=payment_status_template.format(
                 #             chain_name=chain.chain_name,
                 #             status_message=payment_status.message
@@ -326,8 +326,8 @@ class Subscription:
             reset_chat_data(context)
             return ConversationHandler.END
 
-        update.callback_query.edit_message_text(
-            text="<i>Invalid transaction hash</i> \n\n Please enter transaction hash",
+        update.message.reply_text(
+            text="<i>Invalid/Used transaction hash</i> \n\n Please enter a valid transaction hash!",
             parse_mode=ParseMode.HTML,
             reply_markup=InlineKeyboardMarkup([cancel_button])
         )
@@ -484,7 +484,7 @@ class Subscription:
             text=final_subscription_review_template.format(
                 group_title=chat_data['group_title'],
                 package=f'{subscription.subscription_type} {f"({count})" if count else ""}',
-                total_cost=f'${subscription.usd_price * int(count) }',
+                total_cost=f'{web3.Web3.fromWei(BotService().usd_to_native_price_by_chain(subscription.usd_price * int(count), chain_id), "ether")} {chain.native_symbol}',
                 chain_name=chain.chain_name,
                 wallet=wallet.wallet_address),
             parse_mode=ParseMode.HTML,
