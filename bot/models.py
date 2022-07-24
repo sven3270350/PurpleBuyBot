@@ -1,5 +1,6 @@
-# from bot.app import db
-from app import db
+from bot.app import db
+# from app import db
+
 
 class Group(db.Model):
     __tablename__ = 'group'
@@ -45,6 +46,7 @@ class Subscription(db.Model):
     end_date = db.Column(db.DateTime)
     number_of_countable_subscriptions = db.Column(db.Integer)
     is_life_time_subscription = db.Column(db.Boolean)
+    expected_amount_in_native_wei = db.Column(db.BigInteger)
 
     def __repr__(self):
         return '<Subscription %r>' % f"{self.group_id}_{self.id}"
@@ -138,6 +140,7 @@ class SupportedChain(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     chain_name = db.Column(db.String(20))
     chain_id = db.Column(db.Integer, unique=True, nullable=False)
+    native_symbol = db.Column(db.String(20))
     exchanges = db.relationship(
         'SupportedExchange', backref='supported_chain')
     pairs = db.relationship(
