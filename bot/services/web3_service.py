@@ -1,4 +1,4 @@
-from web3 import Web3, middleware
+from web3 import Web3
 from eth_account import Account
 import secrets
 from web3.middleware import geth_poa_middleware
@@ -120,3 +120,22 @@ class Web3Service:
         except Exception as e:
             print(e)
             return token1_name, token1_symbol, token1_decimal, pair_address, False
+
+    # given chainId and transaction hash, return the transaction receipt
+    def get_transaction_receipt(self, chain_id, tx_hash):
+        provider = AppConfigs().get_provider(chain_id)
+        web3 = Web3(Web3.HTTPProvider(provider))
+        tx_receipt = web3.eth.get_transaction(tx_hash)
+        return tx_receipt
+
+    def wait_for_tx_receipt(self, chain_id, tx_hash):
+        provider = AppConfigs().get_provider(chain_id)
+        web3 = Web3(Web3.HTTPProvider(provider))
+        tx_receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
+        return tx_receipt
+
+    def get_block_timestamp(self, chain_id, block_number):
+        provider = AppConfigs().get_provider(chain_id)
+        web3 = Web3(Web3.HTTPProvider(provider))
+        block = web3.eth.get_block(block_number)
+        return datetime.fromtimestamp(block.timestamp)
