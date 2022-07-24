@@ -173,7 +173,7 @@ Type the number of weeks you want to subscribe to.
 '''
 
 subscription_confirmation_template = '''
-<b>Confirm</b>
+<b>Confirm ({group_title})</b>
 
 You have selected the {package} package.
 
@@ -203,4 +203,29 @@ Transaction hash: <b>{transaction_hash}</b>
 Chain: <b>{chain_name}</b>
 
 <i>{status_message}</i>
+'''
+
+has_pending_subscription_template = '''
+<b>You have a pending subscription</b>
+
+<i>Waiting Payment for: <b>{subscription} package</b></i>
+
+Chain: <b>{chain_name}</b>
+
+Complete your subscription by paying {total_cost} to: 
+{payment_address}.
+
+<i>Use /subscribe to check payment status</i>
+'''
+
+final_subscription_review_template = '''
+<b>Confirm ({group_title})</b>
+
+You have selected the {package} package.
+
+Total cost: {total_cost}
+
+Chain: {chain_name}
+
+<i>pay {total_cost} to {wallet} to complete!</i>
 '''
