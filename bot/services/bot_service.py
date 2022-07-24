@@ -185,6 +185,6 @@ class BotService:
 
     def usd_to_native_price_by_chain(self, usd, chain_id):
         _id = AppConfigs().get_cg_id(chain_id)
-        price = cg.get_price(vs_currencies='usd', ids='bitcoin')
-        price_usd = price[_id]['usd']
+        price: dict = cg.get_price(ids=_id, vs_currencies='usd')
+        price_usd = price.get(_id)['usd']
         return web3.Web3.toWei(Decimal(usd / price_usd), 'ether')
