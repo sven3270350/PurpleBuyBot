@@ -1,7 +1,13 @@
+from decimal import Decimal
+import web3
+from helpers.app_config import AppConfigs
 from services.web3_service import Web3Service
-from models import db, Group, Wallet, SupportedChain, TrackedToken, SupportedExchange, SupportedPairs, SubscriptionType
+from models import db, Group, Wallet, SupportedChain, TrackedToken, SupportedExchange, SupportedPairs, SubscriptionType, Subscription
 from telegram.ext import CallbackContext
 from telegram import Update, ParseMode
+from pycoingecko import CoinGeckoAPI
+
+cg = CoinGeckoAPI()
 
 
 class BotService:
@@ -146,6 +152,10 @@ class BotService:
         plans = SubscriptionType.query.all()
         return plans
 
+    def get_subscription_plan_by_id(self, plan_id):
+        plan = SubscriptionType.query.filter_by(id=plan_id).first()
+        return plan
+
     def is_group_in_focus(self, update: Update, context: CallbackContext):
         group_id = context.chat_data.get('group_id', None)
 
@@ -156,3 +166,25 @@ class BotService:
             return False
 
         return True
+
+    def get_group_wallet(self, group_id):
+        wallet = Wallet.query.filter_by(group_id=group_id).first()
+        return wallet
+
+    def get_group_pending_subscription(self, group_id):
+        subscription = Subscription.query.filter_by(
+            group_id=group_id, tx_hash=None).first()
+        return subscription
+
+    def is_tx_hash_unique(self, tx_hash):
+        subscription = Subscription.query.filter_by(tx_hash=tx_hash).first()
+        if subscription:
+            return False
+        else:
+            return True
+
+    def usd_to_native_price_by_chain(self, usd, chain_id):
+        _id = AppConfigs().get_cg_id(chain_id)
+        price = cg.get_price(vs_currencies='usd', ids='bitcoin')
+        price_usd = price[_id]['usd']
+        return web3.Web3.toWei(Decimal(usd / price_usd), 'ether')
