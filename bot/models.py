@@ -1,5 +1,5 @@
-from bot.app import db
-# from app import db
+# from bot.app import db
+from app import db
 
 
 class Group(db.Model):
