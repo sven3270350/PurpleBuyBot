@@ -5,7 +5,7 @@ class SubscriptionService:
     # is subscription active
     # create subscription
 
-    def get_group_subscriptions(self, group_id):
+    def get_group_pending_subscriptions(self, group_id):
         pass
 
     def is_subscription_active(self, subscription_id):
