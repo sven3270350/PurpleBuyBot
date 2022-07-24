@@ -182,13 +182,6 @@ Total cost: {total_cost}
 <i>Select payment Chain to proceed</i>
 '''
 
-subscription__payment_template = '''
-<b>Payment</b>
-
-Pay {total_cost} to {payment_address}.
-
-<i> Use /subscribe to check payment status</i>
-'''
 
 check_payment_template = '''
 <b>Check Payment</b>
