@@ -256,6 +256,20 @@ class Subscription:
         chain: SupportedChain = chat_data['chain']
         pending_subscription: SubscriptionModel = BotService(
         ).get_group_pending_subscription(group_id)
+
+        if not pending_subscription:
+            update.message.reply_text(
+                text=payment_status_template.format(
+                    chain_name=chain.chain_name,
+                    status_message='You have no pending subscription',
+                    transaction_hash=transaction_hash
+                ),
+                parse_mode=ParseMode.HTML
+            )
+
+            reset_chat_data(context)
+            return ConversationHandler.END
+
         subscription_type: SubscriptionType = BotService().get_subscription_plan_by_id(
             pending_subscription.subscription_type_id)
 
@@ -275,8 +289,21 @@ class Subscription:
             group_wallet: Wallet = BotService().get_group_wallet(
                 chat_data['group_id'])
 
+            if payment_status.blockNumber is None:
+                update.message.reply_text(
+                    text=payment_status_template.format(
+                        chain_name=chain.chain_name,
+                        status_message='Transaction is pending',
+                        transaction_hash=transaction_hash
+                    ),
+                    parse_mode=ParseMode.HTML
+                )
+                reset_chat_data(context)
+                return ConversationHandler.END
+
             block_timestampe: datetime = Web3Service(
             ).get_block_timestamp(chain.chain_id, payment_status.blockNumber)
+
             # Check if transaction is valid
             same_address = payment_status.to.lower() == group_wallet.wallet_address.lower()
             same_amount = payment_status.value == pending_subscription.expected_amount_in_native_wei
@@ -291,43 +318,24 @@ class Subscription:
                 db.session.add(pending_subscription)
                 db.session.commit()
 
-                # if payment_status.status == 'success':
-                #     # payment successful
-                #     update.callback_query.message.edit_text(
-                #         text=payment_status_template.format(
-                #             chain_name=chain.chain_name,
-                #             status_message=payment_status.message
-                #         ),
-                #         parse_mode=ParseMode.HTML,
-                #         reply_markup=InlineKeyboardMarkup([[cancel_button]])
-                #     )
-
-                #     # # create subscription
-                #     # BotService().create_subscription(
-                #     #     context.chat_data['group_id'],
-                #     #     context.chat_data['subscription_type'],
-                #     #     chain.id,
-                #     #     transaction_hash
-                #     # )
-
-                #     reset_chat_data(context)
-                #     return ConversationHandler.END
-
-                # # payment failed
-                # update.callback_query.edit_message_text(
-                #     text=payment_status_template.format(
-                #         chain_name=chain.chain_name,
-                #         status_message=payment_status.message
-                #     ),
-                #     parse_mode=ParseMode.HTML,
-                #     reply_markup=InlineKeyboardMarkup([[cancel_button]])
-                # )
+                update.message.reply_text(
+                    text=payment_status_template.format(
+                        chain_name=chain.chain_name,
+                        status_message='Transaction confirmed',
+                        transaction_hash=transaction_hash
+                    ),
+                    parse_mode=ParseMode.HTML
+                )
 
             reset_chat_data(context)
             return ConversationHandler.END
 
         update.message.reply_text(
-            text="<i>Invalid/Used transaction hash</i> \n\n Please enter a valid transaction hash!",
+            text=payment_status_template.format(
+                chain_name=chain.chain_name,
+                status_message='Transaction hash is not valid/already used',
+                transaction_hash=transaction_hash
+            ),
             parse_mode=ParseMode.HTML,
             reply_markup=InlineKeyboardMarkup([cancel_button])
         )
