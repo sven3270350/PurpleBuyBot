@@ -8,6 +8,7 @@ from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMark
 from services.listener import Listener
 from services.web3_service import Web3Service
 from services.bot_service import BotService
+from services.subscriptions_service import SubscriptionService
 from helpers.utils import (
     is_private_chat, is_group_admin,
     send_typing_action, reset_chat_data, not_group_admin)
@@ -55,14 +56,14 @@ class Subscription:
                 callback_data=f"check_payment")
 
             # check for pending subscription
-            pending_subscription: SubscriptionModel = BotService(
+            pending_subscription: SubscriptionModel = SubscriptionService(
             ).get_group_pending_subscription(group_id)
 
             chain: SupportedChain = BotService().get_supported_chains(
                 pending_subscription.payment_chain_id) if pending_subscription else None
 
             if pending_subscription:
-                subscription_type: SubscriptionType = BotService().get_subscription_plan_by_id(
+                subscription_type: SubscriptionType = SubscriptionService().get_subscription_plan_by_id(
                     pending_subscription.subscription_type_id)
                 wallet: Wallet = BotService().get_group_wallet(group_id)
 
@@ -83,7 +84,7 @@ class Subscription:
                 return SELECT
 
             # show currect subscription plan
-            active_subscriptions: list[SubscriptionModel] = BotService(
+            active_subscriptions: list[SubscriptionModel] = SubscriptionService(
             ).get_active_active_subscription_by_group_id(group_id)
 
             if len(active_subscriptions) > 0:
@@ -107,7 +108,7 @@ class Subscription:
             else:
 
                 # show sumbscription plans
-                plans: list[SubscriptionType] = BotService(
+                plans: list[SubscriptionType] = SubscriptionService(
                 ).get_subscription_plans()
 
                 keyboard = []
@@ -143,7 +144,7 @@ class Subscription:
         query = update.callback_query.data
         subscription_type_id = query.split(':')[1]
 
-        subscription_details: SubscriptionType = BotService(
+        subscription_details: SubscriptionType = SubscriptionService(
         ).get_subscription_plan_by_id(subscription_type_id)
 
         context.chat_data['subscription_type'] = subscription_details
@@ -255,7 +256,7 @@ class Subscription:
         group_id = chat_data['group_id']
         transaction_hash = update.message.text
         chain: SupportedChain = chat_data['chain']
-        pending_subscription: SubscriptionModel = BotService(
+        pending_subscription: SubscriptionModel = SubscriptionService(
         ).get_group_pending_subscription(group_id)
 
         if not pending_subscription:
@@ -271,7 +272,7 @@ class Subscription:
             reset_chat_data(context)
             return ConversationHandler.END
 
-        subscription_type: SubscriptionType = BotService().get_subscription_plan_by_id(
+        subscription_type: SubscriptionType = SubscriptionService().get_subscription_plan_by_id(
             pending_subscription.subscription_type_id)
 
         if transaction_hash and BotService().is_tx_hash_unique(transaction_hash):
