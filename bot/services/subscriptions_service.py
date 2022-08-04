@@ -1,17 +1,44 @@
 
+from models import db, Subscription, SubscriptionType
+
+
 class SubscriptionService:
-    
-    # get group subscriptions
-    # is subscription active
-    # create subscription
 
-    def get_group_pending_subscriptions(self, group_id):
-        pass
+    def get_group_pending_subscription(self, group_id):
+        subscription = Subscription.query.filter_by(
+            group_id=group_id, status='pending').first()
+        return subscription
 
-    def is_subscription_active(self, subscription_id):
-        pass
+    def get_subscription_plans(self):
+        plans = SubscriptionType.query.all()
+        return plans
 
-    def create_subscription(self, group_id, wallet_id, start_date, end_date, subscription_type, subscription_status, tx_hash):
-        pass
+    def get_subscription_plan_by_id(self, plan_id):
+        plan = SubscriptionType.query.filter_by(id=plan_id).first()
+        return plan
 
-    
+    def get_active_active_subscription_by_group_id(self, group_id):
+        stmt = f'''
+        SELECT 
+        st.subscription_type,
+        ss.start_date, ss.end_date,
+        ss.number_of_countable_subscriptions AS total,
+        ss.is_life_time_subscription AS for_life,
+        CASE 
+            WHEN ss.end_date >= NOW() THEN 'active'
+            ELSE 'inactive'
+        END AS status
+        FROM PUBLIC.subscription ss
+        JOIN public.subscription_type st
+        ON st.id = ss.subscription_type_id
+        WHERE ss.group_id = '{group_id}' AND ss.end_date >= NOW();
+        '''
+        return list(db.engine.execute(stmt))
+
+    def has_active_subscription(self, group_id):
+        subscription: list = self.get_active_active_subscription_by_group_id(
+            group_id)
+        if subscription:
+            return True
+        else:
+            return False

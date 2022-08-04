@@ -130,32 +130,6 @@ class BotService:
             print(f"Error deleting tracked token: {e}")
             return False
 
-    def get_active_active_subscription_by_group_id(self, group_id):
-        stmt = f'''
-        SELECT 
-        st.subscription_type,
-        ss.start_date, ss.end_date,
-        ss.number_of_countable_subscriptions AS total,
-        ss.is_life_time_subscription AS for_life,
-        CASE 
-            WHEN ss.end_date >= NOW() THEN 'active'
-            ELSE 'inactive'
-        END AS status
-        FROM PUBLIC.subscription ss
-        JOIN public.subscription_type st
-        ON st.id = ss.subscription_type_id
-        WHERE ss.group_id = '{group_id}' AND ss.end_date >= NOW();
-        '''
-        return list(db.engine.execute(stmt))
-
-    def get_subscription_plans(self):
-        plans = SubscriptionType.query.all()
-        return plans
-
-    def get_subscription_plan_by_id(self, plan_id):
-        plan = SubscriptionType.query.filter_by(id=plan_id).first()
-        return plan
-
     def is_group_in_focus(self, update: Update, context: CallbackContext):
         group_id = context.chat_data.get('group_id', None)
 
@@ -176,11 +150,6 @@ class BotService:
     def get_group_wallet(self, group_id):
         wallet = Wallet.query.filter_by(group_id=group_id).first()
         return wallet
-
-    def get_group_pending_subscription(self, group_id):
-        subscription = Subscription.query.filter_by(
-            group_id=group_id, status='pending').first()
-        return subscription
 
     def is_tx_hash_unique(self, tx_hash):
         subscription = Subscription.query.filter_by(tx_hash=tx_hash).first()
