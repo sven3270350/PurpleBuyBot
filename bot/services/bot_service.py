@@ -160,9 +160,15 @@ class BotService:
         group_id = context.chat_data.get('group_id', None)
 
         if group_id is None:
-            update.message.reply_text(
-                text="<i> ❌ No group in focus; use group link first. </i>",
-                parse_mode=ParseMode.HTML)
+            if update.message is not None:
+                update.message.reply_text(
+                    text="<i> ❌ No group in focus; use group link first. </i>",
+                    parse_mode=ParseMode.HTML)
+            else:
+                update.callback_query.answer()
+                update.callback_query.edit_message_text(
+                    text="<i> ❌ No group in focus; use group link first. </i>",
+                    parse_mode=ParseMode.HTML)
             return False
 
         return True
@@ -173,7 +179,7 @@ class BotService:
 
     def get_group_pending_subscription(self, group_id):
         subscription = Subscription.query.filter_by(
-            group_id=group_id, tx_hash=None).first()
+            group_id=group_id, status='pending').first()
         return subscription
 
     def is_tx_hash_unique(self, tx_hash):
@@ -183,8 +189,17 @@ class BotService:
         else:
             return True
 
-    def usd_to_native_price_by_chain(self, usd, chain_id):
+    def usd_to_native_price_by_chain(self, usd, count, chain_id):
         _id = AppConfigs().get_cg_id(chain_id)
         price: dict = cg.get_price(ids=_id, vs_currencies='usd')
         price_usd = price.get(_id)['usd']
-        return web3.Web3.toWei(Decimal(usd / price_usd), 'ether')
+        return web3.Web3.toWei(Decimal(usd / price_usd), 'ether') * int(count)
+
+    def get_user_tracked_token_name(self, group_id):
+        token_name = TrackedToken.query.filter_by(
+            group_id=group_id).first().token_name
+        return token_name
+
+    def get_all_tracked_tokens(self):
+        tracked_tokens = TrackedToken.query.all()
+        return tracked_tokens
