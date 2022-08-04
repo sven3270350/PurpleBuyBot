@@ -10,10 +10,7 @@ from helpers.templates import (
     biggest_buy_competition_alert_template)
 from datetime import datetime, timedelta
 
-START_TIME, END_TIME, MIN_BUY, WINNER_PRIZE = range(4)
-
 COMPETITION_NAME = "Raffle"
-
 
 class RaffleContest:
     def __init__(self, dispatcher: Dispatcher):
@@ -61,8 +58,6 @@ class RaffleContest:
 
             self.__reply_template(update, context)
 
-            return START_TIME
-
     @send_typing_action
     def __set_start_time(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
@@ -71,7 +66,6 @@ class RaffleContest:
 
         self.dispatcher.remove_handler(self.start_time_handler)
         self.__reply_template(update, context)
-        return END_TIME
 
     @send_typing_action
     def __set_end_time(self, update: Update, context: CallbackContext):
@@ -81,7 +75,6 @@ class RaffleContest:
 
         self.dispatcher.remove_handler(self.end_time_handler)
         self.__reply_template(update, context)
-        return MIN_BUY
 
     @send_typing_action
     def __set_min_buy(self, update: Update, context: CallbackContext):
@@ -91,7 +84,6 @@ class RaffleContest:
 
         self.dispatcher.remove_handler(self.min_buy_handler)
         self.__reply_template(update, context)
-        return WINNER_PRIZE
 
     @send_typing_action
     def __set_winner_prize(self, update: Update, context: CallbackContext):
@@ -101,7 +93,6 @@ class RaffleContest:
 
         self.dispatcher.remove_handler(self.winner_prize_handler)
         self.__reply_template(update, context)
-        return START_TIME
 
     def __start_competition(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
@@ -127,6 +118,7 @@ class RaffleContest:
             # BotService().create_buy_contest(group_id, group_title, token_name, start_date, end_date, minimum_buy, winner_reward)
 
             template = biggest_buy_competition_alert_template.format(
+                competition_name=COMPETITION_NAME,
                 group_title=group_title,
                 token_name=token_name,
                 start_date=start_date,
@@ -182,7 +174,6 @@ class RaffleContest:
         update.callback_query.edit_message_text(
             text=set_start_time_template,
             parse_mode=ParseMode.HTML)
-        return START_TIME
 
     def __goto_end_time(self, update: Update, context: CallbackContext):
         self.dispatcher.add_handler(self.end_time_handler)
@@ -191,7 +182,6 @@ class RaffleContest:
         update.callback_query.edit_message_text(
             text=set_end_time_template,
             parse_mode=ParseMode.HTML)
-        return END_TIME
 
     def __goto_min_buy(self, update: Update, context: CallbackContext):
         self.dispatcher.add_handler(self.min_buy_handler)
@@ -200,7 +190,6 @@ class RaffleContest:
         update.callback_query.edit_message_text(
             text=set_min_buy_template,
             parse_mode=ParseMode.HTML)
-        return MIN_BUY
 
     def __goto_winner_prize(self, update: Update, context: CallbackContext):
         self.dispatcher.add_handler(self.winner_prize_handler)
@@ -209,7 +198,6 @@ class RaffleContest:
         update.callback_query.edit_message_text(
             text=set_winner_reward_template,
             parse_mode=ParseMode.HTML)
-        return WINNER_PRIZE
 
     def __goto_start_comp(self, update: Update, context: CallbackContext):
         self.dispatcher.add_handler(self.set_confirm_comp_handler)
@@ -231,7 +219,6 @@ class RaffleContest:
                 winner_reward=chat_data['winner_prize']
             ),
             parse_mode=ParseMode.HTML, reply_markup=confirm)
-        return START_TIME
 
     def __add_handlers(self):
         #  Conversation handlers
