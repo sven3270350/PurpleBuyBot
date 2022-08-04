@@ -36,7 +36,7 @@ Use command /add_token then follow the prompt to complete
 Use command /remove_token and select the token to remove
 
 <b>Run Contest:</b>
-To run a Buy contest, use /stat_buy_contest and follow the prompt
+To run a Buy contest, use /start_buy_contest and follow the prompt
 For Raffle contests, use /raffle_on and follow the prompt
 
 <i>Note: Only one contest (Buy or Raffle) can be active per group at anytime.</i>
@@ -63,7 +63,7 @@ Use command /add_token then follow the prompt to complete
 Use command /remove_token and select the token to remove
 
 <b>Run Contest:</b>
-To run a Buy contest, use /stat_buy_contest and follow the prompt
+To run a Buy contest, use /start_buy_contest and follow the prompt
 For Raffle contests, use /raffle_on and follow the prompt
 
 <i>Note: Only one contest (Buy or Raffle) can be active per period.</i>
@@ -123,26 +123,6 @@ Chain: <b>{chain_name}</b>
 Click Confirm to remove token
 
 use /cancel to restart
-'''
-
-biggest_buy_winners_template = '''
-<b>🎉Biggest Buy Competition Started</b>
-
-🕓 Start 11:10:00 UTC
-⏳ Ends in 1 hours 16 min 34 sec
-⬇️ Minimum Buy 0.10 BNB
-
-🥇 0x46b0…1974 ➖ 1.2 BNB
-🥈 0xc351…4bf7 ➖ 0.75 BNB
-🥉 0x7171…4ee6 ➖ 0.7 BNB
-4️⃣ 0xdfd0…4815 ➖ 0.54 BNB
-5️⃣ 0x3fa6…d50a ➖ 0.5 BNB
-
-🎖 Biggest Buy 0x46b0…1974 ➖ 1.2 BNB
-
-——
-
-Buy Grimacecoin 🥰
 '''
 
 
@@ -221,4 +201,123 @@ Total cost: {total_cost}
 Chain: {chain_name}
 
 <i>pay {total_cost} to {wallet} to complete!</i>
+'''
+
+no_trackecd_tokens_template = '''
+<b>No tracked tokens</b>
+
+<i>You have no tracked tokens</i>
+use `/add_token` to add a token
+'''
+
+start_biggest_buy_contest_template = '''
+<b>Start Biggest Buy Contest Settings</b>
+
+<i>Group: <b>{group_title}</b></i>
+
+Select <b>Start Competition</b> to start the contest with the following settings:
+
+<b>Token:</b> {token_name}
+
+<b>Start's :</b> {start_date}
+<b>Ends:</b> {end_date}
+
+<b>Minimum Buy:</b> ${minimum_buy}
+<b>Winner's Reward:</b> ${winner_reward}
+
+<i>Note: You can only have one contest at a time</i>
+'''
+
+set_start_time_template = '''
+<b>Set Start Time: </b>
+
+Time to start the contest.
+eg: 21:22:00; 01:02:03 etc
+
+'''
+
+set_end_time_template = '''
+<b> Set End Time: </b>
+
+Time to end the contest.
+eg: 22:44:00 etc
+
+'''
+
+
+set_min_buy_template = '''
+<b>Set Minimum Buy value: </b>
+
+Min USD value to buy to be eligible for the contest.
+eg 100, 200, 1000 etc
+
+'''
+
+set_winner_reward_template = '''
+<b>Set Winner Reward: </b>
+
+Set the reward for the winner in USD. 
+eg 100, 200, 1000 etc
+
+'''
+
+start_competition_confirmation_template = '''
+<b>Confirm </b>
+
+<b>Token:</b> {token_name}
+    
+<b>Start's :</b> {start_date}
+<b>Ends:</b> {end_date}
+
+<b>Minimum Buy:</b> ${minimum_buy}
+<b>Winner's Reward:</b> ${winner_reward}
+
+<i>Click Confirm to start the contest</i>
+
+'''
+
+biggest_buy_competition_alert_template = '''
+📢 📢 📢 📢 📢 📢 📢
+<b>New Biggest Buy Competition Alert</b>
+
+<i>Group: <b>{group_title}</b></i>
+
+<i>Token: <b>{token_name}</b></i>
+
+<b>Start's :</b> {start_date}
+<b>Ends:</b> {end_date}
+
+<b>Minimum Buy:</b> ${minimum_buy}
+<b>Winner's Reward:</b> ${winner_reward}
+
+<i>{ad}</i>
+'''
+
+
+regular_buy_template = '''
+<b>{token_name} </b> Buy!
+
+{amount_in} {usd_price}
+{amount_out} {token_name}
+Buyer: {buyer}
+'''
+
+biggest_buy_winners_template = '''
+<b>🎉Biggest Buy Competition Started</b>
+
+🕓 Start 11:10:00 UTC
+⏳ Ends in 1 hours 16 min 34 sec
+⬇️ Minimum Buy 0.10 BNB
+
+🥇 0x46b0…1974 ➖ 1.2 BNB
+🥈 0xc351…4bf7 ➖ 0.75 BNB
+🥉 0x7171…4ee6 ➖ 0.7 BNB
+4️⃣ 0xdfd0…4815 ➖ 0.54 BNB
+5️⃣ 0x3fa6…d50a ➖ 0.5 BNB
+
+🎖 Biggest Buy 0x46b0…1974 ➖ 1.2 BNB
+
+——
+
+Buy Grimacecoin 🥰
 '''
