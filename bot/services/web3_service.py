@@ -3,10 +3,11 @@ from web3 import Web3
 from eth_account import Account
 import secrets
 from web3.middleware import geth_poa_middleware
+from helpers.utils import decimals_to_unit
 from helpers.app_config import AppConfigs
-from models import db, Wallet, Subscription, TrackedToken, ActiveCompetition, BiggestBuyCampaign
+from models import Wallet
 from decouple import config
-from datetime import datetime, timedelta
+from datetime import datetime
 
 admin_wallet = config('ADMIN_WALLET_ADDRESS')
 
@@ -117,6 +118,12 @@ class Web3Service:
         web3 = Web3(Web3.HTTPProvider(provider))
         block = web3.eth.get_block(block_number)
         return datetime.fromtimestamp(block.timestamp)
+
+    def get_readable_amount(self, amount, decimals):
+        return Web3.fromWei(amount, decimals_to_unit(int(decimals)))
+
+    def ellipse_address(self, address):
+        return address[:6] + "..." + address[-4:]
 
     def get_swap_event_from_pair_address(self, chain_id, pair_address):
         provider = AppConfigs().get_provider(chain_id)
