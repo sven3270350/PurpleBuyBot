@@ -42,6 +42,7 @@ class Subscription(db.Model):
     payment_chain_id = db.Column(
         db.Integer, db.ForeignKey('supported_chain.id'))
     tx_hash = db.Column(db.String(120), unique=True)
+    status = db.Column(db.String(120))
     start_date = db.Column(db.DateTime, default=db.func.now())
     end_date = db.Column(db.DateTime)
     number_of_countable_subscriptions = db.Column(db.Integer)
