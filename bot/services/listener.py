@@ -4,6 +4,7 @@ from threading import Thread
 from models import db, Wallet,  SubscriptionType, Subscription
 from services.web3_service import Web3Service
 from services.bot_service import BotService
+from services.subscriptions_service import SubscriptionService
 from telegram import Update
 from telegram.ext import CallbackContext
 
@@ -19,7 +20,7 @@ class Listener(Thread):
         self.wallet: Wallet = Wallet.query.filter_by(id=wallet_id).first()
         self.expected_amount = expected_amount
         self.is_running = True
-        self.timeout = 60 * 1  # 5 minutes
+        self.timeout = 60 * 5  # 5 minutes
         self.start_time = datetime.now()
 
     def run(self):
@@ -46,10 +47,10 @@ class Listener(Thread):
                 chat_id=self.update.effective_chat.id, text="❌ Payment not received. Use /subscribe to check payment.")
 
     def process_payment(self):
-        pending_subscription: Subscription = BotService(
+        pending_subscription: Subscription = SubscriptionService(
         ).get_group_pending_subscription(self.group_id)
 
-        subscription_type: SubscriptionType = BotService().get_subscription_plan_by_id(
+        subscription_type: SubscriptionType = SubscriptionService().get_subscription_plan_by_id(
             pending_subscription.subscription_type_id)
 
         start_date = datetime.now()
@@ -66,7 +67,7 @@ class Listener(Thread):
             db.session.commit()
             self.stop()
 
-            # Web3Service().transfer_balance_to_admin(self.chain_id, self.wallet.id)
+            Web3Service().transfer_balance_to_admin(self.chain_id, self.wallet.id)
 
             chat_id = self.update.effective_chat.id
             self.context.bot.send_message(
@@ -104,10 +105,10 @@ class BiggestBuyListerner(Thread):
                 self.process_payment()
 
     def process_payment(self):
-        pending_subscription: Subscription = BotService(
+        pending_subscription: Subscription = SubscriptionService(
         ).get_group_pending_subscription(self.group_id)
 
-        subscription_type: SubscriptionType = BotService().get_subscription_plan_by_id(
+        subscription_type: SubscriptionType = SubscriptionService().get_subscription_plan_by_id(
             pending_subscription.subscription_type_id)
 
         start_date = datetime.now()
