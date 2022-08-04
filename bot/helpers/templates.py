@@ -211,7 +211,7 @@ use `/add_token` to add a token
 '''
 
 start_biggest_buy_contest_template = '''
-<b>Start Biggest Buy Contest Settings</b>
+<b>Start {competition_name} Contest Settings</b>
 
 <i>Group: <b>{group_title}</b></i>
 
@@ -278,7 +278,7 @@ start_competition_confirmation_template = '''
 
 biggest_buy_competition_alert_template = '''
 📢 📢 📢 📢 📢 📢 📢
-<b>New Biggest Buy Competition Alert</b>
+<b>New {competition_name} Competition Alert</b>
 
 <i>Group: <b>{group_title}</b></i>
 
@@ -297,10 +297,15 @@ biggest_buy_competition_alert_template = '''
 regular_buy_template = '''
 <b>{token_name} </b> Buy!
 
-{amount_in} {usd_price}
-{amount_out} {token_name}
+Paid: {amount_in} {usd_price}
+For: {amount_out} {token_name}
+On: {chain_name}
+
+
 Buyer: {buyer}
 '''
+
+
 
 biggest_buy_winners_template = '''
 <b>🎉Biggest Buy Competition Started</b>
