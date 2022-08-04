@@ -3,11 +3,11 @@ from telegram.utils import helpers
 from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from services.bot_service import BotService
 from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin
-from helpers.templates import (start_template, start_template_private, start_added_to_group,
-                               no_trackecd_tokens_template, start_biggest_buy_contest_template,
-                               set_start_time_template, set_end_time_template, set_min_buy_template,
-                               set_winner_reward_template, start_competition_confirmation_template,
-                               biggest_buy_competition_alert_template)
+from helpers.templates import (
+    no_trackecd_tokens_template, start_biggest_buy_contest_template,
+    set_start_time_template, set_end_time_template, set_min_buy_template,
+    set_winner_reward_template, start_competition_confirmation_template,
+    biggest_buy_competition_alert_template)
 from datetime import datetime, timedelta
 
 START_TIME, END_TIME, MIN_BUY, WINNER_PRIZE = range(4)
