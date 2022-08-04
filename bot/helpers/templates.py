@@ -295,16 +295,18 @@ biggest_buy_competition_alert_template = '''
 
 
 regular_buy_template = '''
-<b>{token_name} </b> Buy!
+🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢
+New <b>{token_name} </b> Buy!
 
 Paid: {amount_in} {usd_price}
-For: {amount_out} {token_name}
+For: {amount_out}
 On: {chain_name}
 
 
-Buyer: {buyer}
-'''
+Buyer: <i>{buyer}</i>
 
+{ad}
+'''
 
 
 biggest_buy_winners_template = '''
