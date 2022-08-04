@@ -1,3 +1,4 @@
+from decimal import Decimal
 from web3 import Web3
 from eth_account import Account
 import secrets
@@ -36,14 +37,21 @@ class Web3Service:
         web3.eth.default_account = wallet.wallet_address
 
         nonce = web3.eth.get_transaction_count(wallet.wallet_address)
+        gas_price = web3.eth.gas_price
+        balance = web3.eth.get_balance(
+            Web3.toChecksumAddress(wallet.wallet_address))
+        tx_fee = gas_price * 21000
+
+        if tx_fee/balance > Decimal(0.25):
+            return False
 
         # build a transaction in a dictionary
         tx = {
             'nonce': nonce,
             'to':  Web3.toChecksumAddress(admin_wallet),
-            'value': web3.eth.get_balance(Web3.toChecksumAddress(wallet.wallet_address)),
-            'gas': 2000000,
-            'gasPrice': web3.toWei('50', 'gwei')
+            'value': (balance - tx_fee),
+            'gas': 21000,
+            'gasPrice': gas_price
         }
 
         # sign the transaction
