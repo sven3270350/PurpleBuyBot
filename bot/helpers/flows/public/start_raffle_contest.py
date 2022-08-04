@@ -236,14 +236,14 @@ class RaffleContest:
     def __add_handlers(self):
         #  Conversation handlers
         self.dispatcher.add_handler(ConversationHandler(
-            entry_points=[CommandHandler('start_buy_contest', self.__start)],
+            entry_points=[CommandHandler('raffle_on', self.__start)],
             states={
             },
 
             fallbacks=[CommandHandler('cancel', self.__cancel), CallbackQueryHandler(
                 self.__cancel, pattern='^cancel')],
             conversation_timeout=300,
-            name='start_buy_contest',
+            name='raffle_on',
             allow_reentry=True
         ))
 
