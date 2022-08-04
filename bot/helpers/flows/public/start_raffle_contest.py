@@ -271,7 +271,7 @@ class RaffleContest:
 
         update.message.reply_text(
             text=start_biggest_buy_contest_template.format(
-                competition_name=COMPETITION_NAME
+                competition_name=COMPETITION_NAME,
                 group_title=chat_data['group_title'],
                 token_name=chat_data['tracked_token'],
                 start_date=chat_data['start_time'],
