@@ -65,7 +65,7 @@ def not_group_admin(update: Update, context: CallbackContext):
     return ConversationHandler.END
 
 
-def decimals_to_uint(decimals):
+def decimals_to_unit(decimals):
     units = {
         1: 'wei',
         3: 'kwei',
