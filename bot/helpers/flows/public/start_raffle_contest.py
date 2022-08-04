@@ -12,6 +12,8 @@ from datetime import datetime, timedelta
 
 START_TIME, END_TIME, MIN_BUY, WINNER_PRIZE = range(4)
 
+COMPETITION_NAME = "Raffle"
+
 
 class RaffleContest:
     def __init__(self, dispatcher: Dispatcher):
@@ -269,6 +271,7 @@ class RaffleContest:
 
         update.message.reply_text(
             text=start_biggest_buy_contest_template.format(
+                competition_name=COMPETITION_NAME
                 group_title=chat_data['group_title'],
                 token_name=chat_data['tracked_token'],
                 start_date=chat_data['start_time'],

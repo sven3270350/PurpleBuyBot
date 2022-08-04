@@ -12,6 +12,8 @@ from datetime import datetime, timedelta
 
 START_TIME, END_TIME, MIN_BUY, WINNER_PRIZE = range(4)
 
+COMPETITION_NAME = "Biggest Buy"
+
 
 class BuyContest:
     def __init__(self, dispatcher: Dispatcher):
@@ -125,6 +127,7 @@ class BuyContest:
             # BotService().create_buy_contest(group_id, group_title, token_name, start_date, end_date, minimum_buy, winner_reward)
 
             template = biggest_buy_competition_alert_template.format(
+                competition_name=COMPETITION_NAME,
                 group_title=group_title,
                 token_name=token_name,
                 start_date=start_date,
@@ -269,6 +272,7 @@ class BuyContest:
 
         update.message.reply_text(
             text=start_biggest_buy_contest_template.format(
+                competition_name=COMPETITION_NAME,
                 group_title=chat_data['group_title'],
                 token_name=chat_data['tracked_token'],
                 start_date=chat_data['start_time'],
