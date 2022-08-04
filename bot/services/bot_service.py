@@ -164,6 +164,12 @@ class BotService:
         price_usd = price.get(_id)['usd']
         return web3.Web3.toWei(Decimal(usd / price_usd), 'ether') * int(count)
 
+    def native_to_usd_by_chain(self, native, chain_id):
+        _id = AppConfigs().get_cg_id(chain_id)
+        price: dict = cg.get_price(ids=_id, vs_currencies='usd')
+        price_usd = price.get(_id)['usd']
+        return web3.Web3.fromWei(Decimal(native), 'ether') * Decimal(price_usd)
+
     def get_user_tracked_token_name(self, group_id):
         token_name = TrackedToken.query.filter_by(
             group_id=group_id).first().token_name
