@@ -5,6 +5,7 @@ from telegram.ext import (
     CallbackContext, Dispatcher, ConversationHandler,
     CommandHandler, CallbackQueryHandler, MessageHandler, Filters)
 from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
+from services.listener import Listener
 from services.web3_service import Web3Service
 from services.bot_service import BotService
 from helpers.utils import (
@@ -315,6 +316,7 @@ class Subscription:
                 pending_subscription.tx_hash = transaction_hash
                 pending_subscription.start_date = block_timestampe
                 pending_subscription.end_date = end_date
+                pending_subscription.status = 'paid',
                 db.session.add(pending_subscription)
                 db.session.commit()
 
@@ -366,25 +368,42 @@ class Subscription:
 
         # Create a new subscription
         try:
+            number_of_subscription = subscription_count if subscription_count else 1
+
+            expected_amount = BotService().usd_to_native_price_by_chain(
+                subscription_type.usd_price, number_of_subscription,  chain_id)
+
+            group_id = context.chat_data['group_id']
             subscription = SubscriptionModel(
-                group_id=context.chat_data['group_id'],
+                group_id=group_id,
                 subscription_type_id=subscription_type.id,
                 payment_chain_id=chain_id,
                 wallet_id=wallet.id,
+                status='pending',
                 number_of_countable_subscriptions=(
                     subscription_count if subscription_count else 1),
                 is_life_time_subscription=True if subscription_type.subscription_type == 'Lifetime' else False,
-                expected_amount_in_native_wei=BotService().usd_to_native_price_by_chain(subscription_type.usd_price, chain_id))
+                expected_amount_in_native_wei=expected_amount)
 
             db.session.add(subscription)
             db.session.commit()
 
-            context.bot.edit_message_text(
+            current_balance = Web3Service().get_wallet_balance(
+                chain_id, wallet.wallet_address)
+            # start a listener for the transaction
+            self.__start_listener_for_payment(
+                update, context, group_id, chain_id, wallet.id, current_balance, expected_amount)
+
+            context.bot.edit_message_reply_markup(
+                chat_id=update.callback_query.message.chat_id,
+                message_id=message_id,
+                reply_markup=InlineKeyboardMarkup([[]]))
+
+            context.bot.send_message(
                 text=f"<i>✅ Subscription Recorded! It will be activated after payment is confirmed</i>",
                 chat_id=self.chatid,
-                message_id=message_id,
-                parse_mode=ParseMode.HTML,
-                reply_markup=InlineKeyboardMarkup([[]]))
+                parse_mode=ParseMode.HTML
+            )
 
             reset_chat_data(context)
             return ConversationHandler.END
@@ -492,7 +511,7 @@ class Subscription:
             text=final_subscription_review_template.format(
                 group_title=chat_data['group_title'],
                 package=f'{subscription.subscription_type} {f"({count})" if count else ""}',
-                total_cost=f'{web3.Web3.fromWei(BotService().usd_to_native_price_by_chain(subscription.usd_price * int(count), chain_id), "ether")} {chain.native_symbol}',
+                total_cost=f'{web3.Web3.fromWei(BotService().usd_to_native_price_by_chain(subscription.usd_price, count, chain_id), "ether")} {chain.native_symbol}',
                 chain_name=chain.chain_name,
                 wallet=wallet.wallet_address),
             parse_mode=ParseMode.HTML,
@@ -518,7 +537,7 @@ class Subscription:
             fallbacks=[CommandHandler('cancel', self.__cancel), CallbackQueryHandler(
                 self.__cancel, pattern='^cancel')],
             conversation_timeout=300,
-            name='remove_token'
+            name='subscription'
         ))
 
     def __extract_params(self, update: Update, context: CallbackContext):
@@ -528,3 +547,9 @@ class Subscription:
         self.chatusername = update.effective_chat.username
         self.group_message_sent_by = update.effective_user.username
         self.bot_name = context.bot.username
+
+    def __start_listener_for_payment(self, update, context, group_id, chain_id, wallet_id, current_balance, expected_amount):
+        listener = Listener(update, context, group_id, chain_id, wallet_id,
+                            current_balance, expected_amount)
+        listener.start()
+        return listener
