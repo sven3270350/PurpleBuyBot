@@ -296,12 +296,13 @@ biggest_buy_competition_alert_template = '''
 
 regular_buy_template = '''
 🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢
+
 New <b>{token_name} </b> Buy!
 
-Paid: {amount_in} {usd_price}
-For: {amount_out}
-On: {chain_name}
+<b>Paid</b>: <i>{amount_in} ${usd_price}</i>
+<b>For</b>: <i>{amount_out}</i>
 
+<b>On</b>: <i>{chain_name}</i>
 
 Buyer: <i>{buyer}</i>
 
