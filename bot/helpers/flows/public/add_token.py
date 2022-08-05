@@ -263,6 +263,44 @@ class AddToken:
             return not_group_admin(update, context)
 
     @send_typing_action
+    def __active_tracking(self, update: Update, context: CallbackContext):
+        self.__extract_params(update, context)
+        if is_private_chat(update):
+            if not BotService().is_group_in_focus(update, context):
+                reset_chat_data(context)
+                return ConversationHandler.END
+
+            group_id = context.chat_data.get('group_id', None)
+            if not is_group_admin(update, context):
+                return not_group_admin(update, context)
+
+            active_tracked_token: TrackedToken = TrackedToken.query.filter_by(
+                group_id=group_id, active_tracking=True).first()
+
+            if active_tracked_token:
+                disable_button = [[InlineKeyboardButton(
+                    text='Disable Tracking', callback_data="disable")]]
+
+                self.__add_disable_tracking_handler()
+
+                update.message.reply_text(
+                    text=f"<i> Buys for <b>{active_tracked_token.token_name}</b> is being tracked </i>",
+                    parse_mode=ParseMode.HTML,
+                    reply_markup=InlineKeyboardMarkup(disable_button)
+                )
+            else:
+                enable_button = [[InlineKeyboardButton(
+                    text='Enable Tracking', callback_data="enable")]]
+
+                self.__add_enbale_tracking_handler()
+
+                update.message.reply_text(
+                    text=f"<i> You haven't enabled buy tracking </i>",
+                    parse_mode=ParseMode.HTML,
+                    reply_markup=InlineKeyboardMarkup(enable_button)
+                )
+
+    @send_typing_action
     def __cancel_add_token(self, update: Update, context: CallbackContext) -> int:
         update.message.reply_text(text="<i>❌ Add Token Cancelled. </i>",
                                   parse_mode=ParseMode.HTML)
@@ -271,6 +309,8 @@ class AddToken:
         return ConversationHandler.END
 
     def __add_handlers(self):
+        self.dispatcher.add_handler(CommandHandler(
+            'active_tracking', self.__active_tracking))
         self.dispatcher.add_handler(
             ConversationHandler(
                 entry_points=[
@@ -316,3 +356,50 @@ class AddToken:
         self.chatusername = update.effective_chat.username
         self.group_message_sent_by = update.effective_user.username
         self.bot_name = context.bot.username
+
+    def __enable_tracking(self, update: Update, context: CallbackContext):
+        group_id = context.chat_data.get('group_id', None)
+        group_tracked_token: list[TrackedToken] = TrackedToken.query.filter_by(
+            group_id=group_id).all()
+
+        if group_tracked_token:
+            for token in group_tracked_token:
+                token.active_tracking = True
+                db.session.commit()
+
+            update.callback_query.answer()
+            update.callback_query.edit_message_text(text="<i>✅ Tracking enabled successfully </i>",
+                                                    parse_mode=ParseMode.HTML)
+        self.__remove_enbale_tracking_handler()
+
+    def __disable_tracking(self, update: Update, context: CallbackContext):
+        group_id = context.chat_data.get('group_id', None)
+        group_tracked_token: list[TrackedToken] = TrackedToken.query.filter_by(
+            group_id=group_id, active_tracking=True).all()
+
+        if group_tracked_token:
+            for token in group_tracked_token:
+                token.active_tracking = False
+                db.session.commit()
+
+            update.callback_query.answer()
+            update.callback_query.edit_message_text(text="<i>✅ Tracking disabled successfully </i>",
+                                                    parse_mode=ParseMode.HTML)
+
+        self.__remove_disable_tracking_handler()
+
+    def __add_enbale_tracking_handler(self):
+        self.enable_tracking_handler = CallbackQueryHandler(
+            self.__enable_tracking, pattern='^enable$')
+        self.dispatcher.add_handler(self.enable_tracking_handler)
+
+    def __add_disable_tracking_handler(self):
+        self.disable_tracking_handler = CallbackQueryHandler(
+            self.__disable_tracking, pattern='^disable$')
+        self.dispatcher.add_handler(self.disable_tracking_handler)
+
+    def __remove_enbale_tracking_handler(self):
+        self.dispatcher.remove_handler(self.enable_tracking_handler)
+
+    def __remove_disable_tracking_handler(self):
+        self.dispatcher.remove_handler(self.disable_tracking_handler)
