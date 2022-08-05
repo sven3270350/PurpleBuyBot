@@ -3,7 +3,6 @@ from web3 import Web3
 from eth_account import Account
 import secrets
 from web3.middleware import geth_poa_middleware
-from helpers.utils import decimals_to_unit
 from helpers.app_config import AppConfigs
 from models import Wallet
 from decouple import config
@@ -120,7 +119,7 @@ class Web3Service:
         return datetime.fromtimestamp(block.timestamp)
 
     def get_readable_amount(self, amount, decimals):
-        return Web3.fromWei(amount, decimals_to_unit(int(decimals)))
+        return Web3.fromWei(amount, self.decimals_to_unit(int(decimals)))
 
     def ellipse_address(self, address):
         return address[:6] + "..." + address[-4:]
@@ -132,6 +131,22 @@ class Web3Service:
             address=pair_address, abi=AppConfigs().get_pair_abi()
         )
         return pair.events.Swap.createFilter(fromBlock='latest')
+
+    def decimals_to_unit(self, decimals):
+        units = {
+            1: 'wei',
+            3: 'kwei',
+            6: 'mwei',
+            9: 'gwei',
+            12: 'szabo',
+            15: 'finney',
+            18: 'ether',
+            21: 'kether',
+            24: 'mether',
+            27: 'gether',
+            30: 'tether'
+        }
+        return units[decimals]
 
     def swap_even_handler(self, pair: str, data: dict):
         amount_0_in = data.get('amount0In')
