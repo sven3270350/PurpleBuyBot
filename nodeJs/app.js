@@ -3,6 +3,15 @@ require("dotenv").config({ path: "../.env" });
 const URL = "wss://mainnet.infura.io/ws/v3/cf3f5c7c8d5f45a48940d926bab3c403";
 const Web3 = require("web3");
 const appConfig = require("./utils/app_config");
+const db = require("./db");
+
+db.query("SELECT * FROM pairs", (err, res) => {
+  if (err) {
+    console.log(err);
+  } else {
+    console.log(res.rows);
+  }
+});
 
 console.log(appConfig.getExploerUrl(1));
 console.log(appConfig.getChain(1));
