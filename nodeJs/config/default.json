@@ -1,0 +1,40 @@
+{
+  "SECRETS": {
+    "secret_key": "28f653e17bbbae90372c340dd28180127796a348a1c70e1dbc3d58d92ab1ff37"
+  },
+
+  "EXPLORERS": {
+    "etherscan": "https://etherscan.io/",
+    "bscscan": "https://bscscan.com/",
+    "cronoscan": "https://cronoscan.com/",
+    "ropsten": "https://ropsten.etherscan.io/",
+    "bscTestnet": "https://testnet.bscscan.com/",
+    "croTest": "https://cronos.org/explorer/testnet3/"
+  },
+
+  "SURPORTED_CHAINS": {
+    "ethChainId": 1,
+    "bscChainId": 56,
+    "croChainId": 25,
+
+    "testnetEthChainId": 3,
+    "testnetBscChainId": 97,
+    "testnetCroChainId": 338
+  },
+
+  "WEB3_PROVIDER": {
+    "ethProvider": "https://mainnet.infura.io/v3/cf3f5c7c8d5f45a48940d926bab3c403",
+    "bscProvider": " https://bsc-dataseed2.defibit.io/",
+    "croProvider": "https://evm.cronos.org/",
+
+    "testnetEthProvider": "https://ropsten.infura.io/v3/cf3f5c7c8d5f45a48940d926bab3c403",
+    "testnetBscProvider": "https://data-seed-prebsc-2-s1.binance.org:8545/",
+    "testnetCroProvider": "https://evm-t3.cronos.org/"
+  },
+
+  "COINGECKO_IDs": {
+    "ethid": "ethereum",
+    "bscid": "binancecoin",
+    "croid": " crypto-com-chain"
+  }
+}
