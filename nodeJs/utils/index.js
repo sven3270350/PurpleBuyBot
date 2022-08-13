@@ -3,6 +3,11 @@ const appConfig = require("./app_config");
 const UniswapV2Pair = require("./IUniswapV2Pair.json");
 const ERC20 = require("./erc20abi.json");
 const Web3 = require("web3");
+const CoinGecko = require("coingecko-api");
+const CoinGeckoClient = new CoinGecko();
+const TelegramBot = require("node-telegram-bot-api");
+
+const bot = new TelegramBot(process.env.PUBLIC_BOT_API_KEY);
 
 const wss = (provider) => new Web3(provider);
 
@@ -114,6 +119,21 @@ const decimalsToUnit = (decimals) => {
   return units[decimals];
 };
 
+const getUsdPrice = async (amount, chainId) => {
+  const id = appConfig.getCoinGeckoId(chainId);
+  const { data } = await CoinGeckoClient.simple.price({
+    ids: id,
+    vs_currencies: "usd",
+  });
+  const price = data[id].usd;
+
+  return Intl.NumberFormat("en-US").format(Number(amount) * price);
+};
+
+const sendHTMLMessage = async (groupId, messageTemplate) => {
+  bot.sendMessage(groupId, messageTemplate, { parse_mode: "HTML" });
+};
+
 module.exports = {
   ...appConfig,
   selectTrackedToken,
@@ -126,4 +146,6 @@ module.exports = {
   wss,
   fromWei: Web3.utils.fromWei,
   decimalsToUnit,
+  getUsdPrice,
+  sendHTMLMessage,
 };
