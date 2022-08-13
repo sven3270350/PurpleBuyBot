@@ -33,7 +33,7 @@ const getAllActivelyTrackedTokens = async () => {
   const query = `
     SELECT
     tk.group_id,  tk.token_name, tk.token_address,
-    tk.token_symbol, tk.token_decimals, tk.pair_address as pair,
+    tk.token_symbol, tk.token_decimals, tk.pair_address as pair, tk.active_tracking,
     sc.chain_name, sc.chain_id,
     sp.pair_name as paired_with_name, sp.pair_address as paired_with
     FROM public.tracked_token tk
@@ -44,8 +44,7 @@ const getAllActivelyTrackedTokens = async () => {
     JOIN public.token_pairs tp
     ON tk.id = tp.token_id
     JOIN public.supported_pairs sp
-    ON sp.id = tp.pair_id
-    WHERE tk.active_tracking = true;
+    ON sp.id = tp.pair_id;
     `;
   const res = await db.query(query);
   return res.rows;
