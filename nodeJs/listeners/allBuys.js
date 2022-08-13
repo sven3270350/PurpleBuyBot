@@ -8,6 +8,7 @@ const allBuysHandler = async (trackedToken, amountIn, amountOut, to) => {
   const usdPrice = await utils.getUsdPrice(amountIn, trackedToken.chain_id);
   const templates = generalBuyTemplate(
     trackedToken.token_name,
+    trackedToken.token_symbol,
     amountIn,
     usdPrice,
     amountOut,
