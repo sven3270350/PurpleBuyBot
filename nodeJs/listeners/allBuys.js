@@ -1,14 +1,22 @@
 const queries = require("../db/queries");
 const utils = require("../utils");
+const { generalBuyTemplate } = require("../utils/templates");
 
 const subscriptions = {};
 
 const allBuysHandler = async (trackedToken, amountIn, amountOut, to) => {
-  console.log(
-    `Swap* Pair ${trackedToken.pair},  
-    Paid (${trackedToken.paired_with_name}) ${amountIn},  
-    Got (${trackedToken.token_symbol}) ${amountOut}, To ${to} \n\n`
+  const usdPrice = await utils.getUsdPrice(amountIn, trackedToken.chain_id);
+  const templates = generalBuyTemplate(
+    trackedToken.token_name,
+    amountIn,
+    usdPrice,
+    amountOut,
+    trackedToken.chain_name,
+    to
   );
+
+  // send message to group
+  utils.sendHTMLMessage(trackedToken.group_id, templates);
 };
 
 const subscribe = async (trackedToken, contract) => {
