@@ -1,3 +1,4 @@
+from datetime import datetime
 from time import sleep
 from threading import Thread
 from models import TrackedToken, SupportedPairs, SupportedChain
@@ -7,6 +8,11 @@ from services.subscriptions_service import SubscriptionService
 from telegram import ParseMode, Bot
 from helpers.templates import regular_buy_template
 import asyncio
+import telegram
+from decouple import config
+
+telegram_bot_token = config('PUBLIC_BOT_API_KEY')
+bot = telegram.Bot(token=telegram_bot_token)
 
 loop = asyncio.new_event_loop()
 
@@ -17,6 +23,7 @@ class BuyListener(Thread):
         self.bot = bot
         self.is_running = True
         self.is_terminated = False
+        self.tasks = []
 
     def run(self):
         while not self.is_running and not self.is_terminated:
@@ -43,8 +50,6 @@ class BuyListener(Thread):
         self.is_terminated = True
 
     def __fetch_tokens_to_track(self):
-        print('[Buy Listener]: ',
-              f'Fetch tracked tokens called, in {self.is_running}')
         tracked_tokens: list[TrackedToken] = TrackedToken.query.filter_by(
             active_tracking=True).all()
 
@@ -54,14 +59,11 @@ class BuyListener(Thread):
         return tracked_tokens
 
     async def __listen_loop(self, tracked_token: TrackedToken, event_filter, poll_interval=2):
-      
-        while TrackedToken.query.filter_by(id=tracked_token.id).first().active_tracking:
-            print('[Buy Listener]: ',
-              f'Has active tracking {self.is_running}')
+        active_tracking = tracked_token.active_tracking
+        while active_tracking:
             for event in event_filter.get_new_entries():
                 self.__process_event(event['args'], tracked_token)
             await asyncio.sleep(poll_interval)
-            
 
     def __process_event(self, data: dict, tracked_token: TrackedToken):
         amount0_in = data.get('amount0In')
@@ -98,22 +100,23 @@ class BuyListener(Thread):
             )
 
     def __run_listener(self):
-        tasks = []
-
         for tracked_token in self.__fetch_tokens_to_track():
             chain: SupportedChain = tracked_token.chain[0]
             pair_address = tracked_token.pair_address
             event_filter = Web3Service().get_swap_event_from_pair_address(
                 chain.chain_id, pair_address)
-            tasks.append(loop.create_task(
+            self.tasks.append(loop.create_task(
                 self.__listen_loop(tracked_token, event_filter)))
 
         try:
-            if tasks:
+            if self.tasks:
                 loop.run_until_complete(
-                    asyncio.gather(*tasks)
+                    asyncio.gather(*self.tasks)
                 )
 
             self.stop()
         finally:
             loop.close()
+
+
+buy_listener = BuyListener(bot)
