@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "coingecko-api": "^1.0.10",
     "config": "^3.3.7",
     "dotenv": "^16.0.1",
     "node-telegram-bot-api": "^0.58.0",
