@@ -126,7 +126,10 @@ const getUsdPrice = async (amount, chainId) => {
   });
   const price = data[id].usd;
 
-  return Intl.NumberFormat("en-US").format(Number(amount) * price);
+  return Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(Number(amount) * price);
 };
 
 const sendHTMLMessage = async (groupId, messageTemplate) => {
