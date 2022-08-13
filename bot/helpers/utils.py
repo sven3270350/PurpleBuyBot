@@ -63,28 +63,3 @@ def not_group_admin(update: Update, context: CallbackContext):
                               parse_mode=ParseMode.HTML)
     reset_chat_data(context)
     return ConversationHandler.END
-
-class EventList(list):
-
-    def __setitem__(self, key, value):
-        super(EventList, self).__setitem__(key, value)
-        print("The list has been changed!")
-
-    def __delitem__(self, value):
-        super(EventList, self).__delitem__(value)
-        print("The list has been changed!")
-
-    def __add__(self, value):
-        super(EventList, self).__add__(value)
-        print("The list has been changed!")
-
-    def __iadd__(self, value):
-        super(EventList, self).__iadd__(value)
-        print("The list has been changed!")
-
-    def append(self, value):
-        super(EventList, self).append(value)
-        print("The list has been changed!")
-
-    def remove(self, value):
-        super(EventList, self).remove(value)
