@@ -71,8 +71,17 @@ const getActiveSubscriptionByGroupId = async (group_id) => {
   return res.rows;
 };
 
+const getActiveAd = async () => {
+  const query = `
+        SELECT NOW();
+    `;
+  const res = await db.query(query);
+  return res.rows;
+};
+
 module.exports = {
   getTrackedTokensById,
   getActiveSubscriptionByGroupId,
   getAllActivelyTrackedTokens,
+  getActiveAd,
 };
