@@ -91,7 +91,6 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
   const to = data.returnValues.to;
 
   if (amountIn > 0 || amountOut > 0) {
-    console.log(data.returnValues);
     callback(trackedToken, amountIn, amountOut, to);
   }
 };
