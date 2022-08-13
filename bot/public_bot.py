@@ -1,5 +1,5 @@
 
-from services.listeners.buy_listeners import BuyListener
+from services.listeners.buy_listeners import buy_listener
 from helpers.flows.public.start_raffle_contest import RaffleContest
 from helpers.flows.public.start_buy_contest import BuyContest
 from helpers.flows.public.subscription import Subscription
@@ -33,10 +33,6 @@ def main():
     GeneralHandler(dispatcher)
     BuyContest(dispatcher)
     RaffleContest(dispatcher)
-
-    buy_listener = BuyListener(bot)
-    buy_listener.start()
-
     start_bot()
 
 if __name__ == '__main__':
