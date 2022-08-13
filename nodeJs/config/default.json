@@ -23,13 +23,13 @@
   },
 
   "WEB3_PROVIDER": {
-    "ethProvider": "https://mainnet.infura.io/v3/cf3f5c7c8d5f45a48940d926bab3c403",
-    "bscProvider": " https://bsc-dataseed2.defibit.io/",
-    "croProvider": "https://evm.cronos.org/",
+    "ethProvider": "wss://mainnet.infura.io/ws/v3/cf3f5c7c8d5f45a48940d926bab3c403",
+    "bscProvider": "wss://bsc.getblock.io/mainnet/?api_key=d224b0a4-97d9-46c3-9b13-75baeb4f2717",
+    "croProvider": "https://cro.getblock.io/mainnet/?api_key=d224b0a4-97d9-46c3-9b13-75baeb4f2717",
 
-    "testnetEthProvider": "https://ropsten.infura.io/v3/cf3f5c7c8d5f45a48940d926bab3c403",
-    "testnetBscProvider": "https://data-seed-prebsc-2-s1.binance.org:8545/",
-    "testnetCroProvider": "https://evm-t3.cronos.org/"
+    "testnetEthProvider": "wss://eth.getblock.io/goerli/?api_key=d224b0a4-97d9-46c3-9b13-75baeb4f2717",
+    "testnetBscProvider": "wss://bsc.getblock.io/mainnet/?api_key=d224b0a4-97d9-46c3-9b13-75baeb4f2717",
+    "testnetCroProvider": "wss://evm-t3.cronos.org/"
   },
 
   "COINGECKO_IDs": {
