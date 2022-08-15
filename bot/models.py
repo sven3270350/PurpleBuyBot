@@ -1,5 +1,5 @@
-# from bot.app import db
-from app import db
+from bot.app import db
+# from app import db
 
 
 class Group(db.Model):
@@ -84,8 +84,8 @@ class TrackedToken(db.Model):
         return '<TrackedToken %r>' % self.token_name
 
 
-class BiggestBuyCampaign(db.Model):
-    __tablename__ = 'biggest_buy_campaign'
+class Campaigns(db.Model):
+    __tablename__ = 'campaigns'
     id = db.Column(db.Integer, primary_key=True)
     group_id = db.Column(db.String(80), db.ForeignKey('group.group_id'))
     start_time = db.Column(db.DateTime)
@@ -94,30 +94,13 @@ class BiggestBuyCampaign(db.Model):
     campaign_status = db.Column(db.String(80))
     campaign_winner = db.Column(db.String(100))
     minimum_buy_amount = db.Column(db.Integer)
+    campaing_type = db.Column(db.String(120))
     prize = db.Column(db.String(30))
     transactions = db.relationship(
-        'BiggestBuyTransaction', backref='biggest_buy_campaign', lazy='dynamic')
+        'Transactions', backref='campaign', lazy='dynamic')
 
     def __repr__(self):
-        return '<BiggestBuyCampaign %r>' % f"{self.group_id}_{self.id}"
-
-
-class RaffleCampaign(db.Model):
-    __tablename__ = 'raffle_campaign'
-    id = db.Column(db.Integer, primary_key=True)
-    group_id = db.Column(db.String(80), db.ForeignKey('group.group_id'))
-    start_time = db.Column(db.DateTime)
-    end_time = db.Column(db.DateTime)
-    count_down = db.Column(db.Integer)
-    campaign_status = db.Column(db.String(80))
-    campaign_winner = db.Column(db.String(100))
-    minimum_buy_amount = db.Column(db.Integer)
-    prize = db.Column(db.String(30))
-    transactions = db.relationship(
-        'RaffleTransaction', backref='raffle_campaign', lazy='dynamic')
-
-    def __repr__(self):
-        return '<RaffleCampaign %r>' % f"{self.group_id}_{self.id}"
+        return '<Campaigns %r>' % f"{self.campaing_type}_{self.group_id}_{self.id}"
 
 
 class ActiveCompetition(db.Model):
@@ -127,11 +110,6 @@ class ActiveCompetition(db.Model):
     competition_type = db.Column(db.String(80))
     competition_id = db.Column(db.String(80))
     group = db.relationship("Group", back_populates="active_competition")
-
-    def __init__(self, group_id, competition_type, competition_id):
-        self.group_id = group_id
-        self.competition_type = competition_type
-        self.competition_id = competition_id
 
     def __repr__(self):
         return '<ActiveCompetition %r>' % f"{self.group_id}_{self.competition_type}_{self.competition_id}"
@@ -174,10 +152,6 @@ class Admin(db.Model):
     admin_id = db.Column(db.String(80))
     admin_username = db.Column(db.String(80))
 
-    def __init__(self, admin_id, admin_username):
-        self.admin_id = admin_id
-        self.admin_username = admin_username
-
     def __repr__(self):
         return '<Admin %r>' % self.admin_username
 
@@ -198,50 +172,30 @@ class Wallet(db.Model):
         return '<Wallet %r>' % self.wallet_address
 
 
-class BiggestBuyTransaction(db.Model):
-    __tablename__ = 'biggest_buy_transaction'
+class Transactions(db.Model):
+    __tablename__ = 'transactions'
     id = db.Column(db.Integer, primary_key=True)
-    biggest_buy_campaign_id = db.Column(
-        db.Integer, db.ForeignKey('biggest_buy_campaign.id'))
+    campaign_id = db.Column(
+        db.Integer, db.ForeignKey('campaigns.id'))
     buyer_address = db.Column(db.String(100))
     buyer_amount = db.Column(db.Integer)
     transaction_link = db.Column(db.String(100))
     transaction_chain = db.Column(db.String(20))
+    cmapaign_type = db.Column(db.String(100))
     group_id = db.Column(db.String(80), db.ForeignKey('group.group_id'))
 
-    def __init__(self, biggest_buy_campaign_id, buyer_address, buyer_amount, transaction_link, transaction_chain, group_id):
-        self.biggest_buy_campaign_id = biggest_buy_campaign_id
-        self.buyer_address = buyer_address
-        self.buyer_amount = buyer_amount
-        self.transaction_link = transaction_link
-        self.transaction_chain = transaction_chain
-        self.group_id = group_id
-
     def __repr__(self):
-        return '<BiggestBuyTransaction %r>' % f"{self.group_id}_{self.biggest_buy_campaign_id}_{self.id}"
+        return '<Transactions %r>' % f"{self.group_id}_{self.biggest_buy_campaign_id}_{self.id}"
 
 
-class RaffleTransaction(db.Model):
-    __tablename__ = 'raffle_transaction'
+class Advertisement(db.Model):
+    __tablename__ = "advertisement"
     id = db.Column(db.Integer, primary_key=True)
-    raffle_campaign_id = db.Column(
-        db.Integer, db.ForeignKey('raffle_campaign.id'))
-    buyer_address = db.Column(db.String(100))
-    buyer_amount = db.Column(db.Integer)
-    transaction_link = db.Column(db.String(100))
-    transaction_chain = db.Column(db.String(20))
-    group_id = db.Column(db.String(80), db.ForeignKey('group.group_id'))
-
-    def __init__(self, raffle_campaign_id, buyer_address, buyer_amount, transaction_link, transaction_chain, group_id):
-        self.raffle_campaign_id = raffle_campaign_id
-        self.buyer_address = buyer_address
-        self.buyer_amount = buyer_amount
-        self.transaction_link = transaction_link
-        self.transaction_chain = transaction_chain
-        self.group_id = group_id
+    advert = db.Column(db.Text, nullable=False)
+    isActive = db.Column(db.Boolean, nullable=False)
 
     def __repr__(self):
-        return '<RaffleTransaction %r>' % f"{self.group_id}_{self.raffle_campaign_id}_{self.id}"
+        return '<Advertisement %r>' % self.advert
 
 
 #  Association tables
