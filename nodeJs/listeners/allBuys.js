@@ -7,17 +7,13 @@ const subscriptions = {};
 const allBuysHandler = async (trackedToken, amountIn, amountOut, to) => {
   const usdPrice = await utils.getUsdPrice(amountIn, trackedToken.chain_id);
   const ad = await utils.getAd(trackedToken.group_id);
-
-  const templates = generalBuyTemplate(
-    trackedToken.token_name,
-    trackedToken.token_symbol,
+  const amounts = {
     amountIn,
-    usdPrice,
     amountOut,
-    trackedToken.chain_name,
-    to,
-    ad
-  );
+    usdPrice,
+  };
+
+  const templates = generalBuyTemplate(trackedToken, amounts, to, ad);
 
   // send message to group
   utils.sendHTMLMessage(trackedToken.group_id, templates);
