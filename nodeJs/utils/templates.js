@@ -55,7 +55,10 @@ const campaignBiggestBuysTemplate = (
 
 🕓 Started at: <b>${times.start_time}</b>
 ⏳ Ends in: <b>${times.count_down}</b>
-⬇️ Minimum Buy: <b>$${campaign.min_buy}</b>
+⬇️ Minimum Buy: <b>${Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(campaign.min_buy)}</b>
 🏆 Prize: <b>${campaign.prize}</b>
 
 <b>Top 5</b>
