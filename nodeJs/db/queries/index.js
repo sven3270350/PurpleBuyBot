@@ -29,22 +29,30 @@ const getTrackedTokensById = async (group_id) => {
   return res.rows;
 };
 
-const getAllActivelyTrackedTokens = async () => {
+const getAllActivelyTrackedTokensNoActiveCampaign = async () => {
   const query = `
-    SELECT
-    tk.group_id,  tk.token_name, tk.token_address,
-    tk.token_symbol, tk.token_decimals, tk.pair_address as pair, tk.active_tracking,
-    sc.chain_name, sc.chain_id,
-    sp.pair_name as paired_with_name, sp.pair_address as paired_with
-    FROM public.tracked_token tk
-    JOIN public.token_chains tc
-    ON tk.id = tc.token_id
-    JOIN public.supported_chain sc
-    ON sc.id = tc.chain_id
-    JOIN public.token_pairs tp
-    ON tk.id = tp.token_id
-    JOIN public.supported_pairs sp
-    ON sp.id = tp.pair_id;
+  SELECT
+  DISTINCT 
+  tk.group_id,  tk.token_name, tk.token_address,
+  tk.token_symbol, tk.token_decimals, tk.pair_address as pair, tk.active_tracking,
+  sc.chain_name, sc.chain_id,
+  sp.pair_name as paired_with_name, sp.pair_address as paired_with
+  FROM public.tracked_token tk
+  JOIN public.token_chains tc
+  ON tk.id = tc.token_id
+  JOIN public.supported_chain sc
+  ON sc.id = tc.chain_id
+  JOIN public.token_pairs tp
+  ON tk.id = tp.token_id
+  JOIN public.supported_pairs sp
+  ON sp.id = tp.pair_id
+  WHERE 
+  (
+      SELECT COUNT(*) 
+       FROM public.campaigns 
+      WHERE public.campaigns.start_time <= NOW() AND  public.campaigns.end_time >= NOW()
+  ) < 1
+  AND tk.active_tracking = true;
     `;
   const res = await db.query(query);
   return res.rows;
@@ -98,7 +106,7 @@ const getActiveAd = async () => {
 module.exports = {
   getTrackedTokensById,
   getActiveSubscriptionByGroupId,
-  getAllActivelyTrackedTokens,
+  getAllActivelyTrackedTokensNoActiveCampaign,
   getActiveAd,
   getAllActiveCampaigns,
   getAllUpcomingCampaigns,
