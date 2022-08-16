@@ -1,20 +1,58 @@
 const queries = require("../db/queries");
 const utils = require("../utils");
-const { generalBuyTemplate } = require("../utils/templates");
+const { campaignBiggestBuysTemplate } = require("../utils/templates");
 
 const subscriptions = {};
 
-const allBuysHandler = async (trackedToken, amountIn, amountOut, to) => {
+const campaignBuysHandler = async (
+  trackedToken,
+  amountIn,
+  amountOut,
+  to,
+  tx_link
+) => {
   try {
     const usdPrice = await utils.getUsdPrice(amountIn, trackedToken.chain_id);
-    const templates = generalBuyTemplate(
-      trackedToken.token_name,
-      trackedToken.token_symbol,
+    const ad = await utils.getAd(trackedToken.group_id);
+    const activeCampaign = await queries.getGroupActiveCampaign(
+      trackedToken.group_id
+    );
+    const endDate = new Date(activeCampaign.end_time);
+
+    const new_buyer = {
       amountIn,
-      usdPrice,
       amountOut,
-      trackedToken.chain_name,
-      to
+      usdPrice,
+      tx_link,
+      to: utils.ellipseAddress(to),
+      chain_name: trackedToken.chain_name,
+    };
+
+    const times = {
+      start_time: new Date(activeCampaign.start_time).toLocaleString(),
+      count_down: utils.getCountdownString(endDate),
+    };
+
+    const leaderboard = {
+      leading: {
+        address: "",
+        amount: 0,
+      },
+      others: [],
+    };
+
+    const campaign = {
+      min_buy: activeCampaign.minimum_buy_amount,
+      type: activeCampaign.campaing_type,
+      prize: activeCampaign.prize,
+    };
+
+    const templates = campaignBiggestBuysTemplate(
+      times,
+      new_buyer,
+      leaderboard,
+      campaign,
+      ad
     );
 
     // send message to group
@@ -30,7 +68,7 @@ const subscribe = async (trackedToken, contract) => {
 
   // subscribe to event
   subscription.on("data", (data) =>
-    utils.swapHanlder(contract, trackedToken, data, allBuysHandler)
+    utils.swapHanlder(contract, trackedToken, data, campaignBuysHandler)
   );
 
   subscription.on("error", (error) => console.log(error));
@@ -42,7 +80,7 @@ const main = async (interval = 1000 * 30) => {
   try {
     setInterval(async () => {
       const trackedTokens =
-        await queries.getAllActivelyTrackedTokensNoActiveCampaign();
+        await queries.getAllActivelyTrackedTokensWithActiveCampaign();
 
       // if no tracked tokens, and subssciptions, unsubscribe from all
       if (trackedTokens.length === 0 && Object.keys(subscriptions).length > 0) {
@@ -51,6 +89,19 @@ const main = async (interval = 1000 * 30) => {
           delete subscriptions[address];
         });
       }
+
+      // stop subcription if there is no active campaign
+      Object.keys(subscriptions).forEach((address) => {
+        if (
+          !trackedTokens.find(
+            (token) =>
+              token.token_address.toLowerCase() === address.toLowerCase()
+          )
+        ) {
+          subscriptions[address].unsubscribe();
+          delete subscriptions[address];
+        }
+      });
 
       // for each tracked token, subscribe to the event
       trackedTokens.forEach(async (trackedToken) => {
@@ -62,8 +113,7 @@ const main = async (interval = 1000 * 30) => {
           !utils.keyInObject(
             trackedToken.token_address.toLowerCase(),
             subscriptions
-          ) &&
-          trackedToken.active_tracking
+          )
         ) {
           // get event from contract
           const contract = new wss.eth.Contract(
@@ -72,18 +122,6 @@ const main = async (interval = 1000 * 30) => {
           );
 
           await subscribe(trackedToken, contract);
-        }
-
-        // if event is in subscriptions, but not active, unsubscribe
-        if (
-          utils.keyInObject(
-            trackedToken.token_address.toLowerCase(),
-            subscriptions
-          ) &&
-          !trackedToken.active_tracking
-        ) {
-          subscriptions[trackedToken.token_address.toLowerCase()].unsubscribe();
-          delete subscriptions[trackedToken.token_address.toLowerCase()];
         }
       });
     }, interval);
