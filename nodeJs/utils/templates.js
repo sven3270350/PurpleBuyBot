@@ -13,7 +13,7 @@ Buyer: <a href='${tx_link}'><i>${buyer}</i></a>
 
 ——
 
-<i>${ad}</i>
+<i>${ad || "Premium"}</i>
 `;
 };
 
@@ -28,7 +28,7 @@ const countdowToStartTemplate = (startCountdown, EndCountdown, ad) => {
 
 ——
 
-${ad}
+${ad || "Premium"}
 `;
 };
 

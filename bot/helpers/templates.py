@@ -223,7 +223,7 @@ Select <b>Start Competition</b> to start the contest with the following settings
 <b>Ends:</b> {end_date}
 
 <b>Minimum Buy:</b> ${minimum_buy}
-<b>Winner's Reward:</b> ${winner_reward}
+<b>Winner's Reward:</b> {winner_reward}
 
 <i>Note: You can only have one contest at a time</i>
 '''
