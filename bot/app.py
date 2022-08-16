@@ -5,8 +5,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from decouple import config
 
-# from bot.helpers.app_config import AppConfigs
-from helpers.app_config import AppConfigs
+try:
+    from bot.helpers.app_config import AppConfigs
+except ImportError:
+    from helpers.app_config import AppConfigs
 
 uri = config('DATABASE_URL')
 if uri and uri.startswith("postgres://"):
@@ -19,7 +21,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 migrate = Migrate(app, db)
-app.secret_key = AppConfigs().get_secret_key ()
+app.secret_key = AppConfigs().get_secret_key()
+
 
 @app.route('/')
 def get_info(word):

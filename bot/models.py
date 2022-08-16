@@ -1,5 +1,7 @@
-from bot.app import db
-# from app import db
+try:
+    from bot.app import db
+except ImportError:
+    from app import db
 
 
 class Group(db.Model):
@@ -13,12 +15,8 @@ class Group(db.Model):
         'Subscription', backref='group', lazy='dynamic')
     tracked_tokens = db.relationship(
         'TrackedToken', backref='group', lazy='dynamic')
-    biggest_buy_campaigns = db.relationship(
-        'BiggestBuyCampaign', backref='group', lazy='dynamic')
-    raffle_campaigns = db.relationship(
-        'RaffleCampaign', backref='group', lazy='dynamic')
-    active_competition = db.relationship(
-        'ActiveCompetition', back_populates="group", uselist=False)
+    campaigns = db.relationship(
+        'Campaigns', backref='group', lazy='dynamic')
     wallet = db.relationship(
         'Wallet', back_populates="group", uselist=False)
 
@@ -101,18 +99,6 @@ class Campaigns(db.Model):
 
     def __repr__(self):
         return '<Campaigns %r>' % f"{self.campaing_type}_{self.group_id}_{self.id}"
-
-
-class ActiveCompetition(db.Model):
-    __tablename__ = 'active_competition'
-    id = db.Column(db.Integer, primary_key=True)
-    group_id = db.Column(db.String(80), db.ForeignKey('group.group_id'))
-    competition_type = db.Column(db.String(80))
-    competition_id = db.Column(db.String(80))
-    group = db.relationship("Group", back_populates="active_competition")
-
-    def __repr__(self):
-        return '<ActiveCompetition %r>' % f"{self.group_id}_{self.competition_type}_{self.competition_id}"
 
 
 class SupportedChain(db.Model):
