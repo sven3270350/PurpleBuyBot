@@ -95,10 +95,10 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
   }
 };
 
-const addressInSubscription = (address, subscription) => {
-  const length = Object.keys(subscription).length;
+const keyInObject = (key, obj) => {
+  const length = Object.keys(obj).length;
   if (length === 0) return false;
-  return !!subscription.hasOwnProperty(address);
+  return !!obj.hasOwnProperty(key);
 };
 
 const decimalsToUnit = (decimals) => {
@@ -136,13 +136,52 @@ const sendHTMLMessage = async (groupId, messageTemplate) => {
   bot.sendMessage(groupId, messageTemplate, { parse_mode: "HTML" });
 };
 
+const getCountdown = (date) => {
+  const now = new Date();
+  const diff = date.getTime() - now.getTime();
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
+  const minutes = Math.floor(diff / (1000 * 60)) % 60;
+  const seconds = Math.floor(diff / 1000) % 60;
+  return { days, hours, minutes, seconds };
+};
+
+const getCountdownString = (date) => {
+  const { days, hours, minutes, seconds } = getCountdown(date);
+  let countdownString = "";
+  if (days > 0) {
+    countdownString += `${days}d `;
+  }
+  if (hours > 0) {
+    countdownString += `${hours}h `;
+  }
+  if (minutes > 0) {
+    countdownString += `${minutes}m `;
+  }
+  if (seconds > 0) {
+    countdownString += `${seconds}s `;
+  }
+  return countdownString;
+};
+
+const getAd = async (groupId) => {
+  let ad = "";
+  const isSubscriber = await hasActiveSubscription(groupId);
+
+  if (isSubscriber) {
+    const ads = await queries.getActiveAd();
+    ad = ads[0].advert;
+  }
+  return ad;
+};
+
 module.exports = {
   ...appConfig,
   selectTrackedToken,
   getToken0,
   getToken1,
   hasActiveSubscription,
-  addressInSubscription,
+  keyInObject,
   swapHanlder,
   UniswapV2Pair,
   wss,
@@ -150,4 +189,7 @@ module.exports = {
   decimalsToUnit,
   getUsdPrice,
   sendHTMLMessage,
+  getCountdown,
+  getCountdownString,
+  getAd,
 };
