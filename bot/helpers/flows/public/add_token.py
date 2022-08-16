@@ -5,7 +5,7 @@ from services.web3_service import Web3Service
 from models import db, SupportedChain, SupportedExchange, SupportedPairs, TrackedToken
 from services.bot_service import BotService
 from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin
-from helpers.templates import add_token_confirmation_template, add_token_chain_select_template, add_token_dex_select_template
+from helpers.templates import add_token_confirmation_template, add_token_chain_select_template, add_token_dex_select_template, add_token_pair_select_template
 
 DEX, PAIR, ADDRESS, CONFIRM = range(4)
 
@@ -127,7 +127,7 @@ class AddToken:
                 buttons = [[InlineKeyboardButton(
                     text=pair.pair_name, callback_data=f'pair_{pair.id}')] for pair in supported_pairs]
 
-                context.bot.edit_message_text(add_token_dex_select_template.format(
+                context.bot.edit_message_text(add_token_pair_select_template.format(
                     group_title=chat_data.get('group_title', None)
                 ), chat_id=self.chatid, message_id=message_id, reply_markup=InlineKeyboardMarkup(buttons), parse_mode=ParseMode.HTML)
         else:
@@ -329,11 +329,11 @@ class AddToken:
                         CallbackQueryHandler(
                             self.__process_pair_select, pattern='^pair_.*'),
                         MessageHandler(
-                            Filters.text, self.__enter_token_address),
+                            Filters.regex('^0x\w{40}$'), self.__enter_token_address),
 
                     ],
                     CONFIRM: [
-                        MessageHandler(Filters.text,
+                        MessageHandler(Filters.regex('^0x\w{40}$'),
                                        self.__confirm_setup),
                         CallbackQueryHandler(
                             self.__save_config, pattern='confirm'),
