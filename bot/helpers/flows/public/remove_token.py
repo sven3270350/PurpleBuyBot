@@ -147,7 +147,7 @@ class RemoveToken:
 
     @ send_typing_action
     def __cancel_remove_token(self, update: Update, context: CallbackContext) -> int:
-        update.message.reply_text(text="<i>❌ Remove Token Cancelled. </i>",
+        update.message.reply_text(text="<i>❌ Remove Token Session Cancelled. </i>",
                                   parse_mode=ParseMode.HTML)
         return ConversationHandler.END
 
