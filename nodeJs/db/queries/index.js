@@ -71,9 +71,25 @@ const getActiveSubscriptionByGroupId = async (group_id) => {
   return res.rows;
 };
 
+const getAllActiveCampaigns = async () => {
+  const query = `
+  SELECT * FROM public.campaigns WHERE end_time >= NOW();
+    `;
+  const res = await db.query(query);
+  return res.rows;
+};
+
+const getAllUpcomingCampaigns = async () => {
+  const query = `
+    SELECT * FROM public.campaigns WHERE start_time >= NOW();
+    `;
+  const res = await db.query(query);
+  return res.rows;
+};
+
 const getActiveAd = async () => {
   const query = `
-        SELECT NOW();
+  SELECT advert FROM public.advertisement WHERE "isActive" = true;
     `;
   const res = await db.query(query);
   return res.rows;
@@ -84,4 +100,6 @@ module.exports = {
   getActiveSubscriptionByGroupId,
   getAllActivelyTrackedTokens,
   getActiveAd,
+  getAllActiveCampaigns,
+  getAllUpcomingCampaigns,
 };
