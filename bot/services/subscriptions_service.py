@@ -35,6 +35,12 @@ class SubscriptionService:
         '''
         return list(db.engine.execute(stmt))
 
+    def get_active_ad(self):
+        stmt = '''
+          SELECT advert FROM public.advertisement WHERE "isActive" = true;
+        '''
+        return list(db.engine.execute(stmt))
+
     def has_active_subscription(self, group_id):
         subscription: list = self.get_active_active_subscription_by_group_id(
             group_id)
@@ -42,3 +48,14 @@ class SubscriptionService:
             return True
         else:
             return False
+
+    def get_ad(self, group_id):
+        ad = ""
+
+        try:
+            if not self.has_active_subscription(group_id):
+                ad = self.get_active_ad()[0]['advert']
+        except Exception as e:
+            print(e)
+
+        return ad
