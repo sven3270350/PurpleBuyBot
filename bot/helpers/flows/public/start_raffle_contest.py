@@ -3,6 +3,7 @@ from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMark
 from services.subscriptions_service import SubscriptionService
 from models import db, Campaigns
 from services.bot_service import BotService
+from services.campaign_service import CampaignService
 from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin
 from helpers.templates import (
     no_trackecd_tokens_template, start_biggest_buy_contest_template,
@@ -35,6 +36,12 @@ class RaffleContest:
             group_id = context.chat_data.get('group_id', None)
             context.chat_data['group_title'] = context.bot.get_chat(
                 group_id).title
+
+            if CampaignService().get_active_campaigns_count(group_id) > 0:
+                update.message.reply_text(
+                    text="❌ There is already an active competition. Please wait until it ends",
+                    parse_mode=ParseMode.HTML)
+                return ConversationHandler.END
 
             if not is_group_admin(update, context):
                 return not_group_admin(update)
