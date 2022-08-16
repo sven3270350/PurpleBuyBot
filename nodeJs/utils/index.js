@@ -12,13 +12,17 @@ const bot = new TelegramBot(process.env.PUBLIC_BOT_API_KEY);
 const wss = (provider) => new Web3(provider);
 
 const selectTrackedToken = async (trackedToken, contract) => {
-  const token0 = await getToken0(contract);
-  const token1 = await getToken1(contract);
+  try {
+    const token0 = await getToken0(contract);
+    const token1 = await getToken1(contract);
 
-  if (trackedToken === token0) {
-    return { token: 0, address: token0 };
-  } else {
-    return { token: 1, address: token1 };
+    if (trackedToken === token0) {
+      return { token: 0, address: token0 };
+    } else {
+      return { token: 1, address: token1 };
+    }
+  } catch (error) {
+    console.log("[Utils::selectTrackedToken]", error);
   }
 };
 
@@ -31,10 +35,14 @@ const getToken1 = async (contract) => {
 };
 
 const hasActiveSubscription = async (groupId) => {
-  const activeSubscription = await queries.getActiveSubscriptionByGroupId(
-    groupId
-  );
-  return activeSubscription.length > 0;
+  try {
+    const activeSubscription = await queries.getActiveSubscriptionByGroupId(
+      groupId
+    );
+    return activeSubscription.length > 0;
+  } catch (error) {
+    console.log("[Utils::hasActiveSubscription]", error);
+  }
 };
 
 const getTokenDecimals = async (address, chain) => {
@@ -48,50 +56,54 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
   const decimals = trackedToken.token_decimals;
   const chainId = trackedToken.chain_id;
 
-  const selectedTrackedToken = await selectTrackedToken(
-    token_address,
-    contract
-  );
-
-  let amountIn = 0;
-  let amountOut = 0;
-
-  if (selectedTrackedToken.token === 1) {
-    const token1Decimals = await getTokenDecimals(
-      selectedTrackedToken.address,
-      chainId
+  try {
+    const selectedTrackedToken = await selectTrackedToken(
+      token_address,
+      contract
     );
 
-    amountIn = Web3.utils.fromWei(
-      data.returnValues.amount1In,
-      decimalsToUnit(token1Decimals)
-    );
+    let amountIn = 0;
+    let amountOut = 0;
 
-    amountOut = Web3.utils.fromWei(
-      data.returnValues.amount0Out,
-      decimalsToUnit(decimals)
-    );
-  } else {
-    const token0Decimals = await getTokenDecimals(
-      selectedTrackedToken.address,
-      chainId
-    );
+    if (selectedTrackedToken.token === 1) {
+      const token1Decimals = await getTokenDecimals(
+        selectedTrackedToken.address,
+        chainId
+      );
 
-    amountIn = Web3.utils.fromWei(
-      data.returnValues.amount0In,
-      decimalsToUnit(token0Decimals)
-    );
+      amountIn = Web3.utils.fromWei(
+        data.returnValues.amount1In,
+        decimalsToUnit(token1Decimals)
+      );
 
-    amountOut = Web3.utils.fromWei(
-      data.returnValues.amount1Out,
-      decimalsToUnit(decimals)
-    );
-  }
+      amountOut = Web3.utils.fromWei(
+        data.returnValues.amount0Out,
+        decimalsToUnit(decimals)
+      );
+    } else {
+      const token0Decimals = await getTokenDecimals(
+        selectedTrackedToken.address,
+        chainId
+      );
 
-  const to = data.returnValues.to;
+      amountIn = Web3.utils.fromWei(
+        data.returnValues.amount0In,
+        decimalsToUnit(token0Decimals)
+      );
 
-  if (amountIn > 0 || amountOut > 0) {
-    callback(trackedToken, amountIn, amountOut, to);
+      amountOut = Web3.utils.fromWei(
+        data.returnValues.amount1Out,
+        decimalsToUnit(decimals)
+      );
+    }
+
+    const to = data.returnValues.to;
+
+    if (amountIn > 0 || amountOut > 0) {
+      callback(trackedToken, amountIn, amountOut, to);
+    }
+  } catch (error) {
+    console.log("[Utils::swapHanlder]", error);
   }
 };
 
@@ -120,16 +132,21 @@ const decimalsToUnit = (decimals) => {
 
 const getUsdPrice = async (amount, chainId) => {
   const id = appConfig.getCoinGeckoId(chainId);
-  const { data } = await CoinGeckoClient.simple.price({
-    ids: id,
-    vs_currencies: "usd",
-  });
-  const price = data[id].usd;
 
-  return Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(Number(amount) * price);
+  try {
+    const { data } = await CoinGeckoClient.simple.price({
+      ids: id,
+      vs_currencies: "usd",
+    });
+    const price = data[id].usd;
+
+    return Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(Number(amount) * price);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const sendHTMLMessage = async (groupId, messageTemplate) => {
@@ -166,13 +183,17 @@ const getCountdownString = (date) => {
 
 const getAd = async (groupId) => {
   let ad = "";
-  const isSubscriber = await hasActiveSubscription(groupId);
+  try {
+    const isSubscriber = await hasActiveSubscription(groupId);
 
-  if (isSubscriber) {
-    const ads = await queries.getActiveAd();
-    ad = ads[0].advert;
+    if (isSubscriber) {
+      const ads = await queries.getActiveAd();
+      ad = ads[0].advert;
+    }
+    return ad;
+  } catch (error) {
+    console.log("[Utils::getAd]", error);
   }
-  return ad;
 };
 
 module.exports = {
