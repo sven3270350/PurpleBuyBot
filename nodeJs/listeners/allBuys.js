@@ -4,7 +4,13 @@ const { generalBuyTemplate } = require("../utils/templates");
 
 const subscriptions = {};
 
-const allBuysHandler = async (trackedToken, amountIn, amountOut, to) => {
+const allBuysHandler = async (
+  trackedToken,
+  amountIn,
+  amountOut,
+  to,
+  tx_link
+) => {
   try {
     const usdPrice = await utils.getUsdPrice(amountIn, trackedToken.chain_id);
     const ad = await utils.getAd(trackedToken.group_id);
@@ -14,7 +20,13 @@ const allBuysHandler = async (trackedToken, amountIn, amountOut, to) => {
       usdPrice,
     };
 
-    const templates = generalBuyTemplate(trackedToken, amounts, to, ad);
+    const templates = generalBuyTemplate(
+      trackedToken,
+      amounts,
+      utils.ellipseAddress(to),
+      tx_link,
+      ad
+    );
 
     // send message to group
     utils.sendHTMLMessage(trackedToken.group_id, templates);
@@ -51,6 +63,19 @@ const main = async (interval = 1000 * 30) => {
         });
       }
 
+      // if stop subscription if not actively tracked
+      Object.keys(subscriptions).forEach((address) => {
+        if (
+          !trackedTokens.find(
+            (token) =>
+              token.token_address.toLowerCase() === address.toLocaleLowerCase()
+          )
+        ) {
+          subscriptions[trackedToken.token_address.toLowerCase()].unsubscribe();
+          delete subscriptions[trackedToken.token_address.toLowerCase()];
+        }
+      });
+
       // for each tracked token, subscribe to the event
       trackedTokens.forEach(async (trackedToken) => {
         const provider = utils.getProvider(trackedToken.chain_id);
@@ -71,18 +96,6 @@ const main = async (interval = 1000 * 30) => {
           );
 
           await subscribe(trackedToken, contract);
-        }
-
-        // if event is in subscriptions, but not active, unsubscribe
-        if (
-          utils.keyInObject(
-            trackedToken.token_address.toLowerCase(),
-            subscriptions
-          ) &&
-          !trackedToken.active_tracking
-        ) {
-          subscriptions[trackedToken.token_address.toLowerCase()].unsubscribe();
-          delete subscriptions[trackedToken.token_address.toLowerCase()];
         }
       });
     }, interval);
