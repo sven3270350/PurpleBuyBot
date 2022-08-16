@@ -232,7 +232,8 @@ set_start_time_template = '''
 <b>Set Start Time: </b>
 
 Time to start the contest.
-eg: 21:22:00; 01:02:03 etc
+<i> Example: </i>
+  <code> 15/09/2022 04:17:08</code>
 
 '''
 
@@ -240,8 +241,32 @@ set_end_time_template = '''
 <b> Set End Time: </b>
 
 Time to end the contest.
-eg: 22:44:00 etc
+<i> Example: </i>
+  <code> 15/09/2022 04:17:08</code>
 
+'''
+
+invalid_time_template = '''
+<b> ❌ Invalid date.</b>
+
+<i> Please use DD/MM/YYYY HH:MM:SS </i> 
+<i> Example: </i>
+  <code>01/01/2020 12:00:00</code> 
+
+<b> OR </b>
+
+<i> Make sure date is in the future </i>
+  
+<i> Please try again </i>
+'''
+
+not_valid_value_template = '''
+<b> ❌ Invalid value.</b>
+
+<i> Please enter a valid value </i>
+
+<i> Example: </i>
+    <code> 100 </code> for $100
 '''
 
 
@@ -257,7 +282,7 @@ set_winner_reward_template = '''
 <b>Set Winner Reward: </b>
 
 Set the reward for the winner in USD. 
-eg 100, 200, 1000 etc
+eg 100, double, Testa etc
 
 '''
 
@@ -270,7 +295,7 @@ start_competition_confirmation_template = '''
 <b>Ends:</b> {end_date}
 
 <b>Minimum Buy:</b> ${minimum_buy}
-<b>Winner's Reward:</b> ${winner_reward}
+<b>Winner's Reward:</b> {winner_reward}
 
 <i>Click Confirm to start the contest</i>
 
@@ -290,6 +315,8 @@ biggest_buy_competition_alert_template = '''
 <b>Minimum Buy:</b> ${minimum_buy}
 <b>Winner's Reward:</b> ${winner_reward}
 
+——
+
 <i>{ad}</i>
 '''
 
@@ -306,7 +333,9 @@ New <b>{token_name} </b> Buy!
 
 Buyer: <i>{buyer}</i>
 
-{ad}
+——
+
+<i>{ad}</i>
 '''
 
 
