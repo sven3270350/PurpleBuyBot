@@ -1,6 +1,5 @@
 
-
-class RaffleService:
+class CampaignService:
 
     # create a new campaigns,
     # get all campaigns,
@@ -8,7 +7,8 @@ class RaffleService:
     # get campaigns transactions
     # get campaigns winners
 
-    def create_campaign(self, group_id, start_time, end_time, count_down, campaign_status,  campaign_winner, minimum_buy_amount, prize):
+    def get_scheduled_campaigns(self, group_id):
+
         pass
 
     def get_all_campaigns(self):
