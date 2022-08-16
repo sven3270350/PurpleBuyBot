@@ -1,17 +1,21 @@
 from telegram.ext import CallbackContext, Dispatcher, ConversationHandler, CommandHandler, CallbackQueryHandler, MessageHandler, Filters
-from telegram.utils import helpers
 from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
+from services.subscriptions_service import SubscriptionService
+from models import db, Campaigns
 from services.bot_service import BotService
 from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin
 from helpers.templates import (
     no_trackecd_tokens_template, start_biggest_buy_contest_template,
     set_start_time_template, set_end_time_template, set_min_buy_template,
     set_winner_reward_template, start_competition_confirmation_template,
-    biggest_buy_competition_alert_template)
+    biggest_buy_competition_alert_template, invalid_time_template, not_valid_value_template)
 from datetime import datetime, timedelta
 
 
 COMPETITION_NAME = "Biggest Buy"
+DATE_FORMAT = '%d/%m/%Y %H:%M:%S'
+
+
 class BuyContest:
     def __init__(self, dispatcher: Dispatcher):
         self.dispatcher = dispatcher
@@ -51,8 +55,9 @@ class BuyContest:
             start_time = datetime.now()+timedelta(minutes=30)
             end_time = start_time + timedelta(hours=2)
 
-            context.chat_data['start_time'] = start_time.strftime('%H:%M:%S')
-            context.chat_data['end_time'] = end_time.strftime('%H:%M:%S')
+            context.chat_data['start_time'] = start_time.strftime(DATE_FORMAT)
+            context.chat_data['end_time'] = end_time.strftime(
+                DATE_FORMAT)
             context.chat_data['minimum_buy'] = '500'
             context.chat_data['winner_prize'] = '200'
 
@@ -62,33 +67,69 @@ class BuyContest:
     def __set_start_time(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
         timestring = update.message.text
-        context.chat_data['start_time'] = timestring
 
-        self.dispatcher.remove_handler(self.start_time_handler)
-        self.__reply_template(update, context)
+        try:
+            start_time = datetime.strptime(timestring, DATE_FORMAT)
+
+            if start_time > datetime.now():
+                context.chat_data['start_time'] = timestring
+                self.dispatcher.remove_handler(self.start_time_handler)
+                self.__reply_template(update, context)
+            else:
+                update.message.reply_text(
+                    text=invalid_time_template,
+                    parse_mode=ParseMode.HTML
+                )
+        except ValueError:
+            update.message.reply_text(
+                text=invalid_time_template,
+                parse_mode=ParseMode.HTML
+            )
 
     @send_typing_action
     def __set_end_time(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
         timestring = update.message.text
-        context.chat_data['end_time'] = timestring
 
-        self.dispatcher.remove_handler(self.end_time_handler)
-        self.__reply_template(update, context)
+        try:
+            end_time = datetime.strptime(timestring, DATE_FORMAT)
+
+            if end_time > datetime.now():
+                context.chat_data['end_time'] = timestring
+                self.dispatcher.remove_handler(self.end_time_handler)
+                self.__reply_template(update, context)
+            else:
+                update.message.reply_text(
+                    text=invalid_time_template,
+                    parse_mode=ParseMode.HTML
+                )
+        except ValueError:
+            update.message.reply_text(
+                text=invalid_time_template,
+                parse_mode=ParseMode.HTML
+            )
 
     @send_typing_action
     def __set_min_buy(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
         min_buy = update.message.text
-        context.chat_data['minimum_buy'] = min_buy
 
-        self.dispatcher.remove_handler(self.min_buy_handler)
-        self.__reply_template(update, context)
+        if int(min_buy) > 0:
+            context.chat_data['minimum_buy'] = min_buy
+
+            self.dispatcher.remove_handler(self.min_buy_handler)
+            self.__reply_template(update, context)
+        else:
+            update.message.reply_text(
+                text=not_valid_value_template,
+                parse_mode=ParseMode.HTML
+            )
 
     @send_typing_action
     def __set_winner_prize(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
         winner_prize = update.message.text
+
         context.chat_data['winner_prize'] = winner_prize
 
         self.dispatcher.remove_handler(self.winner_prize_handler)
@@ -110,37 +151,82 @@ class BuyContest:
 
             group_title = chat_data['group_title']
             token_name = chat_data['tracked_token']
-            start_date = chat_data['start_time']
-            end_date = chat_data['end_time']
-            minimum_buy = chat_data['minimum_buy']
+            start_date = datetime.strptime(
+                chat_data['start_time'], DATE_FORMAT)
+
+            end_date = datetime.strptime(
+                chat_data['end_time'], DATE_FORMAT)
+
+            minimum_buy = int(chat_data['minimum_buy'])
             winner_reward = chat_data['winner_prize']
 
-            # BotService().create_buy_contest(group_id, group_title, token_name, start_date, end_date, minimum_buy, winner_reward)
+            try:
+                ad = SubscriptionService().get_ad(group_id)
+                # save context
+                contest = Campaigns(
+                    group_id=group_id,
+                    start_time=start_date,
+                    end_time=end_date,
+                    count_down=10,
+                    minimum_buy_amount=minimum_buy,
+                    campaing_type=COMPETITION_NAME,
+                    prize=winner_reward
+                )
+                db.session.add(contest)
+                db.session.commit()
 
-            template = biggest_buy_competition_alert_template.format(
-                competition_name=COMPETITION_NAME,
-                group_title=group_title,
-                token_name=token_name,
-                start_date=start_date,
-                end_date=end_date,
-                minimum_buy=minimum_buy,
-                winner_reward=winner_reward,
-                ad="Some special add"
-            )
+                template = biggest_buy_competition_alert_template.format(
+                    competition_name=COMPETITION_NAME,
+                    group_title=group_title,
+                    token_name=token_name,
+                    start_date=start_date,
+                    end_date=end_date,
+                    minimum_buy=minimum_buy,
+                    winner_reward=winner_reward,
+                    ad=ad
+                )
 
-            update.callback_query.answer()
-            update.callback_query.edit_message_text(
-                text=template, parse_mode=ParseMode.HTML
-            )
-            context.bot.send_message(
-                chat_id=group_id,
-                text=template,
-                parse_mode=ParseMode.HTML
-            )
+                update.callback_query.answer()
+                update.callback_query.edit_message_text(
+                    text=template, parse_mode=ParseMode.HTML
+                )
+                context.bot.send_message(
+                    chat_id=group_id,
+                    text=template,
+                    parse_mode=ParseMode.HTML
+                )
 
-        self.dispatcher.remove_handler(self.set_confirm_comp_handler)
-        reset_chat_data(context)
-        return ConversationHandler.END
+                self.dispatcher.remove_handler(self.set_confirm_comp_handler)
+                reset_chat_data(context)
+                return ConversationHandler.END
+
+            except Exception as e:
+                print(e)
+                update.callback_query.answer()
+                db.session.rollback()
+                db.session.flush()
+                db.session.close()
+
+                try_again_and_cancel_btns = [
+                    InlineKeyboardButton(
+                        text="Try again",
+                        callback_data="confirm"
+                    ),
+                    InlineKeyboardButton(
+                        text="Cancel",
+                        callback_data="cancel"
+                    )
+                ]
+                try_again_and_cancel_keyboard = InlineKeyboardMarkup(
+                    inline_keyboard=[try_again_and_cancel_btns]
+                )
+
+                update.callback_query.edit_message_text(
+                    text="❌ Failed to create context. Please try again",
+                    parse_mode=ParseMode.HTML,
+                    reply_markup=try_again_and_cancel_keyboard,
+                )
+                return ConversationHandler.END
 
     def __cancel(self, update: Update, context: CallbackContext) -> int:
         self.__extract_params(update, context)
@@ -276,13 +362,13 @@ class BuyContest:
             self.__goto_start_time, pattern='set_start_time')
 
         self.start_time_handler = MessageHandler(Filters.regex(
-            '^(2[0-3]|[01]?[0-9])(:[0-5]?[0-9]){2}$'), self.__set_start_time)
+            '(\d?\d\/){2}(\d{4}) (?:2[0-3]|[01]?[0-9])(:[0-5]?[0-9]){2}$'), self.__set_start_time)
 
         self.set_end_time_handler = CallbackQueryHandler(
             self.__goto_end_time, pattern='set_end_time')
 
         self.end_time_handler = MessageHandler(Filters.regex(
-            '^(2[0-3]|[01]?[0-9])(:[0-5]?[0-9]){2}$'), self.__set_end_time)
+            '(\d?\d\/){2}(\d{4}) (?:2[0-3]|[01]?[0-9])(:[0-5]?[0-9]){2}$'), self.__set_end_time)
 
         self.set_min_buy_handler = CallbackQueryHandler(
             self.__goto_min_buy, pattern='set_min_buy')
