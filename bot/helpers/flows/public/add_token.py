@@ -279,7 +279,9 @@ class AddToken:
 
             if active_tracked_token:
                 disable_button = [[InlineKeyboardButton(
-                    text='Disable Tracking', callback_data="disable")]]
+                    text='Disable Tracking', callback_data="disable")],
+                    [InlineKeyboardButton(
+                        text='Cancel', callback_data="cancel")]]
 
                 self.__add_disable_tracking_handler()
 
@@ -290,7 +292,8 @@ class AddToken:
                 )
             else:
                 enable_button = [[InlineKeyboardButton(
-                    text='Enable Tracking', callback_data="enable")]]
+                    text='Enable Tracking', callback_data="enable")], [InlineKeyboardButton(
+                        text='Cancel', callback_data="cancel")]]
 
                 self.__add_enbale_tracking_handler()
 
@@ -302,7 +305,7 @@ class AddToken:
 
     @send_typing_action
     def __cancel_add_token(self, update: Update, context: CallbackContext) -> int:
-        update.message.reply_text(text="<i>❌ Add Token Cancelled. </i>",
+        update.message.reply_text(text="<i>❌ Add Token Sesssion Cancelled. </i>",
                                   parse_mode=ParseMode.HTML)
 
         reset_chat_data(context)
