@@ -89,11 +89,10 @@ class Campaigns(db.Model):
     start_time = db.Column(db.DateTime)
     end_time = db.Column(db.DateTime)
     count_down = db.Column(db.Integer)
-    campaign_status = db.Column(db.String(80))
     campaign_winner = db.Column(db.String(100))
     minimum_buy_amount = db.Column(db.Integer)
     campaing_type = db.Column(db.String(120))
-    prize = db.Column(db.String(30))
+    prize = db.Column(db.String(120))
     transactions = db.relationship(
         'Transactions', backref='campaign', lazy='dynamic')
 
