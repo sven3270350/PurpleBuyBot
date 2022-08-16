@@ -52,9 +52,12 @@ const getTokenDecimals = async (address, chain) => {
 };
 
 const swapHanlder = async (contract, trackedToken, data, callback) => {
+  const tx_hash = data.transactionHash;
   const token_address = trackedToken.token_address.toLowerCase();
   const decimals = trackedToken.token_decimals;
   const chainId = trackedToken.chain_id;
+  const explorer = appConfig.getExploerUrl(chainId);
+  const tx_link = `${explorer}tx/${tx_hash}`;
 
   try {
     const selectedTrackedToken = await selectTrackedToken(
@@ -100,7 +103,7 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
     const to = data.returnValues.to;
 
     if (amountIn > 0 || amountOut > 0) {
-      callback(trackedToken, amountIn, amountOut, to);
+      callback(trackedToken, amountIn, amountOut, to, tx_link);
     }
   } catch (error) {
     console.log("[Utils::swapHanlder]", error);
@@ -130,6 +133,10 @@ const decimalsToUnit = (decimals) => {
   return units[decimals];
 };
 
+const ellipseAddress = (address) => {
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+};
+
 const getUsdPrice = async (amount, chainId) => {
   const id = appConfig.getCoinGeckoId(chainId);
 
@@ -150,7 +157,10 @@ const getUsdPrice = async (amount, chainId) => {
 };
 
 const sendHTMLMessage = async (groupId, messageTemplate) => {
-  bot.sendMessage(groupId, messageTemplate, { parse_mode: "HTML" });
+  bot.sendMessage(groupId, messageTemplate, {
+    parse_mode: "HTML",
+    disable_web_page_preview: true,
+  });
 };
 
 const getCountdown = (date) => {
@@ -186,14 +196,14 @@ const getAd = async (groupId) => {
   try {
     const isSubscriber = await hasActiveSubscription(groupId);
 
-    if (isSubscriber) {
+    if (!isSubscriber) {
       const ads = await queries.getActiveAd();
       ad = ads[0].advert;
     }
-    return ad;
   } catch (error) {
     console.log("[Utils::getAd]", error);
   }
+  return ad;
 };
 
 module.exports = {
@@ -213,4 +223,5 @@ module.exports = {
   getCountdown,
   getCountdownString,
   getAd,
+  ellipseAddress,
 };
