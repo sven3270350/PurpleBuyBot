@@ -6,6 +6,8 @@ const subscriptions = {};
 
 const allBuysHandler = async (trackedToken, amountIn, amountOut, to) => {
   const usdPrice = await utils.getUsdPrice(amountIn, trackedToken.chain_id);
+  const ad = await utils.getAd(trackedToken.group_id);
+
   const templates = generalBuyTemplate(
     trackedToken.token_name,
     trackedToken.token_symbol,
@@ -13,7 +15,8 @@ const allBuysHandler = async (trackedToken, amountIn, amountOut, to) => {
     usdPrice,
     amountOut,
     trackedToken.chain_name,
-    to
+    to,
+    ad
   );
 
   // send message to group
@@ -53,7 +56,7 @@ const main = async (interval = 1000 * 30) => {
 
       // check if event is not in subscriptions
       if (
-        !utils.addressInSubscription(
+        !utils.keyInObject(
           trackedToken.token_address.toLowerCase(),
           subscriptions
         ) &&
@@ -70,7 +73,7 @@ const main = async (interval = 1000 * 30) => {
 
       // if event is in subscriptions, but not active, unsubscribe
       if (
-        utils.addressInSubscription(
+        utils.keyInObject(
           trackedToken.token_address.toLowerCase(),
           subscriptions
         ) &&
