@@ -50,9 +50,47 @@ const getAllActivelyTrackedTokensNoActiveCampaign = async () => {
   (
       SELECT COUNT(*) 
        FROM public.campaigns 
-      WHERE public.campaigns.start_time <= NOW() AND  public.campaigns.end_time >= NOW()
+      WHERE public.campaigns.start_time <= NOW() 
+      AND  
+      public.campaigns.end_time >= NOW() 
+      AND tk.group_id =  public.campaigns.group_id
   ) < 1
   AND tk.active_tracking = true;
+    `;
+  const res = await db.query(query);
+  return res.rows;
+};
+
+const getAllActivelyTrackedTokensWithActiveCampaign = async () => {
+  const query = `
+  SELECT
+  DISTINCT 
+  tk.group_id,  tk.token_name, tk.token_address,
+  tk.token_symbol, tk.token_decimals, tk.pair_address as pair,
+  sc.chain_name, sc.chain_id,
+  sp.pair_name as paired_with_name, sp.pair_address as paired_with,
+  cp.id as campaign_id, cp.start_time, cp.end_time, cp.campaing_type, cp.minimum_buy_amount, cp.prize 
+  FROM public.tracked_token tk
+  JOIN public.token_chains tc
+  ON tk.id = tc.token_id
+  JOIN public.supported_chain sc
+  ON sc.id = tc.chain_id
+  JOIN public.token_pairs tp
+  ON tk.id = tp.token_id
+  JOIN public.supported_pairs sp
+  ON sp.id = tp.pair_id
+  JOIN public.campaigns cp
+  ON cp.group_id = tk.group_id
+  WHERE 
+  (
+      SELECT COUNT(*) 
+       FROM public.campaigns 
+      WHERE public.campaigns.start_time <= NOW() 
+      AND  
+      public.campaigns.end_time >= NOW() 
+      AND tk.group_id =  public.campaigns.group_id
+      
+  ) > 0;
     `;
   const res = await db.query(query);
   return res.rows;
@@ -95,6 +133,21 @@ const getAllUpcomingCampaigns = async () => {
   return res.rows;
 };
 
+const getGroupActiveCampaign = async (group_id) => {
+  const query = `
+  SELECT * 
+    FROM public.campaigns 
+    WHERE public.campaigns.start_time <= NOW() 
+    AND  
+    public.campaigns.end_time >= NOW() 
+    AND public.campaigns.group_id = $1;
+    `;
+  const params = [group_id];
+  const res = await db.query(query, params);
+
+  return res.rows[0];
+};
+
 const getActiveAd = async () => {
   const query = `
   SELECT advert FROM public.advertisement WHERE "isActive" = true;
@@ -110,4 +163,6 @@ module.exports = {
   getActiveAd,
   getAllActiveCampaigns,
   getAllUpcomingCampaigns,
+  getAllActivelyTrackedTokensWithActiveCampaign,
+  getGroupActiveCampaign,
 };
