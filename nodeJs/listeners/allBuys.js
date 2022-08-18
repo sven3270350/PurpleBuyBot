@@ -71,8 +71,8 @@ const main = async (interval = 1000 * 30) => {
               token.token_address.toLowerCase() === address.toLocaleLowerCase()
           )
         ) {
-          subscriptions[trackedToken.token_address.toLowerCase()].unsubscribe();
-          delete subscriptions[trackedToken.token_address.toLowerCase()];
+          subscriptions[address].unsubscribe();
+          delete subscriptions[address];
         }
       });
 
