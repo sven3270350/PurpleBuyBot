@@ -239,6 +239,7 @@ class BuyContest:
     def __cancel(self, update: Update, context: CallbackContext) -> int:
         self.__extract_params(update, context)
         self.__remove_button_handlers()
+        print("Cancel Called")
 
         if is_private_chat(update):
             if not BotService().is_group_in_focus(update, context):
@@ -258,6 +259,7 @@ class BuyContest:
                     text="<i>❌ Start Biggest Buy session closed. </i>",
                     parse_mode=ParseMode.HTML)
 
+        print("Got to the end")
         reset_chat_data(context)
         return ConversationHandler.END
 
@@ -387,8 +389,7 @@ class BuyContest:
         self.set_winner_prize_handler = CallbackQueryHandler(
             self.__goto_winner_prize, pattern='set_winner_prize')
 
-        self.winner_prize_handler = MessageHandler(Filters.regex(
-            '^\d+$'), self.__set_winner_prize)
+        self.winner_prize_handler = MessageHandler(Filters.text, self.__set_winner_prize)
 
         self.set_start_comp_handler = CallbackQueryHandler(
             self.__goto_start_comp, pattern='start_competition')
