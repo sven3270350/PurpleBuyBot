@@ -17,7 +17,7 @@ const campaignBuysHandler = async (
     const activeCampaign = await queries.getGroupActiveCampaign(
       trackedToken.group_id
     );
-    const endDate = new Date(activeCampaign.end_time);
+    const endDate = new Date(activeCampaign?.end_time);
 
     const new_buyer = {
       amountIn,
@@ -29,7 +29,7 @@ const campaignBuysHandler = async (
     };
 
     const times = {
-      start_time: new Date(activeCampaign.start_time).toLocaleString(),
+      start_time: new Date(activeCampaign?.start_time).toLocaleString(),
       count_down: utils.getCountdownString(endDate),
     };
 
