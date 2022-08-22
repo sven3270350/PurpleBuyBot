@@ -12,7 +12,10 @@ const allBuysHandler = async (
   tx_link
 ) => {
   try {
-    const usdPrice = await utils.getUsdPrice(amountIn, trackedToken.chain_id);
+    const { usdString: usdPrice, usdNumber } = await utils.getUsdPrice(
+      amountIn,
+      trackedToken.chain_id
+    );
     const ad = await utils.getAd(trackedToken.group_id);
     const amounts = {
       amountIn,
@@ -106,4 +109,5 @@ const main = async (interval = 1000 * 30) => {
 
 module.exports = {
   main,
+  allBuysHandler,
 };
