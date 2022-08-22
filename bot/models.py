@@ -90,7 +90,7 @@ class Campaigns(db.Model):
     end_time = db.Column(db.DateTime)
     count_down = db.Column(db.Integer)
     campaign_winner = db.Column(db.String(100))
-    minimum_buy_amount = db.Column(db.Integer)
+    min_amount = db.Column(db.Float)
     campaing_type = db.Column(db.String(120))
     prize = db.Column(db.String(120))
     transactions = db.relationship(
