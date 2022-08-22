@@ -313,7 +313,7 @@ biggest_buy_competition_alert_template = '''
 <b>Ends:</b> {end_date}
 
 <b>Minimum Buy:</b> ${minimum_buy}
-<b>Winner's Reward:</b> ${winner_reward}
+<b>Winner's Reward:</b> {winner_reward}
 
 ——
 
