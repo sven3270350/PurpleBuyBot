@@ -64,7 +64,6 @@ const getAllActivelyTrackedTokensNoActiveCampaign = async () => {
 const getAllActivelyTrackedTokensWithActiveCampaign = async () => {
   const query = `
   SELECT
-  DISTINCT 
   tk.group_id,  tk.token_name, tk.token_address,
   tk.token_symbol, tk.token_decimals, tk.pair_address as pair,
   sc.chain_name, sc.chain_id,
@@ -81,16 +80,7 @@ const getAllActivelyTrackedTokensWithActiveCampaign = async () => {
   ON sp.id = tp.pair_id
   JOIN public.campaigns cp
   ON cp.group_id = tk.group_id
-  WHERE 
-  (
-      SELECT COUNT(*) 
-       FROM public.campaigns 
-      WHERE public.campaigns.start_time <= NOW() 
-      AND  
-      public.campaigns.end_time >= NOW() 
-      AND tk.group_id =  public.campaigns.group_id
-      
-  ) > 0;
+  WHERE cp.start_time <= NOW() AND cp.end_time >= NOW();
     `;
   const res = await db.query(query);
   return res.rows;
@@ -204,6 +194,35 @@ const getTop5Buys = async (campaign_id) => {
   return res.rows;
 };
 
+const getRandomWinner = async (campaign_id) => {
+  const query = `
+  SELECT * FROM public.transactions WHERE campaign_id = $1 ORDER BY RANDOM() LIMIT 1;
+    `;
+  const params = [campaign_id];
+  const res = await db.query(query, params);
+  return res.rows[0];
+};
+
+const getOdds = async (campaign_id) => {
+  const query = `
+  SELECT COUNT(*) FROM public.transactions WHERE campaign_id = $1;
+    `;
+  const params = [campaign_id];
+  const res = await db.query(query, params);
+  return `1 in ${res.rows[0].count}`;
+};
+
+const writeWinnerToCampaign = async (address, id) => {
+  const query = `
+  UPDATE public.campaigns
+  SET campaign_winner = $1
+  WHERE id = $2;
+    `;
+  const params = [address, id];
+  const res = await db.query(query, params);
+  return res.rows[0];
+};
+
 module.exports = {
   getTrackedTokensById,
   getActiveSubscriptionByGroupId,
@@ -215,4 +234,7 @@ module.exports = {
   getGroupActiveCampaign,
   writeBuysToDB,
   getTop5Buys,
+  getRandomWinner,
+  getOdds,
+  writeWinnerToCampaign,
 };
