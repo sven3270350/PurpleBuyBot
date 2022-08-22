@@ -176,7 +176,7 @@ class BuyContest:
                     start_time=start_date,
                     end_time=end_date,
                     count_down=10,
-                    minimum_buy_amount=minimum_buy,
+                    min_amount=minimum_buy,
                     campaing_type=COMPETITION_NAME,
                     prize=winner_reward
                 )
