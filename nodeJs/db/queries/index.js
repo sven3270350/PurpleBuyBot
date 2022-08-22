@@ -69,7 +69,7 @@ const getAllActivelyTrackedTokensWithActiveCampaign = async () => {
   tk.token_symbol, tk.token_decimals, tk.pair_address as pair,
   sc.chain_name, sc.chain_id,
   sp.pair_name as paired_with_name, sp.pair_address as paired_with,
-  cp.id as campaign_id, cp.start_time, cp.end_time, cp.campaing_type, cp.minimum_buy_amount, cp.prize 
+  cp.id as campaign_id, cp.start_time, cp.end_time, cp.campaing_type, cp.min_amount, cp.prize 
   FROM public.tracked_token tk
   JOIN public.token_chains tc
   ON tk.id = tc.token_id
@@ -156,6 +156,54 @@ const getActiveAd = async () => {
   return res.rows;
 };
 
+const writeBuysToDB = async (buys) => {
+  const query = `
+  INSERT INTO public.transactions (
+    group_id,
+    campaign_id,
+    buyer_address,
+    buyer_amount,
+    transaction_link,
+    transaction_chain,
+    cmapaign_type
+  )
+  VALUES ($1, $2, $3, $4, $5, $6, $7)
+  RETURNING *;
+  `;
+  const params = [
+    buys.group_id,
+    buys.campaign_id,
+    buys.buyer_address,
+    buys.buyer_amount,
+    buys.transaction_link,
+    buys.transaction_chain,
+    buys.campaign_type,
+  ];
+  const res = await db.query(query, params);
+  return res.rows[0];
+};
+
+const getTop5Buys = async (campaign_id) => {
+  const query = `
+  SELECT
+  *,
+    RANK() OVER (ORDER BY t.amount DESC) AS campaignRank
+  FROM (
+    SELECT
+      group_id,
+      buyer_address,
+      SUM(buyer_amount) AS amount
+    FROM public.transactions
+    WHERE campaign_id = $1
+    GROUP BY group_id, buyer_address
+  ) AS t
+  ORDER BY campaignRank LIMIT 5;
+    `;
+  const params = [campaign_id];
+  const res = await db.query(query, params);
+  return res.rows;
+};
+
 module.exports = {
   getTrackedTokensById,
   getActiveSubscriptionByGroupId,
@@ -165,4 +213,6 @@ module.exports = {
   getAllUpcomingCampaigns,
   getAllActivelyTrackedTokensWithActiveCampaign,
   getGroupActiveCampaign,
+  writeBuysToDB,
+  getTop5Buys,
 };
