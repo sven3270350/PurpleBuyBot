@@ -163,7 +163,7 @@ class Transactions(db.Model):
     campaign_id = db.Column(
         db.Integer, db.ForeignKey('campaigns.id'))
     buyer_address = db.Column(db.String(100))
-    buyer_amount = db.Column(db.Integer)
+    buyer_amount = db.Column(db.Float)
     transaction_link = db.Column(db.String(100))
     transaction_chain = db.Column(db.String(20))
     cmapaign_type = db.Column(db.String(100))
