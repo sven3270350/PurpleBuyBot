@@ -147,13 +147,24 @@ const getUsdPrice = async (amount, chainId) => {
     });
     const price = data[id].usd;
 
-    return Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(Number(amount) * price);
+    return {
+      usdString: numberToUsd(Number(amount) * price),
+      usdNumber: Number(amount) * price,
+    };
   } catch (error) {
     console.log(error);
+    return {
+      usdString: "",
+      usd: 0,
+    };
   }
+};
+
+const numberToUsd = (amount) => {
+  return Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(amount);
 };
 
 const sendHTMLMessage = async (groupId, messageTemplate) => {
@@ -206,6 +217,23 @@ const getAd = async (groupId) => {
   return ad;
 };
 
+const rankIcon = (rank) => {
+  switch (rank) {
+    case 1:
+      return "🥇";
+    case 2:
+      return "🥈";
+    case 3:
+      return "🥉";
+    case 4:
+      return "4️⃣";
+    case 5:
+      return "5️⃣";
+    default:
+      return "😎";
+  }
+};
+
 module.exports = {
   ...appConfig,
   selectTrackedToken,
@@ -224,4 +252,6 @@ module.exports = {
   getCountdownString,
   getAd,
   ellipseAddress,
+  numberToUsd,
+  rankIcon,
 };

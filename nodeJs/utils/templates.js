@@ -1,3 +1,4 @@
+const { ellipseAddress, numberToUsd, rankIcon } = require("../utils");
 const generalBuyTemplate = (trackedToken, amounts, buyer, tx_link, ad = "") => {
   return `
 🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢
@@ -42,16 +43,17 @@ const campaignBiggestBuysTemplate = (
   const top5 = leaderboard.others;
   const leading = leaderboard.leading;
 
-  const templates = `
-🥇 0x46b0…1974 ➖ 1.2 BNB
-🥈 0xc351…4bf7 ➖ 0.75 BNB
-🥉 0x7171…4ee6 ➖ 0.7 BNB
-4️⃣ 0xdfd0…4815 ➖ 0.54 BNB
-5️⃣ 0x3fa6…d50a ➖ 0.5 BNB
+  let templates = ``;
+
+  for (let i = 0; i < top5.length; i++) {
+    const { buyer_address, amount } = top5[i];
+    templates += `
+${rankIcon(i + 1)} ${ellipseAddress(buyer_address)} ➖${numberToUsd(amount)}
 `;
+  }
 
   return `
-<b>🎉 ${campaign.type} Competition Started</b>
+<b>🎉 ${campaign.type} Competition Entry</b>
 
 🕓 Started at: <b>${times.start_time}</b>
 ⏳ Ends in: <b>${times.count_down}</b>
@@ -64,16 +66,94 @@ const campaignBiggestBuysTemplate = (
 <b>Top 5</b>
 ${templates}
 
-🎖 Top buyer <b><i>${leading.address || "take this spot 😉?"}</i></b>  ${
-    leading.amount || ""
-  }
+🎖 Top buyer <b><i>${
+    ellipseAddress(leading.address) || "take this spot 😉?"
+  }</i></b>  ${numberToUsd(leading.amount) || ""}
 
-🆕 <b>New Entry:</b>
+<b>New Entry:</b>
 
-😎 <b>Buyer :</b> <i><a href='${new_buyer.tx_link}'>${new_buyer.to}</a></i>
+😎 <b>Buyer :</b> <i><a href='${new_buyer.tx_link}'>${ellipseAddress(
+    new_buyer.to
+  )}</a></i>
 🤑 <b>Amount :</b> <i>${new_buyer.amountOut} (~${new_buyer.usdPrice})</i>
 
 ⛓ <b>Bought On:</b> <i>${new_buyer.chain_name}</i>
+
+——
+
+<i>${ad || "Premium"}</i>
+`;
+};
+
+const campaignRaffleBuysTemplate = (times, new_buyer, campaign, ad, odds) => {
+  return `
+<b>🎉 ${campaign.type} Competition Entry</b>
+
+🕓 Started at: <b>${times.start_time}</b>
+⏳ Ends in: <b>${times.count_down}</b>
+⬇️ Minimum Buy: <b>${Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(campaign.min_buy)}</b>
+🏆 Prize: <b>${campaign.prize}</b>
+
+<b>Winning Odds</b>
+${odds}
+
+🆕 <b>New Entry:</b>
+
+😎 <b>Buyer :</b> <i><a href='${new_buyer.tx_link}'>${ellipseAddress(
+    new_buyer.to
+  )}</a></i>
+🤑 <b>Amount :</b> <i>${new_buyer.amountOut} (~${new_buyer.usdPrice})</i>
+
+⛓ <b>Bought On:</b> <i>${new_buyer.chain_name}</i>
+
+——
+
+<i>${ad || "Premium"}</i>
+`;
+};
+
+const winnerBiggestBuysTemplate = (leaderboard, campaign, ad) => {
+  let templates = ``;
+
+  for (let i = 0; i < leaderboard.length; i++) {
+    const { buyer_address, amount } = leaderboard[i];
+    templates += `
+${rankIcon(i + 1)} ${ellipseAddress(buyer_address)} ➖${numberToUsd(amount)}
+`;
+  }
+
+  return `
+<b>${campaign.campaing_type} Competition Completed</b>
+
+🎉 🎉 🎉 🎉 🎉 🎉 🎉 🎉 🎉
+<b>Winner</b>
+<code>${leaderboard[0].buyer_address} </code> 
+<i> ➖ ${numberToUsd(leaderboard[0].amount)}</i>
+
+<b>Top 5</b>
+${templates}
+
+🏆 Prize: <b>${campaign.prize}</b>
+
+——
+
+<i>${ad || "Premium"}</i>
+`;
+};
+
+const winnerRaffleBuysTemplate = (winner, campaign, ad) => {
+  return `
+<b>${campaign.campaing_type} Competition Completed</b>
+
+🎉 🎉 🎉 🎉 🎉 🎉 🎉 🎉 🎉
+<b>Winner</b>
+<code>${winner.buyer_address} ➖ ${numberToUsd(winner.buyer_amount)}</code>
+
+
+🏆 Prize: <b>${campaign.prize}</b>
 
 ——
 
@@ -85,4 +165,7 @@ module.exports = {
   generalBuyTemplate,
   countdowToStartTemplate,
   campaignBiggestBuysTemplate,
+  campaignRaffleBuysTemplate,
+  winnerBiggestBuysTemplate,
+  winnerRaffleBuysTemplate,
 };
