@@ -23,7 +23,7 @@
   },
 
   "WEB3_PROVIDER": {
-    "ethProvider": "wss://mainnet.infura.io/ws/v3/cf3f5c7c8d5f45a48940d926bab3c403",
+    "ethProvider": "wss://mainnet.infura.io/ws/v3/e7df69dedf15401681af9b42d456d9eb",
     "bscProvider": "wss://bsc.getblock.io/mainnet/?api_key=d224b0a4-97d9-46c3-9b13-75baeb4f2717",
     "croProvider": "https://cro.getblock.io/mainnet/?api_key=d224b0a4-97d9-46c3-9b13-75baeb4f2717",
 
