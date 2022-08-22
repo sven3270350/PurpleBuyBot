@@ -1,6 +1,10 @@
 const queries = require("../db/queries");
 const utils = require("../utils");
-const { campaignBiggestBuysTemplate } = require("../utils/templates");
+const {
+  campaignBiggestBuysTemplate,
+  campaignRaffleBuysTemplate,
+} = require("../utils/templates");
+const { allBuysHandler } = require("./allBuys");
 
 const subscriptions = {};
 
@@ -12,51 +16,81 @@ const campaignBuysHandler = async (
   tx_link
 ) => {
   try {
-    const usdPrice = await utils.getUsdPrice(amountIn, trackedToken.chain_id);
-    const ad = await utils.getAd(trackedToken.group_id);
-    const activeCampaign = await queries.getGroupActiveCampaign(
-      trackedToken.group_id
-    );
-    const endDate = new Date(activeCampaign?.end_time);
-
-    const new_buyer = {
+    const { usdString: usdPrice, usdNumber } = await utils.getUsdPrice(
       amountIn,
-      amountOut,
-      usdPrice,
-      tx_link,
-      to: utils.ellipseAddress(to),
-      chain_name: trackedToken.chain_name,
-    };
-
-    const times = {
-      start_time: new Date(activeCampaign?.start_time).toLocaleString(),
-      count_down: utils.getCountdownString(endDate),
-    };
-
-    const leaderboard = {
-      leading: {
-        address: "",
-        amount: 0,
-      },
-      others: [],
-    };
-
-    const campaign = {
-      min_buy: activeCampaign.minimum_buy_amount,
-      type: activeCampaign.campaing_type,
-      prize: activeCampaign.prize,
-    };
-
-    const templates = campaignBiggestBuysTemplate(
-      times,
-      new_buyer,
-      leaderboard,
-      campaign,
-      ad
+      trackedToken.chain_id
     );
 
-    // send message to group
-    utils.sendHTMLMessage(trackedToken.group_id, templates);
+    if (usdNumber >= trackedToken.min_amount) {
+      await queries.writeBuysToDB({
+        group_id: trackedToken.group_id,
+        campaign_id: trackedToken.campaign_id,
+        buyer_address: to,
+        buyer_amount: usdNumber,
+        transaction_link: tx_link,
+        transaction_chain: trackedToken.chain_id,
+        campaign_type: trackedToken.campaing_type,
+      });
+
+      const ad = await utils.getAd(trackedToken.group_id);
+      const activeCampaign = await queries.getGroupActiveCampaign(
+        trackedToken.group_id
+      );
+      const endDate = new Date(activeCampaign?.end_time);
+      const times = {
+        start_time: new Date(activeCampaign?.start_time).toLocaleString(),
+        count_down: utils.getCountdownString(endDate),
+      };
+
+      const new_buyer = {
+        amountIn,
+        amountOut,
+        usdPrice,
+        tx_link,
+        to: utils.ellipseAddress(to),
+        chain_name: trackedToken?.chain_name,
+      };
+
+      const campaign = {
+        min_buy: activeCampaign?.min_amount,
+        type: activeCampaign?.campaing_type,
+        prize: activeCampaign?.prize,
+      };
+
+      let templates;
+
+      if (activeCampaign?.campaing_type === "Biggest Buy") {
+        const ranking = await queries.getTop5Buys(trackedToken.campaign_id);
+        const leaderboard = {
+          leading: {
+            address: ranking[0]?.buyer_address,
+            amount: ranking[0]?.amount,
+          },
+          others: ranking,
+        };
+
+        templates = campaignBiggestBuysTemplate(
+          times,
+          new_buyer,
+          leaderboard,
+          campaign,
+          ad
+        );
+      } else if (activeCampaign?.campaing_type === "Raffle") {
+        const odds = await queries.getOdds(trackedToken.campaign_id);
+        templates = campaignRaffleBuysTemplate(
+          times,
+          new_buyer,
+          campaign,
+          ad,
+          odds
+        );
+      }
+      // send message to group
+      utils.sendHTMLMessage(trackedToken.group_id, templates);
+    } else {
+      await allBuysHandler(trackedToken, amountIn, amountOut, to, tx_link);
+    }
   } catch (error) {
     console.log("[campaignBuys::allBuysHandler]", error);
   }
