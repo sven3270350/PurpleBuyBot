@@ -16,13 +16,11 @@ const announcerHandler = async (activeCampaign) => {
     if (activeCampaign.campaing_type === "Biggest Buy") {
       // anounce biggest buy campaign winner
       const winner = await queries.getTop5Buys(activeCampaign.id);
-      console.log("[announcer::announcerHandler] BBB", winner, activeCampaign);
       winnerAddress = winner[0].buyer_address;
       templates = winnerBiggestBuysTemplate(winner, activeCampaign, ad);
     } else {
       // anounce raffle campaign winner
       const winner = await queries.getRandomWinner(activeCampaign.id);
-      console.log("[announcer::announcerHandler] Raffle", winner, activeCampaign);
       winnerAddress = winner.buyer_address;
       templates = winnerRaffleBuysTemplate(winner, activeCampaign, ad);
     }
