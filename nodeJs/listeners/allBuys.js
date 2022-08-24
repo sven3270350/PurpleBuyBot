@@ -12,7 +12,7 @@ const allBuysHandler = async (
   tx_link
 ) => {
   try {
-    const { usdString: usdPrice, usdNumber } = await utils.getUsdPrice(
+    const { usdString: usdPrice } = await utils.getUsdPrice(
       amountIn,
       trackedToken.chain_id
     );
@@ -40,7 +40,7 @@ const allBuysHandler = async (
 
 const subscribe = async (trackedToken, contract) => {
   const subscription = contract.events.Swap({});
-  subscriptions[trackedToken.token_address.toLowerCase()] = subscription;
+  subscriptions[trackedToken.group_id] = subscription;
 
   // subscribe to event
   subscription.on("data", (data) =>
@@ -60,22 +60,17 @@ const main = async (interval = 1000 * 30) => {
 
       // if no tracked tokens, and subssciptions, unsubscribe from all
       if (trackedTokens.length === 0 && Object.keys(subscriptions).length > 0) {
-        Object.keys(subscriptions).forEach((address) => {
-          subscriptions[address].unsubscribe();
-          delete subscriptions[address];
+        Object.keys(subscriptions).forEach((groupId) => {
+          subscriptions[groupId].unsubscribe();
+          delete subscriptions[groupId];
         });
       }
 
       // if stop subscription if not actively tracked
-      Object.keys(subscriptions).forEach((address) => {
-        if (
-          !trackedTokens.find(
-            (token) =>
-              token.token_address.toLowerCase() === address.toLocaleLowerCase()
-          )
-        ) {
-          subscriptions[address].unsubscribe();
-          delete subscriptions[address];
+      Object.keys(subscriptions).forEach((groupId) => {
+        if (!trackedTokens.find((token) => token.groupId === groupId)) {
+          subscriptions[groupId].unsubscribe();
+          delete subscriptions[groupId];
         }
       });
 

@@ -5,7 +5,9 @@ const generalBuyTemplate = (trackedToken, amounts, buyer, tx_link, ad = "") => {
 
 New <b>${trackedToken.token_name} </b> Buy!
 
-<b>Paid</b>: <i>${amounts.amountIn} (${amounts.usdPrice})</i>
+<b>Paid</b>: <i>${amounts.amountIn} ${trackedToken.paired_with_name} (${
+    amounts.usdPrice
+  })</i>
 <b>For</b>: <i>${amounts.amountOut} ${trackedToken.token_symbol}</i>
 
 <b>On</b>: <i>${trackedToken.chain_name}</i>
@@ -29,7 +31,7 @@ const countdowToStartTemplate = (startCountdown, EndCountdown, ad) => {
 
 ——
 
-${ad || "Premium"}
+<i>${ad || "Premium"}</i>
 `;
 };
 

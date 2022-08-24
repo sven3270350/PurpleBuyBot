@@ -16,7 +16,7 @@ const selectTrackedToken = async (trackedToken, contract) => {
     const token0 = await getToken0(contract);
     const token1 = await getToken1(contract);
 
-    if (trackedToken === token0) {
+    if (trackedToken.toLowerCase() === token0) {
       return { token: 0, address: token0 };
     } else {
       return { token: 1, address: token1 };
@@ -27,11 +27,13 @@ const selectTrackedToken = async (trackedToken, contract) => {
 };
 
 const getToken0 = async (contract) => {
-  return contract.methods.token0().call();
+  const token0 = await contract.methods.token0().call();
+  return token0.toLowerCase();
 };
 
 const getToken1 = async (contract) => {
-  return contract.methods.token1().call();
+  const token1 = await contract.methods.token1().call();
+  return token1.toLowerCase();
 };
 
 const hasActiveSubscription = async (groupId) => {
@@ -70,33 +72,53 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
 
     if (selectedTrackedToken.token === 1) {
       const token1Decimals = await getTokenDecimals(
-        selectedTrackedToken.address,
+        trackedToken.paired_with,
         chainId
       );
 
-      amountIn = Web3.utils.fromWei(
+      console.log("[Utils::swapHanlder::isToken1]", {
+        token1Decimals,
+        decimals,
+        token_address,
+        token1: selectedTrackedToken.address,
+        token1n: trackedToken.token_name,
+        token0: trackedToken.paired_with,
+        token0n: trackedToken.paired_with_name,
+      });
+
+      amountOut = Web3.utils.fromWei(
         data.returnValues.amount1In,
         decimalsToUnit(token1Decimals)
       );
 
-      amountOut = Web3.utils.fromWei(
+      amountIn = Web3.utils.fromWei(
         data.returnValues.amount0Out,
         decimalsToUnit(decimals)
       );
     } else {
       const token0Decimals = await getTokenDecimals(
-        selectedTrackedToken.address,
+        trackedToken.paired_with,
         chainId
       );
 
-      amountIn = Web3.utils.fromWei(
-        data.returnValues.amount0In,
-        decimalsToUnit(token0Decimals)
-      );
+      console.log("[Utils::swapHanlder::isToken0]", {
+        token0Decimals,
+        decimals,
+        token_address,
+        token0: selectedTrackedToken.address,
+        token0n: trackedToken.token_name,
+        token1: trackedToken.paired_with,
+        token1n: trackedToken.paired_with_name,
+      });
 
       amountOut = Web3.utils.fromWei(
-        data.returnValues.amount1Out,
+        data.returnValues.amount0Out,
         decimalsToUnit(decimals)
+      );
+
+      amountIn = Web3.utils.fromWei(
+        data.returnValues.amount1In,
+        decimalsToUnit(token0Decimals)
       );
     }
 
@@ -130,7 +152,7 @@ const decimalsToUnit = (decimals) => {
     27: "gether",
     30: "tether",
   };
-  return units[decimals];
+  return units[Number(decimals)];
 };
 
 const ellipseAddress = (address) => {
@@ -145,6 +167,7 @@ const getUsdPrice = async (amount, chainId) => {
       ids: id,
       vs_currencies: "usd",
     });
+    console.log("[Utils::getUsdPrice]", data);
     const price = data[id].usd;
 
     return {
@@ -152,7 +175,7 @@ const getUsdPrice = async (amount, chainId) => {
       usdNumber: Number(amount) * price,
     };
   } catch (error) {
-    console.log(error);
+    console.log("[Utils::getUsdPrice]", error);
     return {
       usdString: "",
       usd: 0,
@@ -168,10 +191,17 @@ const numberToUsd = (amount) => {
 };
 
 const sendHTMLMessage = async (groupId, messageTemplate) => {
-  bot.sendMessage(groupId, messageTemplate, {
-    parse_mode: "HTML",
-    disable_web_page_preview: true,
-  });
+  // send max 29 messages per second per group
+  setTimeout(() => {
+    bot
+      .sendMessage(groupId, messageTemplate, {
+        parse_mode: "HTML",
+        disable_web_page_preview: true,
+      })
+      .catch((error) => {
+        console.log("[Utils::sendHTMLMessage]", { ...error.toJSON(), groupId });
+      });
+  }, 2000);
 };
 
 const getCountdown = (date) => {
