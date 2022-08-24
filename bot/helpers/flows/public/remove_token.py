@@ -1,7 +1,7 @@
 from telegram.ext import CallbackContext, Dispatcher, ConversationHandler, CommandHandler, CallbackQueryHandler
 from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from services.bot_service import BotService
-from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin
+from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin, set_commands
 from helpers.templates import remove_token_confirmation_template
 from models import TrackedToken
 
@@ -20,6 +20,8 @@ class RemoveToken:
         if is_private_chat(update):
             if not BotService().is_group_in_focus(update, context):
                 return
+
+            set_commands(context, True)
 
             group_id = context.chat_data.get('group_id', None)
             group_title = context.bot.get_chat(group_id).title
@@ -46,14 +48,15 @@ class RemoveToken:
     @send_typing_action
     def __remove_token(self, update: Update, context: CallbackContext) -> int:
         self.__extract_params(update, context)
-        
+
         if is_private_chat(update):
             if not BotService().is_group_in_focus(update, context):
                 reset_chat_data(context)
                 return ConversationHandler.END
-            
+
             group_id = context.chat_data.get('group_id', None)
-            context.chat_data['group_title'] = context.bot.get_chat(group_id).title
+            context.chat_data['group_title'] = context.bot.get_chat(
+                group_id).title
             chat_data: dict = context.chat_data
 
             if not is_group_admin(update, context):

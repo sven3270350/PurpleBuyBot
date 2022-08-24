@@ -4,7 +4,7 @@ from services.subscriptions_service import SubscriptionService
 from models import db, Campaigns
 from services.bot_service import BotService
 from services.campaign_service import CampaignService
-from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin
+from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin, set_commands
 from helpers.templates import (
     no_trackecd_tokens_template, start_biggest_buy_contest_template,
     set_start_time_template, set_end_time_template, set_min_buy_template,
@@ -32,6 +32,8 @@ class BuyContest:
             if not BotService().is_group_in_focus(update, context):
                 reset_chat_data(context)
                 return ConversationHandler.END
+
+            set_commands(context, True)
 
             group_id = context.chat_data.get('group_id', None)
             context.chat_data['group_title'] = context.bot.get_chat(
@@ -389,7 +391,8 @@ class BuyContest:
         self.set_winner_prize_handler = CallbackQueryHandler(
             self.__goto_winner_prize, pattern='set_winner_prize')
 
-        self.winner_prize_handler = MessageHandler(Filters.text, self.__set_winner_prize)
+        self.winner_prize_handler = MessageHandler(
+            Filters.text, self.__set_winner_prize)
 
         self.set_start_comp_handler = CallbackQueryHandler(
             self.__goto_start_comp, pattern='start_competition')

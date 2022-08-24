@@ -4,7 +4,7 @@ from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMark
 from services.web3_service import Web3Service
 from models import db, SupportedChain, SupportedExchange, SupportedPairs, TrackedToken
 from services.bot_service import BotService
-from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin
+from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin, set_commands
 from helpers.templates import add_token_confirmation_template, add_token_chain_select_template, add_token_dex_select_template, add_token_pair_select_template
 
 DEX, PAIR, ADDRESS, CONFIRM = range(4)
@@ -23,6 +23,8 @@ class AddToken:
             if not BotService().is_group_in_focus(update, context):
                 reset_chat_data(context)
                 return ConversationHandler.END
+
+            set_commands(context, True)
 
             group_id = context.chat_data.get('group_id', None)
 

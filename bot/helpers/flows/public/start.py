@@ -2,7 +2,7 @@ from telegram.ext import CallbackContext, Dispatcher, CommandHandler, Filters
 from telegram.utils import helpers
 from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from services.bot_service import BotService
-from helpers.utils import is_private_chat, is_group_admin, send_typing_action
+from helpers.utils import is_private_chat, is_group_admin, send_typing_action, set_commands
 from helpers.templates import start_template, start_template_private, start_added_to_group, not_group_admin_template
 from constants import ADD_BOT_TO_GROUP
 
@@ -18,6 +18,8 @@ class StartBot:
         self.__extract_params(update, context)
 
         if is_private_chat(update):
+            set_commands(context, True)
+
             url = helpers.create_deep_linked_url(
                 self.bot_name, ADD_BOT_TO_GROUP, group=True)
             button = InlineKeyboardMarkup.from_button(

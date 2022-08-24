@@ -1,7 +1,7 @@
 from telegram import Update, ParseMode
-from telegram.ext import CallbackContext, Dispatcher, ConversationHandler, CommandHandler, CallbackQueryHandler
+from telegram.ext import CallbackContext, Dispatcher, CommandHandler
 from models import SupportedChain, SupportedExchange, SupportedPairs
-from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin
+from helpers.utils import is_private_chat, set_commands, send_typing_action
 from services.bot_service import BotService
 from services.bot_service import BotService
 from helpers.templates import help_template
@@ -18,6 +18,7 @@ class GeneralHandler:
         if is_private_chat(update):
             supported_chains: list[SupportedChain] = BotService(
             ).get_supported_chains()
+            set_commands(context, True)
             message = '<b>Supported Chains:</b>\n\n'
 
             if len(supported_chains) == 0:
