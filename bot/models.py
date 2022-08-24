@@ -92,7 +92,7 @@ class Campaigns(db.Model):
     campaign_winner = db.Column(db.String(100))
     min_amount = db.Column(db.Float)
     campaing_type = db.Column(db.String(120))
-    prize = db.Column(db.String(120))
+    award = db.Column(db.Text)
     transactions = db.relationship(
         'Transactions', backref='campaign', lazy='dynamic')
 
