@@ -63,3 +63,25 @@ def not_group_admin(update: Update, context: CallbackContext):
                               parse_mode=ParseMode.HTML)
     reset_chat_data(context)
     return ConversationHandler.END
+
+
+def set_commands(context: CallbackContext, enable=False):
+    if enable:
+        context.bot.set_my_commands(commands=[("help", "Show supported commands"),
+                                              ("add_token", "Add the token to be monitored requires token address"),
+                                              ("remove_token",
+                                               "Remove monitored token"),
+                                              ("tracked_tokens",
+                                               "List tracked tokens"),
+                                              ("start_buy_contest",
+                                               "Initiate a biggest buy contest"),
+                                              ("raffle_on",
+                                               "Start raffle buy contest"),
+                                              ("subscribe",
+                                               "Subscribe to premium to remove ads"),
+                                              ("chains", " Show a list of supported chains"),
+                                              ("active_tracking",
+                                               "Toggle active buys tracking"),
+                                              ("cancel", "cancel flow"), ])
+    else:
+        context.bot.set_my_commands(commands=[])
