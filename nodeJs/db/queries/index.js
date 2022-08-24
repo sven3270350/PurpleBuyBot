@@ -223,6 +223,15 @@ const writeWinnerToCampaign = async (address, id) => {
   return res.rows[0];
 };
 
+const deleteTrackedToken = async (group_id) => {
+  const query = `
+  UPDATE public.tracked_token SET active_tracking=false WHERE group_id = $1;
+    `;
+  const params = [group_id];
+  const res = await db.query(query, params);
+  return res.rows[0];
+};
+
 module.exports = {
   getTrackedTokensById,
   getActiveSubscriptionByGroupId,
@@ -237,4 +246,5 @@ module.exports = {
   getRandomWinner,
   getOdds,
   writeWinnerToCampaign,
+  deleteTrackedToken,
 };
