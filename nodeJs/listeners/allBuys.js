@@ -12,15 +12,14 @@ const allBuysHandler = async (
   tx_link
 ) => {
   try {
-    const { usdString: usdPrice } = await utils.getUsdPrice(
-      amountIn,
-      trackedToken.paired_with_name
-    );
+    const { usdString: usdPrice, usdNumber: multiplier } =
+      await utils.getUsdPrice(amountIn, trackedToken.paired_with_name);
     const ad = await utils.getAd(trackedToken.group_id);
     const amounts = {
       amountIn,
       amountOut,
       usdPrice,
+      multiplier,
     };
 
     const templates = generalBuyTemplate(
