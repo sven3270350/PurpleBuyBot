@@ -18,7 +18,7 @@ const campaignBuysHandler = async (
   try {
     const { usdString: usdPrice, usdNumber } = await utils.getUsdPrice(
       amountIn,
-      trackedToken.chain_id
+      trackedToken.paired_with_name
     );
 
     if (usdNumber >= trackedToken.min_amount) {
@@ -98,7 +98,9 @@ const campaignBuysHandler = async (
 
 const subscribe = async (trackedToken, contract) => {
   const subscription = contract.events.Swap({});
-  subscriptions[trackedToken.token_address.toLowerCase()] = subscription;
+  subscriptions[
+    `${trackedToken.token_address.toLowerCase()}_${trackedToken.id}`
+  ] = subscription;
 
   // subscribe to event
   subscription.on("data", (data) =>
@@ -118,22 +120,21 @@ const main = async (interval = 1000 * 30) => {
 
       // if no tracked tokens, and subssciptions, unsubscribe from all
       if (trackedTokens.length === 0 && Object.keys(subscriptions).length > 0) {
-        Object.keys(subscriptions).forEach((address) => {
-          subscriptions[address].unsubscribe();
-          delete subscriptions[address];
+        Object.keys(subscriptions).forEach((id) => {
+          subscriptions[id].unsubscribe();
+          delete subscriptions[id];
         });
       }
 
       // stop subcription if there is no active campaign
-      Object.keys(subscriptions).forEach((address) => {
+      Object.keys(subscriptions).forEach((id) => {
         if (
           !trackedTokens.find(
-            (token) =>
-              token.token_address.toLowerCase() === address.toLowerCase()
+            (token) => `${token.token_address.toLowerCase()}_${token.id}` === id
           )
         ) {
-          subscriptions[address].unsubscribe();
-          delete subscriptions[address];
+          subscriptions[id].unsubscribe();
+          delete subscriptions[id];
         }
       });
 
@@ -145,7 +146,7 @@ const main = async (interval = 1000 * 30) => {
         // check if event is not in subscriptions
         if (
           !utils.keyInObject(
-            trackedToken.token_address.toLowerCase(),
+            `${trackedToken.token_address.toLowerCase()}_${trackedToken.id}`,
             subscriptions
           )
         ) {
