@@ -52,9 +52,14 @@ const getCoinGeckoId = (chainId) => {
   return config.get(`COINGECKO_IDs.${key}`);
 };
 
+const getAllCoingeckoIds = () => {
+  return config.get(`COINGECKO_IDs`);
+};
+
 module.exports = {
   getExploerUrl,
   getChain,
   getProvider,
   getCoinGeckoId,
+  getAllCoingeckoIds,
 };
