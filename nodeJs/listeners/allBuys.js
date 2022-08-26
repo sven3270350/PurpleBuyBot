@@ -14,7 +14,7 @@ const allBuysHandler = async (
   try {
     const { usdString: usdPrice } = await utils.getUsdPrice(
       amountIn,
-      trackedToken.chain_id
+      trackedToken.paired_with_name
     );
     const ad = await utils.getAd(trackedToken.group_id);
     const amounts = {
@@ -40,12 +40,15 @@ const allBuysHandler = async (
 
 const subscribe = async (trackedToken, contract) => {
   const subscription = contract.events.Swap({});
-  subscriptions[trackedToken.group_id] = subscription;
+  subscriptions[
+    `${trackedToken.token_address.toLowerCase()}_${trackedToken.id}`
+  ] = subscription;
 
   // subscribe to event
-  subscription.on("data", (data) =>
-    utils.swapHanlder(contract, trackedToken, data, allBuysHandler)
-  );
+  subscription.on("data", (data) => {
+    console.log("[allBuys::subscribe]", Object.keys(subscriptions));
+    utils.swapHanlder(contract, trackedToken, data, allBuysHandler);
+  });
 
   subscription.on("error", (error) => console.log(error));
 };
@@ -60,17 +63,21 @@ const main = async (interval = 1000 * 30) => {
 
       // if no tracked tokens, and subssciptions, unsubscribe from all
       if (trackedTokens.length === 0 && Object.keys(subscriptions).length > 0) {
-        Object.keys(subscriptions).forEach((groupId) => {
-          subscriptions[groupId].unsubscribe();
-          delete subscriptions[groupId];
+        Object.keys(subscriptions).forEach((id) => {
+          subscriptions[id].unsubscribe();
+          delete subscriptions[id];
         });
       }
 
       // if stop subscription if not actively tracked
-      Object.keys(subscriptions).forEach((groupId) => {
-        if (!trackedTokens.find((token) => token.groupId === groupId)) {
-          subscriptions[groupId].unsubscribe();
-          delete subscriptions[groupId];
+      Object.keys(subscriptions).forEach((id) => {
+        if (
+          !trackedTokens.find(
+            (token) => `${token.token_address.toLowerCase()}_${token.id}` === id
+          )
+        ) {
+          subscriptions[id].unsubscribe();
+          delete subscriptions[id];
         }
       });
 
@@ -82,7 +89,7 @@ const main = async (interval = 1000 * 30) => {
         // check if event is not in subscriptions
         if (
           !utils.keyInObject(
-            trackedToken.token_address.toLowerCase(),
+            `${trackedToken.token_address.toLowerCase()}_${trackedToken.id}`,
             subscriptions
           ) &&
           trackedToken.active_tracking
