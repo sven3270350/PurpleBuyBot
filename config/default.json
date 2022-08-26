@@ -32,7 +32,7 @@
     "testnetCroProvider": "wss://evm-t3.cronos.org/"
   },
 
-  "COINGECKO_IDs": {
+  "COINGECKO_IDS": {
     "ethid": "ethereum",
     "bscid": "binancecoin",
     "croid": "crypto-com-chain",

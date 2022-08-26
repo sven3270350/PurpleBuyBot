@@ -49,11 +49,11 @@ const getCoinGeckoId = (chainId) => {
     338: "croid",
   };
   const key = chains[chainId];
-  return config.get(`COINGECKO_IDs.${key}`);
+  return config.get(`COINGECKO_IDS.${key}`);
 };
 
 const getAllCoingeckoIds = () => {
-  return config.get(`COINGECKO_IDs`);
+  return config.get(`COINGECKO_IDS`);
 };
 
 module.exports = {
