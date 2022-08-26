@@ -64,7 +64,7 @@ const getAllActivelyTrackedTokensNoActiveCampaign = async () => {
 const getAllActivelyTrackedTokensWithActiveCampaign = async () => {
   const query = `
   SELECT
-  tk.group_id,  tk.token_name, tk.token_address,
+  tk.id, tk.group_id,  tk.token_name, tk.token_address,
   tk.token_symbol, tk.token_decimals, tk.pair_address as pair,
   sc.chain_name, sc.chain_id,
   sp.pair_name as paired_with_name, sp.pair_address as paired_with,
