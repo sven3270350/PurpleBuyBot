@@ -33,7 +33,7 @@ class RaffleContest:
                 reset_chat_data(context)
                 return ConversationHandler.END
 
-            set_commands(set_commands(context, True))
+            set_commands(context, True)
 
             group_id = context.chat_data.get('group_id', None)
             context.chat_data['group_title'] = context.bot.get_chat(
