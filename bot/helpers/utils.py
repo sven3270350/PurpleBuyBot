@@ -83,5 +83,4 @@ def set_commands(context: CallbackContext, enable=False):
                                               ("active_tracking",
                                                "Toggle active buys tracking"),
                                               ("cancel", "cancel flow"), ])
-    else:
-        context.bot.set_my_commands(commands=[])
+   
