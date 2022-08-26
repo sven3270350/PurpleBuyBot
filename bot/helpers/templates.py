@@ -322,7 +322,7 @@ biggest_buy_competition_alert_template = '''
 
 
 regular_buy_template = '''
-🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢
+🟢🟢🟢🟢🟢🟢🟢🟢🟢
 
 New <b>{token_name} </b> Buy!
 
