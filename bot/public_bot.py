@@ -22,7 +22,7 @@ dispatcher = updater.dispatcher
 
 def start_bot():
     updater.start_webhook(listen="0.0.0.0",
-                          port=int(os.environ.get('PORT', '8443')),
+                          port=int(os.environ.get('PORT', '5000')),
                           url_path=telegram_bot_token,
                           )
     updater.bot.setWebhook(
