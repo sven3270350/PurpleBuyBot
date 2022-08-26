@@ -76,16 +76,6 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
         chainId
       );
 
-      console.log("[Utils::swapHanlder::isToken1]", {
-        token1Decimals,
-        decimals,
-        token_address,
-        token1: selectedTrackedToken.address,
-        token1n: trackedToken.token_name,
-        token0: trackedToken.paired_with,
-        token0n: trackedToken.paired_with_name,
-      });
-
       amountOut = Web3.utils.fromWei(
         data.returnValues.amount1In,
         decimalsToUnit(token1Decimals)
@@ -100,16 +90,6 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
         trackedToken.paired_with,
         chainId
       );
-
-      console.log("[Utils::swapHanlder::isToken0]", {
-        token0Decimals,
-        decimals,
-        token_address,
-        token0: selectedTrackedToken.address,
-        token0n: trackedToken.token_name,
-        token1: trackedToken.paired_with,
-        token1n: trackedToken.paired_with_name,
-      });
 
       amountOut = Web3.utils.fromWei(
         data.returnValues.amount0Out,
@@ -159,27 +139,64 @@ const ellipseAddress = (address) => {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 };
 
-const getUsdPrice = async (amount, chainId) => {
-  const id = appConfig.getCoinGeckoId(chainId);
+const getUsdPrice = async (amount, paired_with) => {
+  const price = await getUsdPriceFromCache(paired_with);
+  return {
+    usdString: numberToUsd(Number(amount) * price),
+    usdNumber: Number(amount) * price,
+  };
+};
 
+const getUSDPrices = async () => {
+  const ids = appConfig.getAllCoingeckoIds();
   try {
     const { data } = await CoinGeckoClient.simple.price({
-      ids: id,
+      ids: Object.values(ids),
       vs_currencies: "usd",
     });
-    console.log("[Utils::getUsdPrice]", data);
-    const price = data[id].usd;
-
-    return {
-      usdString: numberToUsd(Number(amount) * price),
-      usdNumber: Number(amount) * price,
-    };
+    return data;
   } catch (error) {
-    console.log("[Utils::getUsdPrice]", error);
-    return {
-      usdString: "",
-      usd: 0,
-    };
+    console.log("[Utils::getUsdPrices]", error);
+    return {};
+  }
+};
+
+let prices = {};
+const cachePrices = async (interval = 1000 * 15) => {
+  return (async () => {
+    if (Object.keys(prices).length === 0) {
+      try {
+        prices = await getUSDPrices();
+        setInterval(async () => {
+          prices = await getUSDPrices();
+        }, interval);
+      } catch (error) {
+        console.log("[allBuys::cachePrices]", error);
+      }
+    }
+    return prices;
+  })();
+};
+
+const getUsdPriceFromCache = async (paired_with) => {
+  const id = paired_with.toLowerCase();
+  const pairs = {
+    eth: "ethereum",
+    bnb: "binancecoin",
+    cro: "crypto-com-chain",
+    usdt: "tether",
+    busd: "binance-usd",
+    usdc: "usd-coin",
+  };
+
+  try {
+    const cachedPrices = await cachePrices();
+
+    const price = cachedPrices[pairs[id]].usd;
+    return price;
+  } catch (error) {
+    console.log("[Utils::getUsdPriceFromCache]", error);
+    return 0;
   }
 };
 
@@ -284,4 +301,7 @@ module.exports = {
   ellipseAddress,
   numberToUsd,
   rankIcon,
+  getUSDPrices,
+  cachePrices,
+  getUsdPriceFromCache,
 };
