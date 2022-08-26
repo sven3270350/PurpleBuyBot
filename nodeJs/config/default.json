@@ -35,6 +35,9 @@
   "COINGECKO_IDs": {
     "ethid": "ethereum",
     "bscid": "binancecoin",
-    "croid": " crypto-com-chain"
+    "croid": "crypto-com-chain",
+    "busdid": "binance-usd",
+    "usdtid": "tether",
+    "usdcid": "usd-coin"
   }
 }
