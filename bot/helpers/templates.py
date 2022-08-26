@@ -219,8 +219,8 @@ Select <b>Start Competition</b> to start the contest with the following settings
 
 <b>Token:</b> {token_name}
 
-<b>Start's :</b> {start_date}
-<b>Ends:</b> {end_date}
+<b>Start's :</b> <code>{start_date}</code>
+<b>Ends:</b> <code>{end_date}</code>
 
 <b>Minimum Buy:</b> ${minimum_buy}
 <b>Winner's Reward:</b> {winner_reward}
@@ -291,8 +291,8 @@ start_competition_confirmation_template = '''
 
 <b>Token:</b> {token_name}
     
-<b>Start's :</b> {start_date}
-<b>Ends:</b> {end_date}
+<b>Start's :</b> <code>{start_date}</code>
+<b>Ends:</b> <code>{end_date}</code>
 
 <b>Minimum Buy:</b> ${minimum_buy}
 <b>Winner's Reward:</b> {winner_reward}
@@ -338,23 +338,3 @@ Buyer: <i>{buyer}</i>
 <i>{ad}</i>
 '''
 
-
-biggest_buy_winners_template = '''
-<b>🎉Biggest Buy Competition Started</b>
-
-🕓 Start 11:10:00 UTC
-⏳ Ends in 1 hours 16 min 34 sec
-⬇️ Minimum Buy 0.10 BNB
-
-🥇 0x46b0…1974 ➖ 1.2 BNB
-🥈 0xc351…4bf7 ➖ 0.75 BNB
-🥉 0x7171…4ee6 ➖ 0.7 BNB
-4️⃣ 0xdfd0…4815 ➖ 0.54 BNB
-5️⃣ 0x3fa6…d50a ➖ 0.5 BNB
-
-🎖 Biggest Buy 0x46b0…1974 ➖ 1.2 BNB
-
-——
-
-Buy Grimacecoin 🥰
-'''
