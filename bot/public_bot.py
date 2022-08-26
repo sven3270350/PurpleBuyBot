@@ -19,8 +19,14 @@ bot = telegram.Bot(token=telegram_bot_token)
 updater = Updater(token=telegram_bot_token, use_context=True)
 dispatcher = updater.dispatcher
 
+
 def start_bot():
-    updater.start_polling()
+    updater.start_webhook(listen="0.0.0.0",
+                          port=int(os.environ.get('PORT', 5000)),
+                          url_path=telegram_bot_token,
+                          webhook_url=f"https://{'biggestbuybot'}.herokuapp.com/{telegram_bot_token}"
+                          )
+    # updater.start_polling()
     updater.idle()
 
 
@@ -34,6 +40,7 @@ def main():
     BuyContest(dispatcher)
     RaffleContest(dispatcher)
     start_bot()
+
 
 if __name__ == '__main__':
     main()
