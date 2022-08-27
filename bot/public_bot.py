@@ -26,9 +26,9 @@ def start_bot():
 
     updater.start_webhook(listen="0.0.0.0",
                           port=PORT,
-                          url_path=telegram_bot_token)
-    updater.bot.set_webhook(
-        "https://{}.herokuapp.com/{}".format(HEROKU_APP_NAME, telegram_bot_token))
+                          url_path=telegram_bot_token,
+                          webhook_url="https://{}.herokuapp.com/{}".format(HEROKU_APP_NAME, telegram_bot_token))
+
     updater.idle()
     # updater.start_polling()
 
