@@ -19,14 +19,10 @@ dispatcher = updater.dispatcher
 
 
 def start_bot():
-    PORT = int(os.environ.get("PORT", "5000"))
-    HEROKU_APP_NAME = 'biggestbuybot'
-
     updater.start_webhook(listen="0.0.0.0",
-                          port=80,
+                          port=int(os.environ.get('PORT', 5000)),
                           url_path=telegram_bot_token,
-                          webhook_url="https://{}.herokuapp.com/{}".format(HEROKU_APP_NAME, telegram_bot_token))
-
+                          webhook_url=f"https://{'biggestbuybot'}.herokuapp.com/{telegram_bot_token}")
     updater.idle()
     # updater.start_polling()
 
