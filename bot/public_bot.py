@@ -22,7 +22,7 @@ dispatcher = updater.dispatcher
 
 def start_bot():
     PORT = int(os.environ.get("PORT", "8443"))
-    HEROKU_APP_NAME = os.environ.get("HEROKU_APP_NAME")
+    HEROKU_APP_NAME = 'biggestbuybot'
 
     updater.start_webhook(listen="0.0.0.0",
                           port=PORT,
