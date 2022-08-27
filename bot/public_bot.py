@@ -23,7 +23,7 @@ def start_bot():
     HEROKU_APP_NAME = 'biggestbuybot'
 
     updater.start_webhook(listen="0.0.0.0",
-                          port=PORT,
+                          port=80,
                           url_path=telegram_bot_token,
                           webhook_url="https://{}.herokuapp.com/{}".format(HEROKU_APP_NAME, telegram_bot_token))
 
