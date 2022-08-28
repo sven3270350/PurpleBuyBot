@@ -1,5 +1,4 @@
 
-from services.listeners.buy_listeners import buy_listener
 from helpers.flows.public.start_raffle_contest import RaffleContest
 from helpers.flows.public.start_buy_contest import BuyContest
 from helpers.flows.public.subscription import Subscription
