@@ -1,7 +1,9 @@
 const { ellipseAddress, numberToUsd, rankIcon } = require(".");
 const generalBuyTemplate = (trackedToken, amounts, buyer, tx_link, ad = "") => {
+  const multiplier = Math.round(amounts.multiplier / 10);
+  console.log("Template::Multiplier", multiplier);
   return `
-🟢${"🟢".repeat(Math.round(amounts.multiplier / 10) | 1)}
+🟢${"🟢".repeat(multiplier | 1)}
 
 New <b>${trackedToken.token_name} </b> Buy!
 
