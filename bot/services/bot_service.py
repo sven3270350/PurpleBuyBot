@@ -145,6 +145,9 @@ class BotService:
                     parse_mode=ParseMode.HTML)
             return False
 
+        if not self.is_registered_group(group_id):
+            return False
+
         return True
 
     def get_group_wallet(self, group_id):
