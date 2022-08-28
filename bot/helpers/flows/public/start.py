@@ -53,6 +53,7 @@ class StartBot:
         self.__extract_params(update, context)
         group_id = context.args[0]
         group_title = context.bot.get_chat(group_id).title
+        group_username = context.bot.get_chat(group_id).username
 
         context.chat_data['group_id'] = group_id
 
@@ -60,7 +61,7 @@ class StartBot:
             if is_group_admin(update, context):
 
                 if not BotService().is_registered_group(group_id):
-                    BotService().create_new_bot_user(self.chatid, self.chattitle, self.chatusername)
+                    BotService().create_new_bot_user(group_id, group_title, group_username)
 
                 update.message.reply_text(text=start_template(group_title),
                                           parse_mode=ParseMode.HTML)
