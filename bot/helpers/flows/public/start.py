@@ -60,9 +60,7 @@ class StartBot:
             if is_group_admin(update, context):
 
                 if not BotService().is_registered_group(group_id):
-                    update.message.reply_text(
-                        text='<i>❌ Group is not registered. Use /start to get started.</>', parse_mode=ParseMode.HTML)
-                    return
+                    BotService().create_new_bot_user(self.chatid, self.chattitle, self.chatusername)
 
                 update.message.reply_text(text=start_template(group_title),
                                           parse_mode=ParseMode.HTML)
