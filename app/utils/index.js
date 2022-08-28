@@ -77,13 +77,13 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
       );
 
       amountOut = Web3.utils.fromWei(
-        data.returnValues.amount1In,
-        decimalsToUnit(token1Decimals)
+        data.returnValues.amount1Out,
+        decimalsToUnit(decimals)
       );
 
       amountIn = Web3.utils.fromWei(
-        data.returnValues.amount0Out,
-        decimalsToUnit(decimals)
+        data.returnValues.amount0OIn,
+        decimalsToUnit(token1Decimals)
       );
     } else {
       const token0Decimals = await getTokenDecimals(
