@@ -55,6 +55,7 @@ help_template = '''
 /raffle_on - Start raffle buy contest
 /subscribe - Subscribe to premium to remove ads
 /chains - Show a list of supported chains
+/active_tracking - Toggle active buys tracking
 
 <b>Adding a token:</b>
 Use command /add_token then follow the prompt to complete
@@ -65,6 +66,9 @@ Use command /remove_token and select the token to remove
 <b>Run Contest:</b>
 To run a Buy contest, use /start_buy_contest and follow the prompt
 For Raffle contests, use /raffle_on and follow the prompt
+
+<b>Toggle Tracking:</b>
+Use /active_tracking to toggle tracking of buys
 
 <i>Note: Only one contest (Buy or Raffle) can be active per period.</i>
 '''
