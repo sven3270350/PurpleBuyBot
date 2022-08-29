@@ -17,6 +17,12 @@ const generalBuyTemplate = (trackedToken, amounts, buyer, tx_link, ad = "") => {
     amounts.amountOut,
     trackedToken.chain_id
   );
+  console.log(
+    "Template::generalBuyTemplate::isNewTokenBuyer",
+    isNewTokenBuyer,
+    !isNewTokenBuyer ? "⏫Position: " : "🔥 New Holder"
+  );
+
 
   return `
  <b>${trackedToken.token_name}  Buy!</b>
