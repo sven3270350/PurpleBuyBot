@@ -8,7 +8,13 @@ const {
   getChart,
 } = require(".");
 
-const generalBuyTemplate = async (trackedToken, amounts, buyer, tx_link, ad = "") => {
+const generalBuyTemplate = async (
+  trackedToken,
+  amounts,
+  buyer,
+  tx_link,
+  ad = ""
+) => {
   const multiplier = Math.round(amounts.multiplier / 10);
   const isNewTokenBuyer = await isNewBuyer(
     amounts.buyer,
@@ -17,12 +23,6 @@ const generalBuyTemplate = async (trackedToken, amounts, buyer, tx_link, ad = ""
     amounts.amountOut,
     trackedToken.chain_id
   );
-  console.log(
-    "Template::generalBuyTemplate::isNewTokenBuyer",
-    isNewTokenBuyer,
-    !isNewTokenBuyer ? "⏫Position: " : "🔥 New Holder"
-  );
-
 
   return `
  <b>${trackedToken.token_name}  Buy!</b>
