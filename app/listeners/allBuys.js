@@ -31,11 +31,8 @@ const allBuysHandler = async (
       ad
     );
 
-    // if more than $1
     // send message to group
-    if (multiplier > 1) {
-      utils.sendHTMLMessage(trackedToken.group_id, templates);
-    }
+    utils.sendHTMLMessage(trackedToken.group_id, templates);
   } catch (error) {
     console.log("[allBuys::allBuysHandler]", error);
   }
