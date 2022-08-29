@@ -11,6 +11,8 @@ class Group(db.Model):
     group_title = db.Column(db.Text)
     username = db.Column(db.Text)
     sign_up_date = db.Column(db.DateTime, default=db.func.now())
+    buy_icon = db.Column(db.String(2), default="🟢")
+    buy_media = db.Column(db.Text)
     subscriptions = db.relationship(
         'Subscription', backref='group', lazy='dynamic')
     tracked_tokens = db.relationship(
