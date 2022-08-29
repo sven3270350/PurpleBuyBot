@@ -211,7 +211,7 @@ const getUsdPriceFromCache = async (paired_with) => {
 
   try {
     const cachedPrices = await cachePrices();
-    console.log("UTILS::getUsdPriceFromCache::cachedPrices", cachedPrices);
+    // console.log("UTILS::getUsdPriceFromCache::cachedPrices", cachedPrices);
 
     const price = cachedPrices[pairs[id]]?.usd;
     return price;
