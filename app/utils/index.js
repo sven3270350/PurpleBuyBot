@@ -53,6 +53,27 @@ const getTokenDecimals = async (address, chain) => {
   return token.methods.decimals().call();
 };
 
+const getBuyerLink = (address, chainId) => {
+  const explorer = appConfig.getExploerUrl(chainId);
+  return `${explorer}address/${address}`;
+};
+
+const getBuyerBalance = async (address, token, chainId) => {
+  const web3 = wss(appConfig.getProvider(chainId));
+  const tokenContract = new web3.eth.Contract(ERC20, token);
+  return tokenContract.methods.balanceOf(address).call();
+};
+
+const isNewBuyer = async (address, token, chainId) => {
+  const balance = await getBuyerBalance(address, token, chainId);
+  return balance === "0";
+};
+
+const getChart = (chainId, pairAddress) => {
+  const chart = appConfig.getDexChartUrl(chainId);
+  return `${chart}${pairAddress}`;
+};
+
 const swapHanlder = async (contract, trackedToken, data, callback) => {
   const tx_hash = data.transactionHash;
   const token_address = trackedToken.token_address.toLowerCase();
@@ -282,6 +303,19 @@ const rankIcon = (rank) => {
   }
 };
 
+const genFormatter3dec = new Intl.NumberFormat("en-US", {
+  notation: "compact",
+  maximumFractionDigits: 3,
+});
+
+const amountFormater = (value) => {
+  if (Number.parseFloat(value) > 0.001) {
+    return genFormatter3dec.format(value);
+  } else {
+    return Number.parseFloat(value).toExponential(2);
+  }
+};
+
 module.exports = {
   ...appConfig,
   selectTrackedToken,
@@ -305,4 +339,9 @@ module.exports = {
   getUSDPrices,
   cachePrices,
   getUsdPriceFromCache,
+  amountFormater,
+  getBuyerLink,
+  isNewBuyer,
+  getBuyerBalance,
+  getChart,
 };
