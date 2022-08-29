@@ -71,7 +71,8 @@ const isNewBuyer = async (address, token, decimals, amountOut, chainId) => {
     "UTILS::isNewBuyer::balance",
     balance,
     readableBalance,
-    amountOut
+    amountOut,
+    readableBalance <= amountOut
   );
   return readableBalance <= amountOut;
 };
@@ -220,8 +221,9 @@ const getUsdPriceFromCache = async (paired_with) => {
 
   try {
     const cachedPrices = await cachePrices();
+    console.log("UTILS::getUsdPriceFromCache::cachedPrices", cachedPrices);
 
-    const price = cachedPrices[pairs[id]].usd;
+    const price = cachedPrices[pairs[id]]?.usd;
     return price;
   } catch (error) {
     console.log("[Utils::getUsdPriceFromCache]", error);
