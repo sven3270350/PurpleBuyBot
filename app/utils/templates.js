@@ -27,7 +27,7 @@ ${
   isNewBuyer(
     amounts.buyer,
     trackedToken.token_address,
-    trackedToken.trackedToken.token_decimals,
+    trackedToken.token_decimals,
     amounts.amountOut,
     trackedToken.chain_id
   )
