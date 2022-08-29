@@ -14,6 +14,16 @@ const getExploerUrl = (chainId) => {
   return config.get(`EXPLORERS.${key}`);
 };
 
+const getDexChartUrl = (chainId) => {
+  const dexChart = {
+    1: "ethdex",
+    56: "bscdex",
+    25: "crodex",
+  };
+  const key = dexChart[chainId];
+  return config.get(`DEX_EXPLORERS.${key}`);
+};
+
 const getChain = (chainId) => {
   const chain_name = {
     1: "ETH",
@@ -62,4 +72,5 @@ module.exports = {
   getProvider,
   getCoinGeckoId,
   getAllCoingeckoIds,
+  getDexChartUrl,
 };
