@@ -64,9 +64,16 @@ const getBuyerBalance = async (address, token, chainId) => {
   return tokenContract.methods.balanceOf(address).call();
 };
 
-const isNewBuyer = async (address, token, chainId) => {
+const isNewBuyer = async (address, token, decimals, amountOut, chainId) => {
   const balance = await getBuyerBalance(address, token, chainId);
-  return balance === "0";
+  const readableBalance = Web3.utils.fromWei(balance, decimalsToUnit(decimals));
+  console.log(
+    "UTILS::isNewBuyer::balance",
+    balance,
+    readableBalance,
+    amountOut
+  );
+  return readableBalance === amountOut;
 };
 
 const getChart = (chainId, pairAddress) => {
