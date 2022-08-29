@@ -126,10 +126,7 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
     }
 
     const to = data.returnValues.to;
-    const price = await utils.getUsdPrice(
-      amountIn,
-      trackedToken.paired_with_name
-    );
+    const price = await getUsdPrice(amountIn, trackedToken.paired_with_name);
 
     if ((amountIn > 0 || amountOut > 0) && price.usdNumber > 1) {
       callback(trackedToken, amountIn, amountOut, to, tx_link);
