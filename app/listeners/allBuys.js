@@ -15,6 +15,9 @@ const allBuysHandler = async (
     const { usdString: usdPrice, usdNumber: multiplier } =
       await utils.getUsdPrice(amountIn, trackedToken.paired_with_name);
     const ad = await utils.getAd(trackedToken.group_id);
+    const { buy_icon, buy_media } = await queries.getGroupIconAndMedia(
+      trackedToken.group_id
+    );
     const amounts = {
       amountIn,
       amountOut,
@@ -28,6 +31,7 @@ const allBuysHandler = async (
       amounts,
       utils.ellipseAddress(to),
       tx_link,
+      buy_icon,
       ad
     );
 
