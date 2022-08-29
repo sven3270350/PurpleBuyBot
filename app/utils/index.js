@@ -67,13 +67,6 @@ const getBuyerBalance = async (address, token, chainId) => {
 const isNewBuyer = async (address, token, decimals, amountOut, chainId) => {
   const balance = await getBuyerBalance(address, token, chainId);
   const readableBalance = Web3.utils.fromWei(balance, decimalsToUnit(decimals));
-  console.log(
-    "UTILS::isNewBuyer::balance",
-    balance,
-    readableBalance,
-    amountOut,
-    readableBalance <= amountOut
-  );
   return readableBalance <= amountOut;
 };
 
@@ -133,8 +126,12 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
     }
 
     const to = data.returnValues.to;
+    const price = await utils.getUsdPrice(
+      amountIn,
+      trackedToken.paired_with_name
+    );
 
-    if (amountIn > 0 || amountOut > 0) {
+    if ((amountIn > 0 || amountOut > 0) && price.usdNumber > 1) {
       callback(trackedToken, amountIn, amountOut, to, tx_link);
     }
   } catch (error) {
