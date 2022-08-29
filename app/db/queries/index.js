@@ -33,11 +33,13 @@ const getAllActivelyTrackedTokensNoActiveCampaign = async () => {
   const query = `
   SELECT
   DISTINCT 
-  tk.id, tk.group_id,  tk.token_name, tk.token_address,
+  gp.buy_icon, gp.buy_media, tk.id, tk.group_id,  tk.token_name, tk.token_address,
   tk.token_symbol, tk.token_decimals, tk.pair_address as pair, tk.active_tracking,
   sc.chain_name, sc.chain_id,
   sp.pair_name as paired_with_name, sp.pair_address as paired_with
   FROM public.tracked_token tk
+  JOIN public.group gp
+  ON tk.group_id = gp.group_id
   JOIN public.token_chains tc
   ON tk.id = tc.token_id
   JOIN public.supported_chain sc
