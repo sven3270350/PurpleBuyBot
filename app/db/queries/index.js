@@ -234,6 +234,18 @@ const deleteTrackedToken = async (group_id) => {
   return res.rows[0];
 };
 
+const getGroupIconAndMedia = async (group_id) => {
+  const query = `
+  SELECT
+  buy_icon, buy_media
+  FROM public.group
+  WHERE group_id = $1;
+    `;
+  const params = [group_id];
+  const res = await db.query(query, params);
+  return res.rows[0];
+};
+
 module.exports = {
   getTrackedTokensById,
   getActiveSubscriptionByGroupId,
@@ -249,4 +261,5 @@ module.exports = {
   getOdds,
   writeWinnerToCampaign,
   deleteTrackedToken,
+  getGroupIconAndMedia,
 };
