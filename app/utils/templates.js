@@ -20,10 +20,14 @@ const generalBuyTemplate = (trackedToken, amounts, buyer, tx_link, ad = "") => {
   })
 🚀 ${amountFormater(amounts.amountOut)} ${trackedToken.token_symbol}
 👤 Buyer <a href='${getBuyerLink(
-    amounts,
+    amounts.buyer,
     trackedToken.chain_id
   )}'>${buyer}</a> | <a href='${tx_link}'>Txn</a>
-${isNewBuyer() ? "🆕 Buyer" : "🔥 Holder"}
+${
+  isNewBuyer(amounts.buyer, trackedToken.token_address, trackedToken.chain_id)
+    ? "🆕 Buyer"
+    : "🔥 Holder"
+}
 
 🕸 Chain: <i>${trackedToken.chain_name}</i>
 📈 <a href='${getChart(trackedToken.chain_id, trackedToken.pair)}'>Chart</a>
