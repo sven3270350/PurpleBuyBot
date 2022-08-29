@@ -24,9 +24,11 @@ const generalBuyTemplate = async (
     trackedToken.chain_id
   );
 
+  const buy_icon = trackedToken.buy_icon || "🟢";
+
   return `
  <b>${trackedToken.token_name}  Buy!</b>
-🟢${"🟢".repeat((multiplier > 3667 ? 3667 : multiplier) | 1)}
+${buy_icon.repeat((multiplier > 3667 ? 3667 : multiplier) | 1)}
 
 💸 ${amountFormater(amounts.amountIn)} ${trackedToken.paired_with_name} (${
     amounts.usdPrice
