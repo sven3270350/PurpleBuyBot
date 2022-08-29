@@ -25,6 +25,7 @@ const generalBuyTemplate = async (
   );
 
   const buy_icon = trackedToken.buy_icon || "🟢";
+  console.log("Template::generalBuyTemplate::buy_icon", buy_icon);
 
   return `
  <b>${trackedToken.token_name}  Buy!</b>
