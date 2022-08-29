@@ -23,13 +23,13 @@
   },
 
   "WEB3_PROVIDER": {
-    "ethProvider": "wss://mainnet.infura.io/ws/v3/e7df69dedf15401681af9b42d456d9eb",
-    "bscProvider": "wss://bsc.getblock.io/mainnet/?api_key=d224b0a4-97d9-46c3-9b13-75baeb4f2717",
-    "croProvider": "https://cro.getblock.io/mainnet/?api_key=d224b0a4-97d9-46c3-9b13-75baeb4f2717",
+    "ethProvider": "wss://eth.getblock.io/mainnet/?api_key=eb8c01cf-f461-41e4-9ffa-a4368d3f2294",
+    "bscProvider": "wss://bsc.getblock.io/mainnet/?api_key=eb8c01cf-f461-41e4-9ffa-a4368d3f2294",
+    "croProvider": "wss://cro.getblock.io/mainnet/?api_key=eb8c01cf-f461-41e4-9ffa-a4368d3f2294",
 
-    "testnetEthProvider": "wss://eth.getblock.io/goerli/?api_key=d224b0a4-97d9-46c3-9b13-75baeb4f2717",
-    "testnetBscProvider": "wss://bsc.getblock.io/mainnet/?api_key=d224b0a4-97d9-46c3-9b13-75baeb4f2717",
-    "testnetCroProvider": "wss://evm-t3.cronos.org/"
+    "testnetEthProvider": "https://eth.getblock.io/goerli/?api_key=eb8c01cf-f461-41e4-9ffa-a4368d3f2294",
+    "testnetBscProvider": "wss://bsc.getblock.io/testnet/?api_key=eb8c01cf-f461-41e4-9ffa-a4368d3f2294",
+    "testnetCroProvider": "wss://cro.getblock.io/testnet/?api_key=eb8c01cf-f461-41e4-9ffa-a4368d3f2294",
   },
 
   "COINGECKO_IDS": {
