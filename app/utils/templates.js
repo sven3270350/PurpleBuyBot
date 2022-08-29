@@ -22,7 +22,7 @@ const generalBuyTemplate = (trackedToken, amounts, buyer, tx_link, ad = "") => {
     trackedToken.chain_id
   )}'>${buyer}</a> | <a href='${tx_link}'>Txn</a>
 ${
-  isNewBuyer(
+  !isNewBuyer(
     amounts.buyer,
     trackedToken.token_address,
     trackedToken.token_decimals,
