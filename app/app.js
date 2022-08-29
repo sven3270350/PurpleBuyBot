@@ -12,4 +12,4 @@ const utils = require("./utils");
   await countdownListener.main();
   await campaignBuyListener.main();
   await winnerAnnouncer.main();
-})();
+})().catch((err) => console.log(err));
