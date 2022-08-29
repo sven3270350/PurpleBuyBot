@@ -10,18 +10,12 @@ const {
 
 const generalBuyTemplate = (trackedToken, amounts, buyer, tx_link, ad = "") => {
   const multiplier = Math.round(amounts.multiplier / 10);
-  const isNewTokenBuyer = isNewBuyer(
+  const isNewTokenBuyer = await isNewBuyer(
     amounts.buyer,
     trackedToken.token_address,
     trackedToken.token_decimals,
     amounts.amountOut,
     trackedToken.chain_id
-  );
-
-  console.log(
-    "Template::generalBuyTemplate::isNewTokenBuyer",
-    isNewTokenBuyer,
-    !isNewTokenBuyer ? "⏫Position: " : "🔥 New Holder"
   );
 
   return `
