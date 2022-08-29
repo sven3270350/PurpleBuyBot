@@ -66,8 +66,16 @@ const getBuyerBalance = async (address, token, chainId) => {
 
 const isNewBuyer = async (address, token, decimals, amountOut, chainId) => {
   const balance = await getBuyerBalance(address, token, chainId);
-  const readableBalance = Web3.utils.fromWei(balance, decimalsToUnit(decimals));
+  const readableBalance = convertFromWei(balance, decimals);
   return readableBalance <= amountOut;
+};
+
+const convertFromWei = (amount, decimals) => {
+  return new Web3.utils.BN(amount) / 10 ** decimals;
+};
+
+const getPercentageIncrease = (oldValue, newValue) => {
+  return ((newValue - oldValue) / oldValue) * 100;
 };
 
 const getChart = (chainId, pairAddress) => {
@@ -99,30 +107,18 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
         chainId
       );
 
-      amountOut = Web3.utils.fromWei(
-        data.returnValues.amount1Out,
-        decimalsToUnit(decimals)
-      );
+      amountOut = convertFromWei(data.returnValues.amount1Out, decimals);
 
-      amountIn = Web3.utils.fromWei(
-        data.returnValues.amount0In,
-        decimalsToUnit(token1Decimals)
-      );
+      amountIn = convertFromWei(data.returnValues.amount0In, token1Decimals);
     } else {
       const token0Decimals = await getTokenDecimals(
         trackedToken.paired_with,
         chainId
       );
 
-      amountOut = Web3.utils.fromWei(
-        data.returnValues.amount0Out,
-        decimalsToUnit(decimals)
-      );
+      amountOut = convertFromWei(data.returnValues.amount0Out, decimals);
 
-      amountIn = Web3.utils.fromWei(
-        data.returnValues.amount1In,
-        decimalsToUnit(token0Decimals)
-      );
+      amountIn = convertFromWei(data.returnValues.amount1In, token0Decimals);
     }
 
     const to = data.returnValues.to;
@@ -347,4 +343,5 @@ module.exports = {
   isNewBuyer,
   getBuyerBalance,
   getChart,
+  convertFromWei,
 };
