@@ -13,6 +13,7 @@ const generalBuyTemplate = async (
   amounts,
   buyer,
   tx_link,
+  group_icon,
   ad = ""
 ) => {
   const multiplier = Math.round(amounts.multiplier / 10);
@@ -24,7 +25,7 @@ const generalBuyTemplate = async (
     trackedToken.chain_id
   );
 
-  const buy_icon = trackedToken.buy_icon || "🟢";
+  const buy_icon = group_icon || "🟢";
   console.log("Template::generalBuyTemplate::buy_icon", buy_icon);
 
   return `
