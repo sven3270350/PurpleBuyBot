@@ -12,17 +12,17 @@ const generalBuyTemplate = (trackedToken, amounts, buyer, tx_link, ad = "") => {
   return `
  <b>${trackedToken.token_name}  Buy!</b>
 
-🟢${"🟢".repeat(multiplier | 1)}
+🟢${"🟢".repeat((multiplier > 3667 ? 3667 : multiplier) | 1)}
 
 
 💸 ${amountFormater(amounts.amountIn)} ${trackedToken.paired_with_name} (${
     amounts.usdPrice
   })
-🚀 ${amountFormater(amounts.amountOut)} ${trackedToken.token_symbol}</i>
+🚀 ${amountFormater(amounts.amountOut)} ${trackedToken.token_symbol}
 👤 Buyer <a href='${getBuyerLink(
     buyer,
     trackedToken.chain_id
-  )}'>${buyer}</a>|<a href='${tx_link}'>Txn</a>
+  )}'>${buyer}</a> | <a href='${tx_link}'>Txn</a>
 ${isNewBuyer ? "🆕 Buyer" : "🔥 Holder"}
 
 🕸 Chain: <i>${trackedToken.chain_name}</i>
