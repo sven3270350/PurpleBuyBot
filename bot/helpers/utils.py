@@ -82,5 +82,5 @@ def set_commands(context: CallbackContext, enable=False):
                                               ("chains", " Show a list of supported chains"),
                                               ("active_tracking",
                                                "Toggle active buys tracking"),
+                                              ("set_buy_icon", "Set buy icon"),
                                               ("cancel", "cancel flow"), ])
-   
