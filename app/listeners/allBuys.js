@@ -20,6 +20,7 @@ const allBuysHandler = async (
       amountOut,
       usdPrice,
       multiplier,
+      buyer: to,
     };
 
     const templates = generalBuyTemplate(
