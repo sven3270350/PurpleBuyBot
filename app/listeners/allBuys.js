@@ -23,7 +23,7 @@ const allBuysHandler = async (
       buyer: to,
     };
 
-    const templates = generalBuyTemplate(
+    const templates = await generalBuyTemplate(
       trackedToken,
       amounts,
       utils.ellipseAddress(to),

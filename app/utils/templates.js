@@ -8,7 +8,7 @@ const {
   getChart,
 } = require(".");
 
-const generalBuyTemplate = (trackedToken, amounts, buyer, tx_link, ad = "") => {
+const generalBuyTemplate = async (trackedToken, amounts, buyer, tx_link, ad = "") => {
   const multiplier = Math.round(amounts.multiplier / 10);
   const isNewTokenBuyer = await isNewBuyer(
     amounts.buyer,
