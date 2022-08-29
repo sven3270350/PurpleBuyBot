@@ -73,7 +73,7 @@ const isNewBuyer = async (address, token, decimals, amountOut, chainId) => {
     readableBalance,
     amountOut
   );
-  return readableBalance === amountOut;
+  return readableBalance <= amountOut;
 };
 
 const getChart = (chainId, pairAddress) => {
