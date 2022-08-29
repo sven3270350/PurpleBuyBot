@@ -7,8 +7,23 @@ const {
   isNewBuyer,
   getChart,
 } = require(".");
+
 const generalBuyTemplate = (trackedToken, amounts, buyer, tx_link, ad = "") => {
   const multiplier = Math.round(amounts.multiplier / 10);
+  const isNewTokenBuyer = isNewBuyer(
+    amounts.buyer,
+    trackedToken.token_address,
+    trackedToken.token_decimals,
+    amounts.amountOut,
+    trackedToken.chain_id
+  );
+
+  console.log(
+    "Template::generalBuyTemplate::isNewTokenBuyer",
+    isNewTokenBuyer,
+    !isNewTokenBuyer ? "⏫Position: " : "🔥 New Holder"
+  );
+
   return `
  <b>${trackedToken.token_name}  Buy!</b>
 🟢${"🟢".repeat((multiplier > 3667 ? 3667 : multiplier) | 1)}
@@ -21,17 +36,7 @@ const generalBuyTemplate = (trackedToken, amounts, buyer, tx_link, ad = "") => {
     amounts.buyer,
     trackedToken.chain_id
   )}'>${buyer}</a> | <a href='${tx_link}'>Txn</a>
-${
-  !isNewBuyer(
-    amounts.buyer,
-    trackedToken.token_address,
-    trackedToken.token_decimals,
-    amounts.amountOut,
-    trackedToken.chain_id
-  )
-    ? "⏫Position: "
-    : "🔥 New Holder"
-}
+${!isNewTokenBuyer ? "⏫Position: " : "🔥 New Holder"}
 
 🕸 Chain:${trackedToken.chain_name}
 📊 <a href='${getChart(
