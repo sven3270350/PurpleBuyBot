@@ -1,19 +1,32 @@
-const { ellipseAddress, numberToUsd, rankIcon } = require(".");
+const {
+  ellipseAddress,
+  numberToUsd,
+  rankIcon,
+  amountFormater,
+  getBuyerLink,
+  isNewBuyer,
+  getChart,
+} = require(".");
 const generalBuyTemplate = (trackedToken, amounts, buyer, tx_link, ad = "") => {
   const multiplier = Math.round(amounts.multiplier / 10);
   return `
+ <b>${trackedToken.token_name}  Buy!</b>
+
 🟢${"🟢".repeat(multiplier | 1)}
 
-New <b>${trackedToken.token_name} </b> Buy!
 
-<b>Paid</b>: <i>${amounts.amountIn} ${trackedToken.paired_with_name} (${
+💸 ${amountFormater(amounts.amountIn)} ${trackedToken.paired_with_name} (${
     amounts.usdPrice
-  })</i>
-<b>For</b>: <i>${amounts.amountOut} ${trackedToken.token_symbol}</i>
+  })
+🚀 ${amountFormater(amounts.amountOut)} ${trackedToken.token_symbol}</i>
+👤 Buyer <a href='${getBuyerLink(
+    buyer,
+    trackedToken.chain_id
+  )}'>${buyer}</a>|<a href='${tx_link}'>Txn</a>
+${isNewBuyer ? "🆕 Buyer" : "🔥 Holder"}
 
-<b>On</b>: <i>${trackedToken.chain_name}</i>
-
-Buyer: <a href='${tx_link}'><i>${buyer}</i></a>
+🕸 Chain: <i>${trackedToken.chain_name}</i>
+📈 <a href='${getChart(trackedToken.chain_id, trackedToken.pair)}'>Chart</a>
 
 ——
 
