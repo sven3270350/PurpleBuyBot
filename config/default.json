@@ -29,7 +29,13 @@
 
     "testnetEthProvider": "https://eth.getblock.io/goerli/?api_key=eb8c01cf-f461-41e4-9ffa-a4368d3f2294",
     "testnetBscProvider": "wss://bsc.getblock.io/testnet/?api_key=eb8c01cf-f461-41e4-9ffa-a4368d3f2294",
-    "testnetCroProvider": "wss://cro.getblock.io/testnet/?api_key=eb8c01cf-f461-41e4-9ffa-a4368d3f2294",
+    "testnetCroProvider": "wss://cro.getblock.io/testnet/?api_key=eb8c01cf-f461-41e4-9ffa-a4368d3f2294"
+  },
+
+  "DEX_EXPLORERS": {
+    "ethdex": "https://www.dextools.io/app/ether/pair-explorer/",
+    "bscdex": "https://www.dextools.io/app/bnb/pair-explorer/",
+    "crodex": "https://www.dextools.io/app/cronos/pair-explorer/"
   },
 
   "COINGECKO_IDS": {
