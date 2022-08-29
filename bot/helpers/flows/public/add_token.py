@@ -2,7 +2,7 @@ from eth_utils import is_address
 from telegram.ext import CallbackContext, Dispatcher, CommandHandler, ConversationHandler, MessageHandler, CallbackQueryHandler, Filters
 from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from services.web3_service import Web3Service
-from models import db, SupportedChain, SupportedExchange, SupportedPairs, TrackedToken
+from models import db, SupportedChain, SupportedExchange, SupportedPairs, TrackedToken, Group
 from services.bot_service import BotService
 from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin, set_commands
 from helpers.templates import add_token_confirmation_template, add_token_chain_select_template, add_token_dex_select_template, add_token_pair_select_template
@@ -306,6 +306,59 @@ class AddToken:
                 )
 
     @send_typing_action
+    def __set_buy_icon(self, update: Update, context: CallbackContext):
+        self.__extract_params(update, context)
+        if is_private_chat(update):
+            if not BotService().is_group_in_focus(update, context):
+                reset_chat_data(context)
+                return ConversationHandler.END
+
+            group_id = context.chat_data.get('group_id', None)
+            if not is_group_admin(update, context):
+                return not_group_admin(update, context)
+
+            group: Group = Group.query.filter_by(group_id=group_id).first()
+
+            if group.buy_icon:
+                update.message.reply_text(
+                    text=f"<i> Your current buy icon is <b>{group.buy_icon}</b> </i>",
+                    parse_mode=ParseMode.HTML,
+                )
+            else:
+                update.message.reply_text(
+                    text=f"<i> You haven't set a buy icon. The default Icon will be used. Add an icon to change </i>",
+                    parse_mode=ParseMode.HTML,
+                )
+                self.__add_set_icon_handler()
+
+    def __set_icon(self, update: Update, context: CallbackContext):
+        self.__extract_params(update, context)
+        if is_private_chat(update):
+            if not BotService().is_group_in_focus(update, context):
+                reset_chat_data(context)
+                return ConversationHandler.END
+
+            group_id = context.chat_data.get('group_id', None)
+            if not is_group_admin(update, context):
+                return not_group_admin(update, context)
+
+            group: Group = Group.query.filter_by(group_id=group_id).first()
+
+            if update.message.text:
+                group.buy_icon = update.message.text
+                db.session.commit()
+                update.message.reply_text(
+                    text=f"<i> ✅ Buy icon set to <b>{group.buy_icon}</b> </i>",
+                    parse_mode=ParseMode.HTML,
+                )
+                self.__remove_set_icon_handler()
+            else:
+                update.message.reply_text(
+                    text=f"<i> ❌ Invalid icon. Enter a valid icon </i>",
+                    parse_mode=ParseMode.HTML,
+                )
+
+    @send_typing_action
     def __cancel_add_token(self, update: Update, context: CallbackContext) -> int:
         update.message.reply_text(text="<i>❌ Add Token Sesssion Cancelled. </i>",
                                   parse_mode=ParseMode.HTML)
@@ -316,6 +369,9 @@ class AddToken:
     def __add_handlers(self):
         self.dispatcher.add_handler(CommandHandler(
             'active_tracking', self.__active_tracking))
+        self.dispatcher.add_handler(CommandHandler(
+            'set_buy_icon', self.__set_buy_icon))
+
         self.dispatcher.add_handler(
             ConversationHandler(
                 entry_points=[
@@ -408,3 +464,11 @@ class AddToken:
 
     def __remove_disable_tracking_handler(self):
         self.dispatcher.remove_handler(self.disable_tracking_handler)
+
+    def __add_set_icon_handler(self):
+        self.set_icon_handler = MessageHandler(
+            Filters.regex('(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])'), self.__set_icon)
+        self.dispatcher.add_handler(self.set_icon_handler)
+
+    def __remove_set_icon_handler(self):
+        self.dispatcher.remove_handler(self.set_icon_handler)
