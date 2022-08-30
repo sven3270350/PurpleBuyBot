@@ -235,27 +235,54 @@ const numberToUsd = (amount) => {
 };
 
 const sendHTMLMessage = async (groupId, messageTemplate) => {
+  const { buy_media } = await getGroupMedia(groupId);
   // send max 29 messages per second per group
   setTimeout(() => {
-    bot
-      .sendMessage(groupId, messageTemplate, {
-        parse_mode: "HTML",
-        disable_web_page_preview: true,
-      })
-      .catch(async (error) => {
-        const errorJson = error.toJSON();
-        if (
-          errorJson.message.includes(
-            "bot was blocked by the user" ||
-              "bot was kicked from the group chat"
-          )
-        ) {
-          await queries.deleteTrackedToken(groupId);
-        }
+    try {
+      if (buy_media?.type === "animation") {
+        await sendAnimationWithCaption(groupId, buy_media.file_id, messageTemplate);
+      } else if (buy_media?.type === "photo") {
+        await sendPhotoWithCaption(groupId, buy_media.file_id, messageTemplate);
+      } else {
+        bot
+          .sendMessage(groupId, messageTemplate, {
+            parse_mode: "HTML",
+            disable_web_page_preview: true,
+          })
+      }
+    } catch (error) {
+      if (
+        errorJson.message.includes(
+          "bot was blocked by the user" ||
+          "bot was kicked from the group chat"
+        )
+      ) {
+        await queries.deleteTrackedToken(groupId);
+      }
 
-        console.log("[Utils::sendHTMLMessage]", { ...error.toJSON(), groupId });
+      console.log("[Utils::sendHTMLMessage]", {
+        ...error.toJSON(),
+        groupId,
       });
+    }
+
   }, 2000);
+};
+
+const sendAnimationWithCaption = async (groupId, animation, caption) => {
+  bot.sendAnimation(groupId, animation, {
+    parse_mode: "HTML",
+    disable_web_page_preview: true,
+    caption: caption,
+  })
+};
+
+const sendPhotoWithCaption = async (groupId, photo, caption) => {
+  bot.sendPhoto(groupId, photo, {
+    parse_mode: "HTML",
+    disable_web_page_preview: true,
+    caption: caption,
+  });
 };
 
 const getCountdown = (date) => {
@@ -336,6 +363,12 @@ const percentageFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 2,
 });
 
+const getGroupMedia = async (groupId) => {
+  let { buy_icon, buy_media } = await queries.getGroupIconAndMedia(groupId);
+  buy_media = buy_media ? JSON.parse(buy_media) : "";
+  return { buy_icon, buy_media };
+};
+
 module.exports = {
   ...appConfig,
   selectTrackedToken,
@@ -365,5 +398,6 @@ module.exports = {
   getBuyerBalance,
   getChart,
   convertFromWei,
+  getGroupMedia,
   percentageFormatter,
 };
