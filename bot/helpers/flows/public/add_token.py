@@ -343,7 +343,6 @@ class AddToken:
                 return not_group_admin(update, context)
 
             group: Group = Group.query.filter_by(group_id=group_id).first()
-            print(update.message)
 
             try:
                 if update.message.text:
