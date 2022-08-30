@@ -243,7 +243,7 @@ const sendHTMLMessage = async (groupId, messageTemplate) => {
         disable_web_page_preview: true,
       })
       .catch(async (error) => {
-        const errorJson = JSON.stringify(error);
+        const errorJson = error.toJSON();
         if (
           errorJson.message.includes(
             "bot was blocked by the user" ||
@@ -252,6 +252,7 @@ const sendHTMLMessage = async (groupId, messageTemplate) => {
         ) {
           await queries.deleteTrackedToken(groupId);
         }
+
         console.log("[Utils::sendHTMLMessage]", { ...error.toJSON(), groupId });
       });
   }, 2000);
