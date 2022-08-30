@@ -71,7 +71,7 @@ const isNewBuyer = async (address, token, decimals, amountOut, chainId) => {
     newBuyer: readableBalance <= amountOut,
     percentageIncrease: getPercentageIncrease(
       readableBalance - amountOut,
-      amountOut
+      readableBalance
     ),
   };
 };
