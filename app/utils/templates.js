@@ -37,7 +37,7 @@ const generalBuyTemplate = async (
   const maxIcons = has_media ? 500 : 3667;
 
   return `
- <b>${trackedToken.token_name}  Buy!</b>
+ <b>${trackedToken.token_name} Buy!</b>
 ${buy_icon.repeat((multiplier > maxIcons ? maxIcons : multiplier) | 1)}
 
 💸 ${amountFormater(amounts.amountIn)} ${trackedToken.paired_with_name} (${
