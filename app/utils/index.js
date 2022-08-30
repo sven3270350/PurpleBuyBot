@@ -113,8 +113,8 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
         chainId
       );
 
-      amountOut = convertFromWei(data.returnValues.amount1Out, decimals);
-      amountIn = convertFromWei(data.returnValues.amount0In, token1Decimals);
+      amountIn = convertFromWei(data.returnValues.amount1Out, decimals);
+      amountOut = convertFromWei(data.returnValues.amount0In, token1Decimals);
 
       if (amountOut <= 0 || amountIn <= 0) {
         const token1Decimals = await getTokenDecimals(
