@@ -6,7 +6,7 @@ from models import db, SupportedChain, SupportedExchange, SupportedPairs, Tracke
 from services.bot_service import BotService
 from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin, set_commands
 from helpers.templates import add_token_confirmation_template, add_token_chain_select_template, add_token_dex_select_template, add_token_pair_select_template
-
+import json
 DEX, PAIR, ADDRESS, CONFIRM = range(4)
 
 
@@ -365,6 +365,90 @@ class AddToken:
                 )
 
     @send_typing_action
+    def __set_buy_media(self, update: Update, context: CallbackContext):
+        self.__extract_params(update, context)
+        if is_private_chat(update):
+            if not BotService().is_group_in_focus(update, context):
+                reset_chat_data(context)
+                return ConversationHandler.END
+
+            group_id = context.chat_data.get('group_id', None)
+            if not is_group_admin(update, context):
+                return not_group_admin(update, context)
+
+            group: Group = Group.query.filter_by(group_id=group_id).first()
+
+            if group.buy_media:
+                buy_media = json.loads(group.buy_media)
+                if buy_media['type'] == 'photo':
+                    update.message.reply_photo(
+                        photo=buy_media['file_id'],
+                        caption=f"<i>This is your current buy media.</i>",
+                        parse_mode=ParseMode.HTML,
+                    )
+                elif buy_media['type'] == 'animation':
+                    update.message.reply_animation(
+                        animation=buy_media['file_id'],
+                        caption=f"<i>This is your current buy media.</i>",
+                        parse_mode=ParseMode.HTML,
+                    )
+            else:
+                update.message.reply_text(
+                    text=f"<i>You haven't set a buy Media yet.</i>",
+                    parse_mode=ParseMode.HTML,
+                )
+            self.__add_set_media_handler()
+
+    def __set_media(self, update: Update, context: CallbackContext):
+        self.__extract_params(update, context)
+        if is_private_chat(update):
+            if not BotService().is_group_in_focus(update, context):
+                reset_chat_data(context)
+                return ConversationHandler.END
+
+            group_id = context.chat_data.get('group_id', None)
+            if not is_group_admin(update, context):
+                return not_group_admin(update, context)
+
+            group: Group = Group.query.filter_by(group_id=group_id).first()
+
+            try:
+                if update.message.animation:
+                    buy_media = {
+                        'type': 'animation',
+                        'file_id': update.message.animation.file_id,
+                    }
+                    group.buy_media = json.dumps(buy_media)
+                    db.session.commit()
+                    update.message.reply_text(
+                        text=f"<i> ✅ Buy media set to <b>{buy_media['type']}</b> </i>",
+                        parse_mode=ParseMode.HTML,
+                    )
+                    self.__remove_set_media_handler()
+                elif update.message.photo:
+                    buy_media = {
+                        'type': 'photo',
+                        'file_id': update.message.photo[-1].file_id,
+                    }
+                    group.buy_media = json.dumps(buy_media)
+                    db.session.commit()
+                    update.message.reply_text(
+                        text=f"<i> ✅ Buy media set to <b>{buy_media['type']}</b> </i>",
+                        parse_mode=ParseMode.HTML,
+                    )
+                    self.__remove_set_media_handler()
+                else:
+                    update.message.reply_text(
+                        text=f"<i> ❌ Invalid Media Selected. Select a Gif or Image </i>",
+                        parse_mode=ParseMode.HTML,
+                    )
+            except Exception as e:
+                update.message.reply_text(
+                    text=f"<i> ❌ Invalid Media Selected. Select a Gif or Image </i>",
+                    parse_mode=ParseMode.HTML,
+                )
+
+    @send_typing_action
     def __cancel_add_token(self, update: Update, context: CallbackContext) -> int:
         update.message.reply_text(text="<i>❌ Add Token Sesssion Cancelled. </i>",
                                   parse_mode=ParseMode.HTML)
@@ -377,6 +461,8 @@ class AddToken:
             'active_tracking', self.__active_tracking))
         self.dispatcher.add_handler(CommandHandler(
             'set_buy_icon', self.__set_buy_icon))
+        self.dispatcher.add_handler(CommandHandler(
+            'set_buy_media', self.__set_buy_media))
 
         self.dispatcher.add_handler(
             ConversationHandler(
@@ -478,3 +564,16 @@ class AddToken:
 
     def __remove_set_icon_handler(self):
         self.dispatcher.remove_handler(self.set_icon_handler)
+
+    def __add_set_media_handler(self):
+        self.set_media_handler1 = MessageHandler(
+            Filters.animation, self.__set_media)
+        self.set_media_handler2 = MessageHandler(
+            Filters.photo, self.__set_media)
+
+        self.dispatcher.add_handler(self.set_media_handler1)
+        self.dispatcher.add_handler(self.set_media_handler2)
+
+    def __remove_set_media_handler(self):
+        self.dispatcher.remove_handler(self.set_media_handler1)
+        self.dispatcher.remove_handler(self.set_media_handler2)
