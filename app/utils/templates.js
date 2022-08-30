@@ -29,9 +29,9 @@ const generalBuyTemplate = async (
   const buy_icon = group_icon || "🟢";
 
   const percent =
-    percentageIncrease <= 1000
+    percentageIncrease <= 10000
       ? percentageFormatter.format(percentageIncrease)
-      : "1000%+";
+      : "10000%+";
 
   return `
  <b>${trackedToken.token_name}  Buy!</b>
