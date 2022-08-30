@@ -15,6 +15,7 @@ const generalBuyTemplate = async (
   buyer,
   tx_link,
   group_icon,
+  has_media,
   ad = ""
 ) => {
   const multiplier = Math.round(amounts.multiplier / 10);
@@ -33,9 +34,11 @@ const generalBuyTemplate = async (
       ? percentageFormatter.format(percentageIncrease)
       : "10000%+";
 
+  const maxIcons = has_media ? 500 : 3667;
+
   return `
  <b>${trackedToken.token_name}  Buy!</b>
-${buy_icon.repeat((multiplier > 3667 ? 3667 : multiplier) | 1)}
+${buy_icon.repeat((multiplier > maxIcons ? maxIcons : multiplier) | 1)}
 
 💸 ${amountFormater(amounts.amountIn)} ${trackedToken.paired_with_name} (${
     amounts.usdPrice
