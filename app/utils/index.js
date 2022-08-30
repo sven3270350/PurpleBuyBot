@@ -67,7 +67,13 @@ const getBuyerBalance = async (address, token, chainId) => {
 const isNewBuyer = async (address, token, decimals, amountOut, chainId) => {
   const balance = await getBuyerBalance(address, token, chainId);
   const readableBalance = convertFromWei(balance, decimals);
-  return readableBalance <= amountOut;
+  return {
+    newBuyer: readableBalance <= amountOut,
+    percentageIncrease: getPercentageIncrease(
+      readableBalance - amountOut,
+      amountOut
+    ),
+  };
 };
 
 const convertFromWei = (amount, decimals) => {
@@ -75,7 +81,7 @@ const convertFromWei = (amount, decimals) => {
 };
 
 const getPercentageIncrease = (oldValue, newValue) => {
-  return ((newValue - oldValue) / oldValue) * 100;
+  return ((newValue - oldValue) / oldValue) * 1;
 };
 
 const getChart = (chainId, pairAddress) => {
@@ -324,6 +330,11 @@ const amountFormater = (value) => {
   }
 };
 
+const percentageFormatter = new Intl.NumberFormat("en-US", {
+  style: "percent",
+  maximumFractionDigits: 2,
+});
+
 module.exports = {
   ...appConfig,
   selectTrackedToken,
@@ -353,4 +364,5 @@ module.exports = {
   getBuyerBalance,
   getChart,
   convertFromWei,
+  percentageFormatter,
 };

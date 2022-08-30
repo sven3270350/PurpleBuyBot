@@ -6,6 +6,7 @@ const {
   getBuyerLink,
   isNewBuyer,
   getChart,
+  percentageFormatter,
 } = require(".");
 
 const generalBuyTemplate = async (
@@ -17,7 +18,7 @@ const generalBuyTemplate = async (
   ad = ""
 ) => {
   const multiplier = Math.round(amounts.multiplier / 10);
-  const isNewTokenBuyer = await isNewBuyer(
+  const { newBuyer, percentageIncrease } = await isNewBuyer(
     amounts.buyer,
     trackedToken.token_address,
     trackedToken.token_decimals,
@@ -26,6 +27,11 @@ const generalBuyTemplate = async (
   );
 
   const buy_icon = group_icon || "🟢";
+
+  const percent =
+    percentageIncrease <= 1000
+      ? percentageFormatter.format(percentageIncrease)
+      : "1000%+";
 
   return `
  <b>${trackedToken.token_name}  Buy!</b>
@@ -39,7 +45,7 @@ ${buy_icon.repeat((multiplier > 3667 ? 3667 : multiplier) | 1)}
     amounts.buyer,
     trackedToken.chain_id
   )}'>${buyer}</a> | <a href='${tx_link}'>Txn</a>
-${!isNewTokenBuyer ? "⏫Position: " : "🔥 New Holder"}
+${!newBuyer ? "⏫Position: " + percent : "🔥 New Holder"}
 
 🕸 Chain:${trackedToken.chain_name}
 📊 <a href='${getChart(
