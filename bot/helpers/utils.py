@@ -83,4 +83,6 @@ def set_commands(context: CallbackContext, enable=False):
                                               ("active_tracking",
                                                "Toggle active buys tracking"),
                                               ("set_buy_icon", "Set buy icon"),
+                                              ("set_buy_media",
+                                               "Set a gif or image to show with buys"),
                                               ("cancel", "cancel flow"), ])
