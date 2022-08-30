@@ -114,8 +114,18 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
       );
 
       amountOut = convertFromWei(data.returnValues.amount1Out, decimals);
-
       amountIn = convertFromWei(data.returnValues.amount0In, token1Decimals);
+
+      if (amountOut <= 0 || amountIn <= 0) {
+        const token1Decimals = await getTokenDecimals(
+          selectedTrackedToken.address,
+          chainId
+        );
+
+        amountIn = convertFromWei(data.returnValues.amount1In, token1Decimals);
+
+        amountOut = convertFromWei(data.returnValues.amount0Out, decimals);
+      }
     } else {
       const token0Decimals = await getTokenDecimals(
         trackedToken.paired_with,
@@ -240,21 +250,23 @@ const sendHTMLMessage = async (groupId, messageTemplate) => {
   setTimeout(async () => {
     try {
       if (buy_media?.type === "animation") {
-        await sendAnimationWithCaption(groupId, buy_media.file_id, messageTemplate);
+        await sendAnimationWithCaption(
+          groupId,
+          buy_media.file_id,
+          messageTemplate
+        );
       } else if (buy_media?.type === "photo") {
         await sendPhotoWithCaption(groupId, buy_media.file_id, messageTemplate);
       } else {
-        bot
-          .sendMessage(groupId, messageTemplate, {
-            parse_mode: "HTML",
-            disable_web_page_preview: true,
-          })
+        bot.sendMessage(groupId, messageTemplate, {
+          parse_mode: "HTML",
+          disable_web_page_preview: true,
+        });
       }
     } catch (error) {
       if (
         errorJson.message.includes(
-          "bot was blocked by the user" ||
-          "bot was kicked from the group chat"
+          "bot was blocked by the user" || "bot was kicked from the group chat"
         )
       ) {
         await queries.deleteTrackedToken(groupId);
@@ -265,7 +277,6 @@ const sendHTMLMessage = async (groupId, messageTemplate) => {
         groupId,
       });
     }
-
   }, 2000);
 };
 
@@ -274,7 +285,7 @@ const sendAnimationWithCaption = async (groupId, animation, caption) => {
     parse_mode: "HTML",
     disable_web_page_preview: true,
     caption: caption,
-  })
+  });
 };
 
 const sendPhotoWithCaption = async (groupId, photo, caption) => {
