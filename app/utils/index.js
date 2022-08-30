@@ -237,7 +237,7 @@ const numberToUsd = (amount) => {
 const sendHTMLMessage = async (groupId, messageTemplate) => {
   const { buy_media } = await getGroupMedia(groupId);
   // send max 29 messages per second per group
-  setTimeout(() => {
+  setTimeout(async () => {
     try {
       if (buy_media?.type === "animation") {
         await sendAnimationWithCaption(groupId, buy_media.file_id, messageTemplate);
