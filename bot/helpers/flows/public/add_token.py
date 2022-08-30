@@ -329,7 +329,7 @@ class AddToken:
                     text=f"<i> You haven't set a buy icon. The default Icon will be used. Add an icon to change </i>",
                     parse_mode=ParseMode.HTML,
                 )
-                self.__add_set_icon_handler()
+            self.__add_set_icon_handler()
 
     def __set_icon(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
@@ -343,16 +343,23 @@ class AddToken:
                 return not_group_admin(update, context)
 
             group: Group = Group.query.filter_by(group_id=group_id).first()
+            print(update.message)
 
-            if update.message.text:
-                group.buy_icon = update.message.text
-                db.session.commit()
-                update.message.reply_text(
-                    text=f"<i> ✅ Buy icon set to <b>{group.buy_icon}</b> </i>",
-                    parse_mode=ParseMode.HTML,
-                )
-                self.__remove_set_icon_handler()
-            else:
+            try:
+                if update.message.text:
+                    group.buy_icon = update.message.text
+                    db.session.commit()
+                    update.message.reply_text(
+                        text=f"<i> ✅ Buy icon set to <b>{group.buy_icon}</b> </i>",
+                        parse_mode=ParseMode.HTML,
+                    )
+                    self.__remove_set_icon_handler()
+                else:
+                    update.message.reply_text(
+                        text=f"<i> ❌ Invalid icon. Enter a valid icon </i>",
+                        parse_mode=ParseMode.HTML,
+                    )
+            except Exception as e:
                 update.message.reply_text(
                     text=f"<i> ❌ Invalid icon. Enter a valid icon </i>",
                     parse_mode=ParseMode.HTML,
@@ -467,7 +474,7 @@ class AddToken:
 
     def __add_set_icon_handler(self):
         self.set_icon_handler = MessageHandler(
-            Filters.regex('(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])'), self.__set_icon)
+            Filters.regex('[^ -~]+'), self.__set_icon)
         self.dispatcher.add_handler(self.set_icon_handler)
 
     def __remove_set_icon_handler(self):
