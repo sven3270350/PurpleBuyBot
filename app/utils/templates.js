@@ -34,7 +34,7 @@ const generalBuyTemplate = async (
       ? percentageFormatter.format(percentageIncrease)
       : "10000%+";
 
-  const maxIcons = has_media ? 500 : 3667;
+  const maxIcons = has_media ? 300 : 3667;
 
   return `
  <b>${trackedToken.token_name} Buy!</b>
