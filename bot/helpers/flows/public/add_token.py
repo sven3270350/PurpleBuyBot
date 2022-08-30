@@ -383,18 +383,18 @@ class AddToken:
                 if buy_media['type'] == 'photo':
                     update.message.reply_photo(
                         photo=buy_media['file_id'],
-                        caption=f"<i>This is your current buy media.</i>",
+                        caption=f"<i>This is your current buy media. Replace by sending a new one (recommended 1280px x 720px).</i>",
                         parse_mode=ParseMode.HTML,
                     )
                 elif buy_media['type'] == 'animation':
                     update.message.reply_animation(
                         animation=buy_media['file_id'],
-                        caption=f"<i>This is your current buy media.</i>",
+                        caption=f"<i>This is your current buy media. Replace by sending a new one (recommended 1280px x 720px).</i>",
                         parse_mode=ParseMode.HTML,
                     )
             else:
                 update.message.reply_text(
-                    text=f"<i>You haven't set a buy Media yet.</i>",
+                    text=f"<i>You haven't set a buy Media yet. Send a gif/image to set (recommended 1280px x 720px)</i>",
                     parse_mode=ParseMode.HTML,
                 )
             self.__add_set_media_handler()
@@ -439,12 +439,12 @@ class AddToken:
                     self.__remove_set_media_handler()
                 else:
                     update.message.reply_text(
-                        text=f"<i> ❌ Invalid Media Selected. Select a Gif or Image </i>",
+                        text=f"<i> ❌ Invalid Media Selected. Select a Gif or Image (recommended 1280px x 720px).</i>",
                         parse_mode=ParseMode.HTML,
                     )
             except Exception as e:
                 update.message.reply_text(
-                    text=f"<i> ❌ Invalid Media Selected. Select a Gif or Image </i>",
+                    text=f"<i> ❌ Invalid Media Selected. Select a Gif or Image (recommended 1280px x 720px).</i>",
                     parse_mode=ParseMode.HTML,
                 )
 
