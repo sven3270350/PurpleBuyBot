@@ -18,6 +18,26 @@ dispatcher = updater.dispatcher
 
 
 def start_bot():
+    updater.bot.set_my_commands(commands=[("help", "Show supported commands"),
+                                          ("add_token", "Add the token to be monitored requires token address"),
+                                          ("remove_token",
+                                           "Remove monitored token"),
+                                          ("tracked_tokens",
+                                           "List tracked tokens"),
+                                          ("start_buy_contest",
+                                           "Initiate a biggest buy contest"),
+                                          ("raffle_on",
+                                           "Start raffle buy contest"),
+                                          ("subscribe",
+                                           "Subscribe to premium to remove ads"),
+                                          ("chains", " Show a list of supported chains"),
+                                          ("active_tracking",
+                                           "Toggle active buys tracking"),
+                                          ("set_buy_icon", "Set buy icon"),
+                                          ("set_buy_media",
+                                           "Set a gif or image to show with buys"),
+                                          ("cancel", "cancel flow"), ])
+
     updater.start_webhook(listen="0.0.0.0",
                           port=int(os.environ.get('PORT', 5000)),
                           url_path=telegram_bot_token,
