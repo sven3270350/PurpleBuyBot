@@ -262,8 +262,8 @@ const sendHTMLMessage = async (groupId, messageTemplate) => {
           parse_mode: "HTML",
           disable_web_page_preview: true,
         })
-        .catch(async (error) => {
-          await handleSendError(error, groupId);
+        .catch((error) => {
+          handleSendError(error, groupId);
         });
     }
   }, 2000);
@@ -276,8 +276,8 @@ const sendAnimationWithCaption = async (groupId, animation, caption) => {
       disable_web_page_preview: true,
       caption: caption,
     })
-    .catch(async (error) => {
-      await handleSendError(error, groupId);
+    .catch((error) => {
+      handleSendError(error, groupId);
     });
 };
 
@@ -288,8 +288,8 @@ const sendPhotoWithCaption = async (groupId, photo, caption) => {
       disable_web_page_preview: true,
       caption: caption,
     })
-    .catch(async (error) => {
-      await handleSendError(error, groupId);
+    .catch((error) => {
+      handleSendError(error, groupId);
     });
 };
 
@@ -377,13 +377,15 @@ const getGroupMedia = async (groupId) => {
   return { buy_icon, buy_media };
 };
 
-const handleSendError = async (error, groupId) => {
+const handleSendError = (error, groupId) => {
   if (
     errorJson.message.includes(
       "bot was blocked by the user" || "bot was kicked from the group chat"
     )
   ) {
-    await queries.deleteTrackedToken(groupId);
+    queries
+      .deleteTrackedToken(groupId)
+      .then(() => console.log("[Utils::handleSendError]", "Tracking disabled"));
   }
 
   console.log("[Utils::sendHTMLMessage]", {
