@@ -80,7 +80,7 @@ class StartBot:
         url = helpers.create_deep_linked_url(
             self.bot_name, self.chatid)
         button = InlineKeyboardMarkup.from_button(
-            InlineKeyboardButton(text="Click me", url=url)
+            InlineKeyboardButton(text="Click To Continue", url=url)
         )
         update.message.reply_text(text=start_added_to_group(self.bot_name),
                                   parse_mode=ParseMode.HTML, reply_markup=button)
