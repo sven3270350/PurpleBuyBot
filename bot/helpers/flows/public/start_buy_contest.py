@@ -265,13 +265,13 @@ class BuyContest:
                 return not_group_admin(update)
 
             if update.message is not None:
-                update.message.reply_text(text="<i>❌ Start Biggest Buy session closed. </i>",
+                update.message.reply_text(text="<i>❌ Start Contest session closed. </i>",
                                           parse_mode=ParseMode.HTML)
 
             else:
                 update.callback_query.answer()
                 update.callback_query.edit_message_text(
-                    text="<i>❌ Start Biggest Buy session closed. </i>",
+                    text="<i>❌ Start Biggest Contest session closed. </i>",
                     parse_mode=ParseMode.HTML)
 
         print("Got to the end")
