@@ -281,19 +281,33 @@ const sendHTMLMessage = async (groupId, messageTemplate) => {
 };
 
 const sendAnimationWithCaption = async (groupId, animation, caption) => {
-  bot.sendAnimation(groupId, animation, {
-    parse_mode: "HTML",
-    disable_web_page_preview: true,
-    caption: caption,
-  });
+  bot
+    .sendAnimation(groupId, animation, {
+      parse_mode: "HTML",
+      disable_web_page_preview: true,
+      caption: caption,
+    })
+    .catch((error) => {
+      console.log("[Utils::sendAnimationWithCaption]", {
+        ...error.toJSON(),
+        groupId,
+      });
+    });
 };
 
 const sendPhotoWithCaption = async (groupId, photo, caption) => {
-  bot.sendPhoto(groupId, photo, {
-    parse_mode: "HTML",
-    disable_web_page_preview: true,
-    caption: caption,
-  });
+  bot
+    .sendPhoto(groupId, photo, {
+      parse_mode: "HTML",
+      disable_web_page_preview: true,
+      caption: caption,
+    })
+    .catch((error) => {
+      console.log("[Utils::sendPhotoWithCaption]", {
+        ...error.toJSON(),
+        groupId,
+      });
+    });
 };
 
 const getCountdown = (date) => {
