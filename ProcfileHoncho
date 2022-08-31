@@ -1,0 +1,2 @@
+public: python bot/admin_bot.py $PORT
+admin: python bot/public_bot.py $PORT
