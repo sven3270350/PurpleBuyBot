@@ -27,7 +27,6 @@ class StartBot:
             )
             update.message.reply_text(text=start_template_private(self.bot_name),
                                       parse_mode=ParseMode.HTML, reply_markup=button)
-
         else:
             self.__response_for_group(update)
 

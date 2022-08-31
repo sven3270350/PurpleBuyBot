@@ -1,7 +1,7 @@
 from telegram.ext import CallbackContext, Dispatcher, ConversationHandler, CommandHandler, CallbackQueryHandler
 from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from services.bot_service import BotService
-from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin, set_commands
+from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin, set_commands, response_for_group
 from helpers.templates import remove_token_confirmation_template
 from models import TrackedToken
 
@@ -44,6 +44,8 @@ class RemoveToken:
                     message += f"<i><b>Dex: </b>{token.exchange_name}</i>\n\n"
 
             update.message.reply_text(message, parse_mode=ParseMode.HTML)
+        else:
+            response_for_group(self, update)
 
     @send_typing_action
     def __remove_token(self, update: Update, context: CallbackContext) -> int:
@@ -89,7 +91,8 @@ class RemoveToken:
                     parse_mode=ParseMode.HTML)
 
                 return SELECT
-
+        else:
+            response_for_group(self, update)
         return ConversationHandler.END
 
     @send_typing_action

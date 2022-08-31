@@ -1,7 +1,7 @@
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext, Dispatcher, CommandHandler
 from models import SupportedChain, SupportedExchange, SupportedPairs
-from helpers.utils import is_private_chat, set_commands, send_typing_action
+from helpers.utils import is_private_chat, set_commands, send_typing_action, response_for_group
 from services.bot_service import BotService
 from services.bot_service import BotService
 from helpers.templates import help_template
@@ -40,11 +40,15 @@ class GeneralHandler:
                         *[pair.pair_name for pair in pairs]) + "</i>\n\n"
 
             update.message.reply_text(message, parse_mode=ParseMode.HTML)
+        else:
+            response_for_group(self, update)
 
     def __help(self, update: Update, context: CallbackContext):
         if is_private_chat(update):
             update.message.reply_text(help_template,
                                       parse_mode=ParseMode.HTML)
+        else:
+            response_for_group(self, update)
 
     def __add_handlers(self):
         self.dispatcher.add_handler(CommandHandler("chains", self.__chains))

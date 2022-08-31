@@ -4,7 +4,7 @@ from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMark
 from services.web3_service import Web3Service
 from models import db, SupportedChain, SupportedExchange, SupportedPairs, TrackedToken, Group
 from services.bot_service import BotService
-from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin, set_commands
+from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin, set_commands, response_for_group
 from helpers.templates import add_token_confirmation_template, add_token_chain_select_template, add_token_dex_select_template, add_token_pair_select_template
 import json
 DEX, PAIR, ADDRESS, CONFIRM = range(4)
@@ -56,7 +56,8 @@ class AddToken:
                 return not_group_admin(update, context)
 
             return DEX
-
+        else:
+            response_for_group(self, update)
         return ConversationHandler.END
 
     @send_typing_action
@@ -304,6 +305,8 @@ class AddToken:
                     parse_mode=ParseMode.HTML,
                     reply_markup=InlineKeyboardMarkup(enable_button)
                 )
+        else:
+            response_for_group(self, update)
 
     @send_typing_action
     def __set_buy_icon(self, update: Update, context: CallbackContext):
@@ -330,6 +333,8 @@ class AddToken:
                     parse_mode=ParseMode.HTML,
                 )
             self.__add_set_icon_handler()
+        else:
+            response_for_group(self, update)
 
     def __set_icon(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
@@ -363,6 +368,8 @@ class AddToken:
                     text=f"<i> ❌ Invalid icon. Enter a valid icon </i>",
                     parse_mode=ParseMode.HTML,
                 )
+        else:
+            response_for_group(self, update)
 
     @send_typing_action
     def __set_buy_media(self, update: Update, context: CallbackContext):
@@ -398,6 +405,8 @@ class AddToken:
                     parse_mode=ParseMode.HTML,
                 )
             self.__add_set_media_handler()
+        else:
+            response_for_group(self, update)
 
     def __set_media(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
@@ -447,6 +456,8 @@ class AddToken:
                     text=f"<i> ❌ Invalid Media Selected. Select a Gif or Image (recommended 1280px x 720px).</i>",
                     parse_mode=ParseMode.HTML,
                 )
+        else:
+            response_for_group(self, update)
 
     @send_typing_action
     def __cancel_add_token(self, update: Update, context: CallbackContext) -> int:

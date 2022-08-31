@@ -11,7 +11,7 @@ from services.bot_service import BotService
 from services.subscriptions_service import SubscriptionService
 from helpers.utils import (
     is_private_chat, is_group_admin,
-    send_typing_action, reset_chat_data, not_group_admin, set_commands)
+    send_typing_action, reset_chat_data, not_group_admin, set_commands, response_for_group)
 from helpers.templates import (
     no_active_subscription_template, active_subscription_template,
     weekly_subscription_template, subscription_confirmation_template,
@@ -130,6 +130,8 @@ class Subscription:
                     parse_mode=ParseMode.HTML)
 
                 return SELECT
+        else:
+            response_for_group(self, update)
 
         reset_chat_data(context)
         return ConversationHandler.END
