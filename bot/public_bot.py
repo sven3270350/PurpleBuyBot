@@ -9,7 +9,6 @@ from helpers.flows.public.general import GeneralHandler
 from helpers.bots_imports import *
 
 telegram_bot_token = config('PUBLIC_BOT_API_KEY')
-telegram_admin_bot_token = config('ADMIN_BOT_API_KEY')
 bot = telegram.Bot(token=telegram_bot_token)
 
 
