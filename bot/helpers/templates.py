@@ -53,6 +53,7 @@ help_template = '''
 /tracked_tokens - List tracked tokens
 /start_buy_contest - Initiate a biggest buy contest
 /raffle_on - Start raffle buy contest
+/active_contest - Show active contest and cancel if needed
 /subscribe - Subscribe to premium to remove ads
 /chains - Show a list of supported chains
 /active_tracking - Toggle active buys tracking
@@ -324,6 +325,17 @@ biggest_buy_competition_alert_template = '''
 ——
 
 <i>{ad}</i>
+'''
+
+active_contest_template = '''
+<b>{competition_name} Contest</b>
+
+<i>Group: <b>{group_title}</b></i>
+
+<b>Start :</b> {start_date}
+<b>End:</b> {end_date}
+<b>Minimum Buy:</b> ${minimum_buy}
+<b>Winner's Reward:</b> {winner_reward}
 '''
 
 
