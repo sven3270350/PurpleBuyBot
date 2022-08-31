@@ -116,16 +116,16 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
       amountOut = convertFromWei(data.returnValues.amount1Out, decimals);
       amountIn = convertFromWei(data.returnValues.amount0In, token1Decimals);
 
-      if (amountOut <= 0 || amountIn <= 0) {
-        const token1Decimals = await getTokenDecimals(
-          selectedTrackedToken.address,
-          chainId
-        );
+      // if (amountOut <= 0 || amountIn <= 0) {
+      //   const token1Decimals = await getTokenDecimals(
+      //     selectedTrackedToken.address,
+      //     chainId
+      //   );
 
-        amountOut = convertFromWei(data.returnValues.amount1In, token1Decimals);
+      //   amountOut = convertFromWei(data.returnValues.amount1In, token1Decimals);
 
-        amountIn = convertFromWei(data.returnValues.amount0Out, decimals);
-      }
+      //   amountIn = convertFromWei(data.returnValues.amount0Out, decimals);
+      // }
     } else {
       const token0Decimals = await getTokenDecimals(
         trackedToken.paired_with,
