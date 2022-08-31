@@ -1,5 +1,3 @@
-
-from helpers.flows.public.start_raffle_contest import RaffleContest
 from helpers.flows.public.start_buy_contest import BuyContest
 from helpers.flows.public.subscription import Subscription
 from helpers.flows.public.remove_token import RemoveToken
@@ -27,6 +25,8 @@ def start_bot():
                                            "Initiate a biggest buy contest"),
                                           ("raffle_on",
                                            "Start raffle buy contest"),
+                                          ("active_contest",
+                                           "Show active contest and cancel if needed"),
                                           ("subscribe",
                                            "Subscribe to premium to remove ads"),
                                           ("chains", " Show a list of supported chains"),
@@ -53,7 +53,6 @@ def main():
     Subscription(dispatcher)
     GeneralHandler(dispatcher)
     BuyContest(dispatcher)
-    RaffleContest(dispatcher)
     start_bot()
 
 
