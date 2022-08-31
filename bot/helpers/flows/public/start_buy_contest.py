@@ -4,12 +4,12 @@ from services.subscriptions_service import SubscriptionService
 from models import db, Campaigns
 from services.bot_service import BotService
 from services.campaign_service import CampaignService
-from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin, set_commands
+from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin, set_commands, response_for_group
 from helpers.templates import (
     no_trackecd_tokens_template, start_biggest_buy_contest_template,
     set_start_time_template, set_end_time_template, set_min_buy_template,
     set_winner_reward_template, start_competition_confirmation_template,
-    biggest_buy_competition_alert_template, invalid_time_template, not_valid_value_template)
+    biggest_buy_competition_alert_template, invalid_time_template, not_valid_value_template, active_contest_template)
 from datetime import datetime, timedelta
 
 
@@ -80,6 +80,8 @@ class BuyContest:
             context.chat_data['winner_prize'] = '200'
 
             self.__reply_template(update, context)
+        else:
+            response_for_group(self, update)
 
     @send_typing_action
     def __set_start_time(self, update: Update, context: CallbackContext):
@@ -152,6 +154,79 @@ class BuyContest:
 
         self.dispatcher.remove_handler(self.winner_prize_handler)
         self.__reply_template(update, context)
+
+    @send_typing_action
+    def __get_active_contest(self, update: Update, context: CallbackContext):
+        self.__extract_params(update, context)
+
+        if is_private_chat(update):
+            if not BotService().is_group_in_focus(update, context):
+                reset_chat_data(context)
+                return ConversationHandler.END
+
+            set_commands(context, True)
+
+            group_id = context.chat_data.get('group_id', None)
+            context.chat_data['group_title'] = context.bot.get_chat(
+                group_id).title
+
+            if not is_group_admin(update, context):
+                return not_group_admin(update)
+
+            active_campaign: Campaigns = CampaignService(
+            ).get_active_campaigns(group_id)
+            
+            if active_campaign:
+                active_campaign = active_campaign[0]
+                start_date = active_campaign.start_time.strftime(
+                    self.DATE_FORMAT)
+                end_date = active_campaign.end_time.strftime(
+                    self.DATE_FORMAT)
+
+                cancel_contest_button = InlineKeyboardButton(
+                    text="Cancel Contest", callback_data="cancel_contest")
+
+                update.message.reply_text(
+                    text=active_contest_template.format(
+                        competition_name=active_campaign.campaing_type,
+                        group_title=context.chat_data['group_title'],
+                        start_date=start_date,
+                        end_date=end_date,
+                        minimum_buy=active_campaign.min_amount,
+                        winner_reward=active_campaign.prize
+
+                    ),
+                    parse_mode=ParseMode.HTML,
+                    reply_markup=InlineKeyboardMarkup(
+                        [[cancel_contest_button]])
+                )
+            else:
+                update.message.reply_text(
+                    text="ℹ️ There is no active competition",
+                    parse_mode=ParseMode.HTML
+                )
+        else:
+            response_for_group(self, update)
+
+    def __cancel_contest(self, update: Update, context: CallbackContext):
+        query = update.callback_query
+        query.answer()
+
+        group_id = context.chat_data.get('group_id', None)
+        active_campaign: Campaigns = CampaignService(
+        ).get_active_campaigns(group_id)[0]
+
+        if active_campaign:
+            CampaignService().update_campaign_end_time_by_id(active_campaign.id)
+            query.edit_message_text(
+                text="✅ Contest canceled",
+                parse_mode=ParseMode.HTML
+            )
+        else:
+            query.edit_message_text(
+                text="ℹ️ There is no active competition",
+                parse_mode=ParseMode.HTML
+            )
 
     def __start_competition(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
@@ -245,7 +320,8 @@ class BuyContest:
                     reply_markup=try_again_and_cancel_keyboard,
                 )
                 return ConversationHandler.END
-
+        else:
+            response_for_group(self, update)
         self.__remove_button_handlers()
 
     def __cancel(self, update: Update, context: CallbackContext) -> int:
@@ -331,6 +407,10 @@ class BuyContest:
 
     def __add_handlers(self):
         self.dispatcher.add_handler(self.set_cancel_handler)
+        self.dispatcher.add_handler(CommandHandler(
+            'active_contest', self.__get_active_contest))
+        self.dispatcher.add_handler(CallbackQueryHandler(
+            self.__cancel_contest, pattern='cancel_contest'))
         #  Conversation handlers
         self.dispatcher.add_handler(ConversationHandler(
             entry_points=[CommandHandler('start_buy_contest', self.__biigest_buy_start), CommandHandler(
