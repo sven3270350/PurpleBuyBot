@@ -1,5 +1,5 @@
 def start_template_private(bot_name): return f'''
-<b>Welcome to Biggest Buy Bot!</b>
+<b>Welcome to PurpleBuyBot!</b>
 
 Follow these simple steps to get started:
 
