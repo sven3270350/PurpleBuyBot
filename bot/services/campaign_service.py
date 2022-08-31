@@ -1,4 +1,5 @@
-from models import db
+from datetime import datetime
+from models import db, Campaigns
 
 
 class CampaignService:
@@ -15,6 +16,18 @@ class CampaignService:
 
     def get_all_campaigns(self):
         pass
+
+    def get_active_campaigns(self, group_id):
+        contest: Campaigns = Campaigns.query.filter_by(
+            group_id=group_id).filter(Campaigns.end_time >= datetime.now()).all()
+        return contest
+
+    def update_campaign_end_time_by_id(self, campaign_id):
+        constest: Campaigns = Campaigns.query.filter_by(
+            id=campaign_id).first()
+        constest.end_time = datetime.now()
+        db.session.commit()
+        return constest
 
     def get_active_campaigns_count(self, group_id):
         stmt = f'''
