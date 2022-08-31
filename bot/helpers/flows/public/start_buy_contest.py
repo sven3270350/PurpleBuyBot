@@ -251,8 +251,6 @@ class BuyContest:
     def __cancel(self, update: Update, context: CallbackContext) -> int:
         self.__extract_params(update, context)
 
-        print("Cancel Called")
-
         if update.callback_query:
             update.callback_query.answer()
 
@@ -274,7 +272,6 @@ class BuyContest:
                     text="<i>❌ Start Biggest Contest session closed. </i>",
                     parse_mode=ParseMode.HTML)
 
-        print("Got to the end")
         reset_chat_data(context)
         self.__remove_button_handlers()
         return ConversationHandler.END
