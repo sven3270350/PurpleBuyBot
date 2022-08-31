@@ -1,11 +1,10 @@
 from functools import wraps
 from telegram import (ChatAction)
-from telegram import Update, ParseMode
+from telegram.utils import helpers
+from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext, ConversationHandler
 import json
-from web3 import HTTPProvider, Web3
 from services.bot_service import BotService
-from helpers.app_config import AppConfigs
 from helpers.templates import not_group_admin_template
 
 
@@ -65,6 +64,16 @@ def not_group_admin(update: Update, context: CallbackContext):
     return ConversationHandler.END
 
 
+def response_for_group(self, update: Update):
+    url = helpers.create_deep_linked_url(
+        self.bot_name, self.chatid)
+    button = InlineKeyboardMarkup.from_button(
+        InlineKeyboardButton(text="Click To Continue", url=url)
+    )
+    update.message.reply_text(text="Please click the button below to continue",
+                              parse_mode=ParseMode.HTML, reply_markup=button)
+
+
 def set_commands(context: CallbackContext, enable=False):
     if enable:
         context.bot.set_my_commands(commands=[("help", "Show supported commands"),
@@ -77,6 +86,8 @@ def set_commands(context: CallbackContext, enable=False):
                                                "Initiate a biggest buy contest"),
                                               ("raffle_on",
                                                "Start raffle buy contest"),
+                                              ("active_contest",
+                                               "Show active contest and cancel if needed"),
                                               ("subscribe",
                                                "Subscribe to premium to remove ads"),
                                               ("chains", " Show a list of supported chains"),
