@@ -220,7 +220,7 @@ class BuyContest:
                 try_again_and_cancel_btns = [
                     InlineKeyboardButton(
                         text="Try again",
-                        callback_data="confirm"
+                        callback_data="confirm_biggest_buy"
                     ),
                     InlineKeyboardButton(
                         text="Cancel",
@@ -304,7 +304,8 @@ class BuyContest:
         chat_data = context.chat_data
 
         confirm = InlineKeyboardMarkup([
-            [InlineKeyboardButton('Confirm', callback_data='confirm')],
+            [InlineKeyboardButton(
+                'Confirm', callback_data='confirm_biggest_buy')],
             [InlineKeyboardButton('Cancel', callback_data='cancel')]
         ])
 
@@ -349,7 +350,7 @@ class BuyContest:
             [InlineKeyboardButton('Set minimum buy', callback_data='set_min_buy'),
              InlineKeyboardButton('Set winner prize', callback_data='set_winner_prize')],
             [InlineKeyboardButton(
-                'Set start competition', callback_data='start_competition')],
+                'Set start competition', callback_data='start_bb_competition')],
             [InlineKeyboardButton(
                 'Cancel', callback_data='cancel')]
         ])
@@ -395,10 +396,10 @@ class BuyContest:
             Filters.text, self.__set_winner_prize)
 
         self.set_start_comp_handler = CallbackQueryHandler(
-            self.__goto_start_comp, pattern='start_competition')
+            self.__goto_start_comp, pattern='start_bb_competition')
 
         self.set_confirm_comp_handler = CallbackQueryHandler(
-            self.__start_competition, pattern='confirm')
+            self.__start_competition, pattern='confirm_biggest_buy')
 
     def __set_button_handlers(self):
         self.dispatcher.add_handler(self.set_start_time_hander)

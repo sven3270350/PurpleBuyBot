@@ -221,7 +221,7 @@ class RaffleContest:
                 try_again_and_cancel_btns = [
                     InlineKeyboardButton(
                         text="Try again",
-                        callback_data="confirm"
+                        callback_data="confirm_raffle"
                     ),
                     InlineKeyboardButton(
                         text="Cancel",
@@ -233,7 +233,7 @@ class RaffleContest:
                 )
 
                 update.callback_query.edit_message_text(
-                    text="❌ Failed to create context. Please try again",
+                    text="❌ Failed to create contest. Please try again",
                     parse_mode=ParseMode.HTML,
                     reply_markup=try_again_and_cancel_keyboard,
                 )
@@ -303,7 +303,7 @@ class RaffleContest:
         chat_data = context.chat_data
 
         confirm = InlineKeyboardMarkup([
-            [InlineKeyboardButton('Confirm', callback_data='confirm')],
+            [InlineKeyboardButton('Confirm', callback_data='confirm_raffle')],
             [InlineKeyboardButton('Cancel', callback_data='cancel')]
         ])
 
@@ -397,7 +397,7 @@ class RaffleContest:
             self.__goto_start_comp, pattern='start_competition')
 
         self.set_confirm_comp_handler = CallbackQueryHandler(
-            self.__start_competition, pattern='confirm')
+            self.__start_competition, pattern='confirm_raffle')
 
     def __set_button_handlers(self):
         self.dispatcher.add_handler(self.set_start_time_hander)
