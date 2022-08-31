@@ -248,41 +248,23 @@ const sendHTMLMessage = async (groupId, messageTemplate) => {
   const { buy_media } = await getGroupMedia(groupId);
   // send max 29 messages per second per group
   setTimeout(async () => {
-    try {
-      if (buy_media?.type === "animation") {
-        await sendAnimationWithCaption(
-          groupId,
-          buy_media.file_id,
-          messageTemplate
-        );
-      } else if (buy_media?.type === "photo") {
-        await sendPhotoWithCaption(groupId, buy_media.file_id, messageTemplate);
-      } else {
-        bot
-          .sendMessage(groupId, messageTemplate, {
-            parse_mode: "HTML",
-            disable_web_page_preview: true,
-          })
-          .catch((error) => {
-            console.log("[Utils::sendHTMLMessage]", {
-              ...error.toJSON(),
-              groupId,
-            });
-          });
-      }
-    } catch (error) {
-      if (
-        errorJson.message.includes(
-          "bot was blocked by the user" || "bot was kicked from the group chat"
-        )
-      ) {
-        await queries.deleteTrackedToken(groupId);
-      }
-
-      console.log("[Utils::sendHTMLMessage]", {
-        ...error.toJSON(),
+    if (buy_media?.type === "animation") {
+      await sendAnimationWithCaption(
         groupId,
-      });
+        buy_media.file_id,
+        messageTemplate
+      );
+    } else if (buy_media?.type === "photo") {
+      await sendPhotoWithCaption(groupId, buy_media.file_id, messageTemplate);
+    } else {
+      bot
+        .sendMessage(groupId, messageTemplate, {
+          parse_mode: "HTML",
+          disable_web_page_preview: true,
+        })
+        .catch(async (error) => {
+          await handleSendError(error, groupId);
+        });
     }
   }, 2000);
 };
@@ -294,11 +276,8 @@ const sendAnimationWithCaption = async (groupId, animation, caption) => {
       disable_web_page_preview: true,
       caption: caption,
     })
-    .catch((error) => {
-      console.log("[Utils::sendAnimationWithCaption]", {
-        ...error.toJSON(),
-        groupId,
-      });
+    .catch(async (error) => {
+      await handleSendError(error, groupId);
     });
 };
 
@@ -309,11 +288,8 @@ const sendPhotoWithCaption = async (groupId, photo, caption) => {
       disable_web_page_preview: true,
       caption: caption,
     })
-    .catch((error) => {
-      console.log("[Utils::sendPhotoWithCaption]", {
-        ...error.toJSON(),
-        groupId,
-      });
+    .catch(async (error) => {
+      await handleSendError(error, groupId);
     });
 };
 
@@ -399,6 +375,21 @@ const getGroupMedia = async (groupId) => {
   let { buy_icon, buy_media } = await queries.getGroupIconAndMedia(groupId);
   buy_media = buy_media ? JSON.parse(buy_media) : "";
   return { buy_icon, buy_media };
+};
+
+const handleSendError = async (error, groupId) => {
+  if (
+    errorJson.message.includes(
+      "bot was blocked by the user" || "bot was kicked from the group chat"
+    )
+  ) {
+    await queries.deleteTrackedToken(groupId);
+  }
+
+  console.log("[Utils::sendHTMLMessage]", {
+    ...error.toJSON(),
+    groupId,
+  });
 };
 
 module.exports = {
