@@ -258,10 +258,17 @@ const sendHTMLMessage = async (groupId, messageTemplate) => {
       } else if (buy_media?.type === "photo") {
         await sendPhotoWithCaption(groupId, buy_media.file_id, messageTemplate);
       } else {
-        bot.sendMessage(groupId, messageTemplate, {
-          parse_mode: "HTML",
-          disable_web_page_preview: true,
-        });
+        bot
+          .sendMessage(groupId, messageTemplate, {
+            parse_mode: "HTML",
+            disable_web_page_preview: true,
+          })
+          .catch((error) => {
+            console.log("[Utils::sendHTMLMessage]", {
+              ...error.toJSON(),
+              groupId,
+            });
+          });
       }
     } catch (error) {
       if (
