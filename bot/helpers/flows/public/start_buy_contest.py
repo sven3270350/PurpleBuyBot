@@ -13,17 +13,24 @@ from helpers.templates import (
 from datetime import datetime, timedelta
 
 
-COMPETITION_NAME = "Biggest Buy"
-DATE_FORMAT = '%d/%m/%Y %H:%M:%S'
-
-
 class BuyContest:
     def __init__(self, dispatcher: Dispatcher):
         self.dispatcher = dispatcher
-        self.__add_handlers()
+        self.COMPETITION_NAME = ""
+        self.DATE_FORMAT = '%d/%m/%Y %H:%M:%S'
         self.__create_handlers()
+        self.__add_handlers()
 
     @send_typing_action
+    def __biigest_buy_start(self, update: Update, context: CallbackContext):
+        self.COMPETITION_NAME = "Biggest Buy"
+        self.__start(update, context)
+
+    @send_typing_action
+    def __raffle_start(self, update: Update, context: CallbackContext):
+        self.COMPETITION_NAME = "Raffle"
+        self.__start(update, context)
+
     def __start(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
         self.__set_button_handlers()
@@ -65,9 +72,10 @@ class BuyContest:
             start_time = datetime.now()+timedelta(minutes=30)
             end_time = start_time + timedelta(hours=2)
 
-            context.chat_data['start_time'] = start_time.strftime(DATE_FORMAT)
+            context.chat_data['start_time'] = start_time.strftime(
+                self.DATE_FORMAT)
             context.chat_data['end_time'] = end_time.strftime(
-                DATE_FORMAT)
+                self.DATE_FORMAT)
             context.chat_data['minimum_buy'] = '500'
             context.chat_data['winner_prize'] = '200'
 
@@ -79,7 +87,7 @@ class BuyContest:
         timestring = update.message.text
 
         try:
-            start_time = datetime.strptime(timestring, DATE_FORMAT)
+            start_time = datetime.strptime(timestring, self.DATE_FORMAT)
 
             if start_time > datetime.now():
                 context.chat_data['start_time'] = timestring
@@ -102,7 +110,7 @@ class BuyContest:
         timestring = update.message.text
 
         try:
-            end_time = datetime.strptime(timestring, DATE_FORMAT)
+            end_time = datetime.strptime(timestring, self.DATE_FORMAT)
 
             if end_time > datetime.now():
                 context.chat_data['end_time'] = timestring
@@ -162,10 +170,10 @@ class BuyContest:
             group_title = chat_data['group_title']
             token_name = chat_data['tracked_token']
             start_date = datetime.strptime(
-                chat_data['start_time'], DATE_FORMAT)
+                chat_data['start_time'], self.DATE_FORMAT)
 
             end_date = datetime.strptime(
-                chat_data['end_time'], DATE_FORMAT)
+                chat_data['end_time'], self.DATE_FORMAT)
 
             minimum_buy = int(chat_data['minimum_buy'])
             winner_reward = chat_data['winner_prize']
@@ -177,16 +185,16 @@ class BuyContest:
                     group_id=group_id,
                     start_time=start_date,
                     end_time=end_date,
-                    count_down=10,
+                    count_down=5,
                     min_amount=minimum_buy,
-                    campaing_type=COMPETITION_NAME,
+                    campaing_type=self.COMPETITION_NAME,
                     prize=winner_reward
                 )
                 db.session.add(contest)
                 db.session.commit()
 
                 template = biggest_buy_competition_alert_template.format(
-                    competition_name=COMPETITION_NAME,
+                    competition_name=self.COMPETITION_NAME,
                     group_title=group_title,
                     token_name=token_name,
                     start_date=start_date,
@@ -220,11 +228,11 @@ class BuyContest:
                 try_again_and_cancel_btns = [
                     InlineKeyboardButton(
                         text="Try again",
-                        callback_data="confirm_biggest_buy"
+                        callback_data="confirm_bc"
                     ),
                     InlineKeyboardButton(
                         text="Cancel",
-                        callback_data="cancel"
+                        callback_data="cancel_bc"
                     )
                 ]
                 try_again_and_cancel_keyboard = InlineKeyboardMarkup(
@@ -238,10 +246,15 @@ class BuyContest:
                 )
                 return ConversationHandler.END
 
+        self.__remove_button_handlers()
+
     def __cancel(self, update: Update, context: CallbackContext) -> int:
         self.__extract_params(update, context)
-        self.__remove_button_handlers()
+
         print("Cancel Called")
+
+        if update.callback_query:
+            update.callback_query.answer()
 
         if is_private_chat(update):
             if not BotService().is_group_in_focus(update, context):
@@ -263,6 +276,7 @@ class BuyContest:
 
         print("Got to the end")
         reset_chat_data(context)
+        self.__remove_button_handlers()
         return ConversationHandler.END
 
     def __goto_start_time(self, update: Update, context: CallbackContext):
@@ -304,9 +318,8 @@ class BuyContest:
         chat_data = context.chat_data
 
         confirm = InlineKeyboardMarkup([
-            [InlineKeyboardButton(
-                'Confirm', callback_data='confirm_biggest_buy')],
-            [InlineKeyboardButton('Cancel', callback_data='cancel')]
+            [InlineKeyboardButton('Confirm', callback_data='confirm_bc')],
+            [InlineKeyboardButton('Cancel', callback_data='cancel_bc')]
         ])
 
         update.callback_query.edit_message_text(
@@ -320,16 +333,17 @@ class BuyContest:
             parse_mode=ParseMode.HTML, reply_markup=confirm)
 
     def __add_handlers(self):
+        self.dispatcher.add_handler(self.set_cancel_handler)
         #  Conversation handlers
         self.dispatcher.add_handler(ConversationHandler(
-            entry_points=[CommandHandler('start_buy_contest', self.__start)],
+            entry_points=[CommandHandler('start_buy_contest', self.__biigest_buy_start), CommandHandler(
+                'raffle_on', self.__raffle_start)],
             states={
             },
 
-            fallbacks=[CommandHandler('cancel', self.__cancel), CallbackQueryHandler(
-                self.__cancel, pattern='^cancel')],
+            fallbacks=[CommandHandler('cancel', self.__cancel)],
             conversation_timeout=300,
-            name='start_buy_contest',
+            name='start_contest',
             allow_reentry=True
         ))
 
@@ -350,14 +364,14 @@ class BuyContest:
             [InlineKeyboardButton('Set minimum buy', callback_data='set_min_buy'),
              InlineKeyboardButton('Set winner prize', callback_data='set_winner_prize')],
             [InlineKeyboardButton(
-                'Set start competition', callback_data='start_bb_competition')],
+                'Set start competition', callback_data='start_bc_competition')],
             [InlineKeyboardButton(
-                'Cancel', callback_data='cancel')]
+                'Cancel', callback_data='cancel_bc')]
         ])
 
         update.message.reply_text(
             text=start_biggest_buy_contest_template.format(
-                competition_name=COMPETITION_NAME,
+                competition_name=self.COMPETITION_NAME,
                 group_title=chat_data['group_title'],
                 token_name=chat_data['tracked_token'],
                 start_date=chat_data['start_time'],
@@ -371,6 +385,9 @@ class BuyContest:
         )
 
     def __create_handlers(self):
+        self.set_cancel_handler = CallbackQueryHandler(
+            self.__cancel, pattern='^cancel_bc')
+
         self.set_start_time_hander = CallbackQueryHandler(
             self.__goto_start_time, pattern='set_start_time')
 
@@ -396,10 +413,10 @@ class BuyContest:
             Filters.text, self.__set_winner_prize)
 
         self.set_start_comp_handler = CallbackQueryHandler(
-            self.__goto_start_comp, pattern='start_bb_competition')
+            self.__goto_start_comp, pattern='start_bc_competition')
 
         self.set_confirm_comp_handler = CallbackQueryHandler(
-            self.__start_competition, pattern='confirm_biggest_buy')
+            self.__start_competition, pattern='confirm_bc')
 
     def __set_button_handlers(self):
         self.dispatcher.add_handler(self.set_start_time_hander)
@@ -407,8 +424,10 @@ class BuyContest:
         self.dispatcher.add_handler(self.set_min_buy_handler)
         self.dispatcher.add_handler(self.set_winner_prize_handler)
         self.dispatcher.add_handler(self.set_start_comp_handler)
+        self.dispatcher.add_handler(self.set_cancel_handler)
 
     def __remove_button_handlers(self):
+        self.dispatcher.remove_handler(self.set_cancel_handler)
         self.dispatcher.remove_handler(self.set_start_time_hander)
         self.dispatcher.remove_handler(self.set_end_time_handler)
         self.dispatcher.remove_handler(self.set_min_buy_handler)
