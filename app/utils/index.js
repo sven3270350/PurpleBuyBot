@@ -380,8 +380,8 @@ const getGroupMedia = async (groupId) => {
 const handleSendError = (error, groupId) => {
   const errorJson = error.toJSON();
   if (
-    errorJson.message.includes("bot was blocked by the user") ||
-    errorJson.message.includes("bot was kicked from the group chat")
+    errorJson.message.includes("bot was blocked") ||
+    errorJson.message.includes("bot was kicked")
   ) {
     queries
       .deleteTrackedToken(groupId)
