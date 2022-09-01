@@ -14,6 +14,7 @@ class GeneralHandler:
 
     @send_typing_action
     def __chains(self, update: Update, context: CallbackContext):
+        self.__extract_params(update, context)
 
         if is_private_chat(update):
             supported_chains: list[SupportedChain] = BotService(
@@ -44,6 +45,7 @@ class GeneralHandler:
             response_for_group(self, update)
 
     def __help(self, update: Update, context: CallbackContext):
+        self.__extract_params(update, context)
         if is_private_chat(update):
             update.message.reply_text(help_template,
                                       parse_mode=ParseMode.HTML)
@@ -53,3 +55,11 @@ class GeneralHandler:
     def __add_handlers(self):
         self.dispatcher.add_handler(CommandHandler("chains", self.__chains))
         self.dispatcher.add_handler(CommandHandler("help", self.__help))
+
+    def __extract_params(self, update: Update, context: CallbackContext):
+        self.chattype = update.effective_chat.type
+        self.chatid = str(update.effective_chat.id)
+        self.chattitle = update.effective_chat.title
+        self.chatusername = update.effective_chat.username
+        self.group_message_sent_by = update.effective_user.username
+        self.bot_name = context.bot.username
