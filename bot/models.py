@@ -40,7 +40,7 @@ class Subscription(db.Model):
     subscription_type_id = db.Column(
         db.Integer, db.ForeignKey('subscription_type.id'))
     payment_chain_id = db.Column(
-        db.Integer, db.ForeignKey('supported_chain.id'))
+        db.Integer, db.ForeignKey('supported_chain.chain_id'))
     tx_hash = db.Column(db.String(120), unique=True)
     status = db.Column(db.String(120))
     start_date = db.Column(db.DateTime, default=db.func.now())
