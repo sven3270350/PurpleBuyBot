@@ -226,8 +226,8 @@ Select <b>Start Competition</b> to start the contest with the following settings
 
 <b>Token:</b> {token_name}
 
-<b>Start's :</b> <code>{start_date}</code>
-<b>Ends:</b> <code>{end_date}</code>
+<b>Start's :</b> <code>{start_date}</code> UTC
+<b>Ends:</b> <code>{end_date}</code> UTC
 
 <b>Minimum Buy:</b> ${minimum_buy}
 <b>Winner's Reward:</b> {winner_reward}
@@ -238,18 +238,18 @@ Select <b>Start Competition</b> to start the contest with the following settings
 set_start_time_template = '''
 <b>Set Start Time: </b>
 
-Time to start the contest.
+Time to start the contest (UTC)
 <i> Example: </i>
-  <code> 15/09/2022 04:17:08</code>
+  <code>{date}</code>
 
 '''
 
 set_end_time_template = '''
 <b> Set End Time: </b>
 
-Time to end the contest.
+Time to end the contest. (UTC)
 <i> Example: </i>
-  <code> 15/09/2022 04:17:08</code>
+  <code>{date}</code>
 
 '''
 
@@ -258,7 +258,7 @@ invalid_time_template = '''
 
 <i> Please use DD/MM/YYYY HH:MM:SS </i> 
 <i> Example: </i>
-  <code>01/01/2020 12:00:00</code> 
+  <code>01/01/2020 12:00:00</code>
 
 <b> OR </b>
 

@@ -353,17 +353,19 @@ class BuyContest:
     def __goto_start_time(self, update: Update, context: CallbackContext):
         self.dispatcher.add_handler(self.start_time_handler)
 
+        date_now = datetime.now().strftime(self.DATE_FORMAT)
         update.callback_query.answer()
         update.callback_query.edit_message_text(
-            text=set_start_time_template,
+            text=set_start_time_template.format(date=date_now),
             parse_mode=ParseMode.HTML)
 
     def __goto_end_time(self, update: Update, context: CallbackContext):
         self.dispatcher.add_handler(self.end_time_handler)
 
+        date_now = datetime.now().strftime(self.DATE_FORMAT)
         update.callback_query.answer()
         update.callback_query.edit_message_text(
-            text=set_end_time_template,
+            text=set_end_time_template.format(date=date_now),
             parse_mode=ParseMode.HTML)
 
     def __goto_min_buy(self, update: Update, context: CallbackContext):
@@ -431,7 +433,7 @@ class BuyContest:
         self.bot_name = context.bot.username
 
     def __reply_template(self, update: Update, context: CallbackContext):
-        chat_data = context.chat_data
+        chat_data: dict = context.chat_data
 
         buttons = InlineKeyboardMarkup([
             [InlineKeyboardButton('Set start time', callback_data='set_start_time'),
@@ -447,12 +449,12 @@ class BuyContest:
         update.message.reply_text(
             text=start_biggest_buy_contest_template.format(
                 competition_name=self.COMPETITION_NAME,
-                group_title=chat_data['group_title'],
-                token_name=chat_data['tracked_token'],
-                start_date=chat_data['start_time'],
-                end_date=chat_data['end_time'],
-                minimum_buy=chat_data['minimum_buy'],
-                winner_reward=chat_data['winner_prize']
+                group_title=chat_data.get('group_title', self.chattitle),
+                token_name=chat_data.get('tracked_token', "N/A"),
+                start_date=chat_data.get('start_time', "N/A"),
+                end_date=chat_data.get('end_time', "N/A"),
+                minimum_buy=chat_data.get('minimum_buy', "N/A"),
+                winner_reward=chat_data.get('winner_prize', "N/A")
             ),
             reply_markup=buttons,
             parse_mode=ParseMode.HTML
