@@ -53,6 +53,12 @@ const getTokenDecimals = async (address, chain) => {
   return token.methods.decimals().call();
 };
 
+const getTokenTotalSupply = async (tokenAddress, chainId) => {
+  const web3 = wss(appConfig.getProvider(chainId));
+  const token = new web3.eth.Contract(ERC20, tokenAddress);
+  return token.methods.totalSupply().call();
+};
+
 const getBuyerLink = (address, chainId) => {
   const explorer = appConfig.getExploerUrl(chainId);
   return `${explorer}address/${address}`;
@@ -381,7 +387,8 @@ const handleSendError = (error, groupId) => {
   const errorJson = error.toJSON();
   if (
     errorJson.message.includes("bot was blocked") ||
-    errorJson.message.includes("bot was kicked")
+    errorJson.message.includes("bot was kicked") ||
+    errorJson.message.includes("group chat was upgraded")
   ) {
     queries
       .deleteTrackedToken(groupId)
