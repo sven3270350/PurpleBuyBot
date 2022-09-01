@@ -96,7 +96,7 @@ def set_commands(context: CallbackContext, enable=False):
                                                "Subscribe to premium to remove ads"),
                                               ("chains", " Show a list of supported chains"),
                                               ("active_tracking",
-                                               "Toggle active buys tracking"),
+                                               "Toggle active buy tracking"),
                                               ("set_buy_icon", "Set buy icon"),
                                               ("set_buy_media",
                                                "Set a gif or image to show with buys"),

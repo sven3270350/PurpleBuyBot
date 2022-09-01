@@ -66,7 +66,7 @@ const countdowToStartTemplate = (startCountdown, EndCountdown, ad) => {
   return `
 🕐🕐🕐🕐🕐🕐🕐🕐🕐🕐🕐
 
-<b>Countdown to buys contest</b>
+<b>Countdown to buy contest</b>
 
 <b>Starts: <i>${startCountdown}</i></b>
 <b>Ends: <i>${EndCountdown}</i></b>
