@@ -54,7 +54,7 @@ ${!newBuyer ? "⏫Position: " + percent : "🔥 New Holder"}
 📊 <a href='${getChart(
     trackedToken.chain_id,
     trackedToken.pair
-  )}'>Chart</a> | 📈 Trending
+  )}'>Chart</a> | 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 
 ——
 
@@ -119,7 +119,9 @@ ${templates}
 😎 <b>Buyer :</b> <i><a href='${new_buyer.tx_link}'>${ellipseAddress(
     new_buyer.to
   )}</a></i>
-🤑 <b>Amount :</b> <i>${amountFormater(new_buyer.amountOut)} (~${new_buyer.usdPrice})</i>
+🤑 <b>Amount :</b> <i>${amountFormater(new_buyer.amountOut)} (~${
+    new_buyer.usdPrice
+  })</i>
 
 ⛓ <b>Bought On:</b> <i>${new_buyer.chain_name}</i>
 
@@ -149,7 +151,9 @@ ${odds}
 😎 <b>Buyer :</b> <i><a href='${new_buyer.tx_link}'>${ellipseAddress(
     new_buyer.to
   )}</a></i>
-🤑 <b>Amount :</b> <i>${amountFormater(new_buyer.amountOut)} (~${new_buyer.usdPrice})</i>
+🤑 <b>Amount :</b> <i>${amountFormater(new_buyer.amountOut)} (~${
+    new_buyer.usdPrice
+  })</i>
 
 ⛓ <b>Bought On:</b> <i>${new_buyer.chain_name}</i>
 
