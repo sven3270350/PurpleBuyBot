@@ -354,7 +354,7 @@ const rankIcon = (rank) => {
 };
 
 const genFormatter3dec = new Intl.NumberFormat("en-US", {
-  notation: "compact",
+  notation: "standard",
   maximumFractionDigits: 3,
 });
 
