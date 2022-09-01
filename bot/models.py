@@ -70,6 +70,7 @@ class TrackedToken(db.Model):
     token_name = db.Column(db.String(100))
     token_symbol = db.Column(db.String(20))
     token_decimals = db.Column(db.Integer)
+    circulating_supply = db.Column(db.BigInteger)
     pair_address = db.Column(db.String(100))
     active_tracking = db.Column(db.Boolean, default=True)
     chain = db.relationship(
