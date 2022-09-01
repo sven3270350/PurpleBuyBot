@@ -119,7 +119,7 @@ ${templates}
 😎 <b>Buyer :</b> <i><a href='${new_buyer.tx_link}'>${ellipseAddress(
     new_buyer.to
   )}</a></i>
-🤑 <b>Amount :</b> <i>${new_buyer.amountOut} (~${new_buyer.usdPrice})</i>
+🤑 <b>Amount :</b> <i>${amountFormater(new_buyer.amountOut)} (~${new_buyer.usdPrice})</i>
 
 ⛓ <b>Bought On:</b> <i>${new_buyer.chain_name}</i>
 
@@ -149,7 +149,7 @@ ${odds}
 😎 <b>Buyer :</b> <i><a href='${new_buyer.tx_link}'>${ellipseAddress(
     new_buyer.to
   )}</a></i>
-🤑 <b>Amount :</b> <i>${new_buyer.amountOut} (~${new_buyer.usdPrice})</i>
+🤑 <b>Amount :</b> <i>${amountFormater(new_buyer.amountOut)} (~${new_buyer.usdPrice})</i>
 
 ⛓ <b>Bought On:</b> <i>${new_buyer.chain_name}</i>
 
