@@ -26,6 +26,7 @@ class CampaignService:
         constest: Campaigns = Campaigns.query.filter_by(
             id=campaign_id).first()
         constest.end_time = datetime.now()
+        constest.start_time = datetime.now()
         db.session.commit()
         return constest
 
