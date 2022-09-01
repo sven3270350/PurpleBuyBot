@@ -45,7 +45,8 @@ class RemoveToken:
 
             update.message.reply_text(message, parse_mode=ParseMode.HTML)
         else:
-            response_for_group(self, update)
+            if is_group_admin(update, context):
+                response_for_group(self, update)
 
     @send_typing_action
     def __remove_token(self, update: Update, context: CallbackContext) -> int:
@@ -92,7 +93,8 @@ class RemoveToken:
 
                 return SELECT
         else:
-            response_for_group(self, update)
+            if is_group_admin(update, context):
+                response_for_group(self, update)
         return ConversationHandler.END
 
     @send_typing_action

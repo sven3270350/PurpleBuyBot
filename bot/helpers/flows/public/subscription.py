@@ -131,7 +131,8 @@ class Subscription:
 
                 return SELECT
         else:
-            response_for_group(self, update)
+            if is_group_admin(update, context):
+                response_for_group(self, update)
 
         reset_chat_data(context)
         return ConversationHandler.END

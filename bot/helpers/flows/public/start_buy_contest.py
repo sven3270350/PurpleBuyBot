@@ -81,7 +81,8 @@ class BuyContest:
 
             self.__reply_template(update, context)
         else:
-            response_for_group(self, update)
+            if is_group_admin(update, context):
+                response_for_group(self, update)
 
     @send_typing_action
     def __set_start_time(self, update: Update, context: CallbackContext):
@@ -175,7 +176,7 @@ class BuyContest:
 
             active_campaign: Campaigns = CampaignService(
             ).get_active_campaigns(group_id)
-            
+
             if active_campaign:
                 active_campaign = active_campaign[0]
                 start_date = active_campaign.start_time.strftime(
@@ -206,7 +207,8 @@ class BuyContest:
                     parse_mode=ParseMode.HTML
                 )
         else:
-            response_for_group(self, update)
+            if is_group_admin(update, context):
+                response_for_group(self, update)
 
     def __cancel_contest(self, update: Update, context: CallbackContext):
         query = update.callback_query
@@ -230,99 +232,95 @@ class BuyContest:
 
     def __start_competition(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
-
-        if is_private_chat(update):
-            if not BotService().is_group_in_focus(update, context):
-                reset_chat_data(context)
-                return ConversationHandler.END
-
-            if not is_group_admin(update, context):
-                return not_group_admin(update)
-
-            group_id = context.chat_data.get('group_id', None)
-            chat_data: dict = context.chat_data
-
-            group_title = chat_data['group_title']
-            token_name = chat_data['tracked_token']
-            start_date = datetime.strptime(
-                chat_data['start_time'], self.DATE_FORMAT)
-
-            end_date = datetime.strptime(
-                chat_data['end_time'], self.DATE_FORMAT)
-
-            minimum_buy = int(chat_data['minimum_buy'])
-            winner_reward = chat_data['winner_prize']
-
-            try:
-                ad = SubscriptionService().get_ad(group_id)
-                # save context
-                contest = Campaigns(
-                    group_id=group_id,
-                    start_time=start_date,
-                    end_time=end_date,
-                    count_down=5,
-                    min_amount=minimum_buy,
-                    campaing_type=self.COMPETITION_NAME,
-                    prize=winner_reward
-                )
-                db.session.add(contest)
-                db.session.commit()
-
-                template = biggest_buy_competition_alert_template.format(
-                    competition_name=self.COMPETITION_NAME,
-                    group_title=group_title,
-                    token_name=token_name,
-                    start_date=start_date,
-                    end_date=end_date,
-                    minimum_buy=minimum_buy,
-                    winner_reward=winner_reward,
-                    ad=ad
-                )
-
-                update.callback_query.answer()
-                update.callback_query.edit_message_text(
-                    text=template, parse_mode=ParseMode.HTML
-                )
-                context.bot.send_message(
-                    chat_id=group_id,
-                    text=template,
-                    parse_mode=ParseMode.HTML
-                )
-
-                self.dispatcher.remove_handler(self.set_confirm_comp_handler)
-                reset_chat_data(context)
-                return ConversationHandler.END
-
-            except Exception as e:
-                print(e)
-                update.callback_query.answer()
-                db.session.rollback()
-                db.session.flush()
-                db.session.close()
-
-                try_again_and_cancel_btns = [
-                    InlineKeyboardButton(
-                        text="Try again",
-                        callback_data="confirm_bc"
-                    ),
-                    InlineKeyboardButton(
-                        text="Cancel",
-                        callback_data="cancel_bc"
-                    )
-                ]
-                try_again_and_cancel_keyboard = InlineKeyboardMarkup(
-                    inline_keyboard=[try_again_and_cancel_btns]
-                )
-
-                update.callback_query.edit_message_text(
-                    text="❌ Failed to create context. Please try again",
-                    parse_mode=ParseMode.HTML,
-                    reply_markup=try_again_and_cancel_keyboard,
-                )
-                return ConversationHandler.END
-        else:
-            response_for_group(self, update)
         self.__remove_button_handlers()
+
+        if not BotService().is_group_in_focus(update, context):
+            reset_chat_data(context)
+            return ConversationHandler.END
+
+        if not is_group_admin(update, context):
+            return not_group_admin(update)
+
+        group_id = context.chat_data.get('group_id', None)
+        chat_data: dict = context.chat_data
+
+        group_title = chat_data['group_title']
+        token_name = chat_data['tracked_token']
+        start_date = datetime.strptime(
+            chat_data['start_time'], self.DATE_FORMAT)
+
+        end_date = datetime.strptime(
+            chat_data['end_time'], self.DATE_FORMAT)
+
+        minimum_buy = int(chat_data['minimum_buy'])
+        winner_reward = chat_data['winner_prize']
+
+        try:
+            ad = SubscriptionService().get_ad(group_id)
+            # save context
+            contest = Campaigns(
+                group_id=group_id,
+                start_time=start_date,
+                end_time=end_date,
+                count_down=5,
+                min_amount=minimum_buy,
+                campaing_type=self.COMPETITION_NAME,
+                prize=winner_reward
+            )
+            db.session.add(contest)
+            db.session.commit()
+
+            template = biggest_buy_competition_alert_template.format(
+                competition_name=self.COMPETITION_NAME,
+                group_title=group_title,
+                token_name=token_name,
+                start_date=start_date,
+                end_date=end_date,
+                minimum_buy=minimum_buy,
+                winner_reward=winner_reward,
+                ad=ad
+            )
+
+            update.callback_query.answer()
+            update.callback_query.edit_message_text(
+                text=template, parse_mode=ParseMode.HTML
+            )
+            context.bot.send_message(
+                chat_id=group_id,
+                text=template,
+                parse_mode=ParseMode.HTML
+            )
+
+            self.dispatcher.remove_handler(self.set_confirm_comp_handler)
+            reset_chat_data(context)
+            return ConversationHandler.END
+        except Exception as e:
+            print(e)
+            update.callback_query.answer()
+            db.session.rollback()
+            db.session.flush()
+            db.session.close()
+
+            try_again_and_cancel_btns = [
+                InlineKeyboardButton(
+                    text="Try again",
+                    callback_data="confirm_bc"
+                ),
+                InlineKeyboardButton(
+                    text="Cancel",
+                    callback_data="cancel_bc"
+                )
+            ]
+            try_again_and_cancel_keyboard = InlineKeyboardMarkup(
+                inline_keyboard=[try_again_and_cancel_btns]
+            )
+
+            update.callback_query.edit_message_text(
+                text="❌ Failed to create context. Please try again",
+                parse_mode=ParseMode.HTML,
+                reply_markup=try_again_and_cancel_keyboard,
+            )
+            return ConversationHandler.END
 
     def __cancel(self, update: Update, context: CallbackContext) -> int:
         self.__extract_params(update, context)

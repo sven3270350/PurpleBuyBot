@@ -57,7 +57,8 @@ class AddToken:
 
             return DEX
         else:
-            response_for_group(self, update)
+            if is_group_admin(update, context):
+                response_for_group(self, update)
         return ConversationHandler.END
 
     @send_typing_action
@@ -306,7 +307,8 @@ class AddToken:
                     reply_markup=InlineKeyboardMarkup(enable_button)
                 )
         else:
-            response_for_group(self, update)
+            if is_group_admin(update, context):
+                response_for_group(self, update)
 
     @send_typing_action
     def __set_buy_icon(self, update: Update, context: CallbackContext):
@@ -334,7 +336,8 @@ class AddToken:
                 )
             self.__add_set_icon_handler()
         else:
-            response_for_group(self, update)
+            if is_group_admin(update, context):
+                response_for_group(self, update)
 
     def __set_icon(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
@@ -368,8 +371,6 @@ class AddToken:
                     text=f"<i> ❌ Invalid icon. Enter a valid icon </i>",
                     parse_mode=ParseMode.HTML,
                 )
-        else:
-            response_for_group(self, update)
 
     @send_typing_action
     def __set_buy_media(self, update: Update, context: CallbackContext):
@@ -406,7 +407,8 @@ class AddToken:
                 )
             self.__add_set_media_handler()
         else:
-            response_for_group(self, update)
+            if is_group_admin(update, context):
+                response_for_group(self, update)
 
     def __set_media(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
@@ -456,8 +458,6 @@ class AddToken:
                     text=f"<i> ❌ Invalid Media Selected. Select a Gif or Image (recommended 1280px x 720px).</i>",
                     parse_mode=ParseMode.HTML,
                 )
-        else:
-            response_for_group(self, update)
 
     @send_typing_action
     def __cancel_add_token(self, update: Update, context: CallbackContext) -> int:
