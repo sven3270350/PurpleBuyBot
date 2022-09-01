@@ -27,8 +27,12 @@ def is_group_admin(update: Update, context: CallbackContext):
     """
     Checks if the user is a group admin.
     """
+
     if context.chat_data.get('group_id'):
         return BotService().is_chat_admin(context, context.chat_data.get('group_id'), update.effective_user.id)
+    elif update.effective_chat.id:
+        return BotService().is_chat_admin(context, update.effective_chat.id, update.effective_user.id)
+
     return False
 
 
