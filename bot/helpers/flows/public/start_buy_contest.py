@@ -33,12 +33,12 @@ class BuyContest:
     @send_typing_action
     def __biigest_buy_start(self, update: Update, context: CallbackContext):
         self.COMPETITION_NAME = "Biggest Buy"
-        self.__start(update, context)
+        return self.__start(update, context)
 
     @send_typing_action
     def __raffle_start(self, update: Update, context: CallbackContext):
         self.COMPETITION_NAME = "Raffle"
-        self.__start(update, context)
+        return self.__start(update, context)
 
     def __start(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
