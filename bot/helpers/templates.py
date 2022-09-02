@@ -288,7 +288,7 @@ eg 100, 200, 1000 etc
 set_winner_reward_template = '''
 <b>Set Winner Reward: </b>
 
-Set the reward for the winner in USD. 
+Set the reward for the winner. 
 eg 100, double, Testa etc
 
 '''
