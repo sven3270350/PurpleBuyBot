@@ -39,7 +39,16 @@ const allBuysHandler = async (
     // send message to group
     utils.sendHTMLMessage(trackedToken.group_id, templates);
   } catch (error) {
-    console.log("[allBuys::allBuysHandler]", trackedToken, error);
+    const { group_id, token_name, chain_name } = trackedToken;
+    console.log(
+      "[allBuys::allBuysHandler]",
+      {
+        group_id,
+        token_name,
+        chain_name,
+      },
+      error
+    );
   }
 };
 
