@@ -27,8 +27,7 @@ class BotService:
 
     def is_registered_group(self, chat_id):
         # try:
-        group: list[Group] = Group.query.filter_by(group_id=chat_id)
-        group: Group = group[0] if group else None
+        group: Group = Group.query.filter_by(group_id=chat_id).first()
         if group:
             return True
         else:
