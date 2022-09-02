@@ -89,9 +89,13 @@ class BuyContest:
             context.chat_data['winner_prize'] = '200'
 
             self.__reply_template(update, context)
+
+            return START_TIME
         else:
             if is_group_admin(update, context):
                 response_for_group(self, update)
+
+        return ConversationHandler.END
 
     @send_typing_action
     def __set_start_time(self, update: Update, context: CallbackContext):
@@ -367,7 +371,7 @@ class BuyContest:
         update.callback_query.edit_message_text(
             text=set_start_time_template.format(date=date_now),
             parse_mode=ParseMode.HTML)
-        
+
         return START_TIME
 
     def __goto_end_time(self, update: Update, context: CallbackContext):
