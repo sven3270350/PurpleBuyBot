@@ -22,7 +22,7 @@ class BotService:
             db.session.commit()
             return True
         except Exception as e:
-            print(f"Error creating new bot user: {e}")
+            print("[BotService::create_new_bot_user]", e)
             return False
 
     def is_registered_group(self, chat_id):
