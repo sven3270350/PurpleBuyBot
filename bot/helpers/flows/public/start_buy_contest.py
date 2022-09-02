@@ -328,7 +328,7 @@ class BuyContest:
             )
             return ConversationHandler.END
 
-    def __cancel(self, update: Update, context: CallbackContext) -> int:
+    def __cancel_buy_contest(self, update: Update, context: CallbackContext) -> int:
         self.__extract_params(update, context)
 
         if update.callback_query:
@@ -425,7 +425,9 @@ class BuyContest:
             states={
             },
 
-            fallbacks=[CommandHandler('cancel', self.__cancel)],
+            fallbacks=[
+                CommandHandler('cancel', self.__cancel_buy_contest)
+            ],
             conversation_timeout=300,
             name='start_contest',
             allow_reentry=True
@@ -470,7 +472,7 @@ class BuyContest:
 
     def __create_handlers(self):
         self.set_cancel_handler = CallbackQueryHandler(
-            self.__cancel, pattern='^cancel_bc')
+            self.__cancel_buy_contest, pattern='^cancel_bc')
 
         self.set_start_time_hander = CallbackQueryHandler(
             self.__goto_start_time, pattern='set_start_time')
