@@ -11,7 +11,13 @@ from helpers.templates import (
     set_winner_reward_template, start_competition_confirmation_template,
     biggest_buy_competition_alert_template, invalid_time_template, not_valid_value_template, active_contest_template)
 from datetime import datetime, timedelta
+import logging
 
+# Enable logging
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+)
+logger = logging.getLogger(__name__)
 
 class BuyContest:
     def __init__(self, dispatcher: Dispatcher):
@@ -378,6 +384,7 @@ class BuyContest:
 
     def __goto_winner_prize(self, update: Update, context: CallbackContext):
         self.dispatcher.add_handler(self.winner_prize_handler)
+        logger.info("winner prize handler added")
 
         update.callback_query.answer()
         update.callback_query.edit_message_text(
