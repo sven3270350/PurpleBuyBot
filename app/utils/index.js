@@ -154,7 +154,7 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
       callback(trackedToken, amountIn, amountOut, to, tx_link);
     }
   } catch (error) {
-    console.log("[Utils::swapHanlder]", error);
+    console.log("[Utils::swapHanlder]", trackedToken, error);
   }
 };
 
