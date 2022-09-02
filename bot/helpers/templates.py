@@ -226,7 +226,7 @@ Select <b>Start Competition</b> to start the contest with the following settings
 
 <b>Token:</b> {token_name}
 
-<b>Start's :</b> <code>{start_date}</code> UTC
+<b>Starts :</b> <code>{start_date}</code> UTC
 <b>Ends:</b> <code>{end_date}</code> UTC
 
 <b>Minimum Buy:</b> ${minimum_buy}
@@ -298,7 +298,7 @@ start_competition_confirmation_template = '''
 
 <b>Token:</b> {token_name}
     
-<b>Start's :</b> <code>{start_date}</code>
+<b>Starts :</b> <code>{start_date}</code>
 <b>Ends:</b> <code>{end_date}</code>
 
 <b>Minimum Buy:</b> ${minimum_buy}
@@ -316,7 +316,7 @@ biggest_buy_competition_alert_template = '''
 
 <i>Token: <b>{token_name}</b></i>
 
-<b>Start's :</b> {start_date}
+<b>Starts :</b> {start_date}
 <b>Ends:</b> {end_date}
 
 <b>Minimum Buy:</b> ${minimum_buy}
