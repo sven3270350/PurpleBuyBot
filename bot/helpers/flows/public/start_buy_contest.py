@@ -120,6 +120,8 @@ class BuyContest:
                 parse_mode=ParseMode.HTML
             )
 
+        return START_TIME
+
     @send_typing_action
     def __set_end_time(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
@@ -143,6 +145,8 @@ class BuyContest:
                 parse_mode=ParseMode.HTML
             )
 
+        return END_TIME
+
     @send_typing_action
     def __set_min_buy(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
@@ -159,6 +163,8 @@ class BuyContest:
                 parse_mode=ParseMode.HTML
             )
 
+        return MIN_BUY
+
     @send_typing_action
     def __set_winner_prize(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
@@ -168,6 +174,8 @@ class BuyContest:
 
         # self.dispatcher.remove_handler(self.winner_prize_handler)
         self.__reply_template(update, context)
+
+        return WINNER_REWARD
 
     @send_typing_action
     def __get_active_contest(self, update: Update, context: CallbackContext):
@@ -397,7 +405,6 @@ class BuyContest:
 
     def __goto_winner_prize(self, update: Update, context: CallbackContext):
         # self.dispatcher.add_handler(self.winner_prize_handler)
-        logger.info("winner prize handler added")
 
         update.callback_query.answer()
         update.callback_query.edit_message_text(
