@@ -26,10 +26,14 @@ class BotService:
             return False
 
     def is_registered_group(self, chat_id):
-        group = Group.query.filter_by(group_id=chat_id).first()
-        if group:
-            return True
-        else:
+        try:
+            group = Group.query.filter_by(group_id=chat_id).first()
+            if group:
+                return True
+            else:
+                return False
+        except Exception as e:
+            print("[BotService::is_registered_group]", e)
             return False
 
     def is_chat_admin(self, context: CallbackContext,  chat_id, user_id):
