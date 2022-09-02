@@ -18,7 +18,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-DEVELOPER_CHAT_ID = 567495946
+DEVELOPER_CHAT_ID = '567495946'
 
 telegram_bot_token = config('PUBLIC_BOT_API_KEY')
 bot = telegram.Bot(token=telegram_bot_token)
@@ -27,7 +27,7 @@ bot = telegram.Bot(token=telegram_bot_token)
 updater = Updater(token=telegram_bot_token, use_context=True)
 dispatcher = updater.dispatcher
 
-async def error_handler(update: object, context: CallbackContext) -> None:
+def error_handler(update: object, context: CallbackContext) -> None:
     """Log the error and send a telegram message to notify the developer."""
     # Log the error before we do anything else, so we can see it even if something breaks.
     logger.error(msg="Exception while handling an update:", exc_info=context.error)
@@ -50,7 +50,7 @@ async def error_handler(update: object, context: CallbackContext) -> None:
     )
 
     # Finally, send the message
-    await context.bot.send_message(
+    context.bot.send_message(
         chat_id=DEVELOPER_CHAT_ID, text=message, parse_mode=ParseMode.HTML
     )
 
