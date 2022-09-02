@@ -13,11 +13,14 @@ from helpers.templates import (
 from datetime import datetime, timedelta
 import logging
 
+START_TIME, END_TIME, MIN_BUY, WINNER_REWARD = range(4)
+
 # Enable logging
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 logger = logging.getLogger(__name__)
+
 
 class BuyContest:
     def __init__(self, dispatcher: Dispatcher):
@@ -100,7 +103,7 @@ class BuyContest:
 
             if start_time > datetime.now():
                 context.chat_data['start_time'] = timestring
-                self.dispatcher.remove_handler(self.start_time_handler)
+                # self.dispatcher.remove_handler(self.start_time_handler)
                 self.__reply_template(update, context)
             else:
                 update.message.reply_text(
@@ -123,7 +126,7 @@ class BuyContest:
 
             if end_time > datetime.now():
                 context.chat_data['end_time'] = timestring
-                self.dispatcher.remove_handler(self.end_time_handler)
+                # self.dispatcher.remove_handler(self.end_time_handler)
                 self.__reply_template(update, context)
             else:
                 update.message.reply_text(
@@ -144,7 +147,7 @@ class BuyContest:
         if int(min_buy) > 0:
             context.chat_data['minimum_buy'] = min_buy
 
-            self.dispatcher.remove_handler(self.min_buy_handler)
+            # self.dispatcher.remove_handler(self.min_buy_handler)
             self.__reply_template(update, context)
         else:
             update.message.reply_text(
@@ -159,7 +162,7 @@ class BuyContest:
 
         context.chat_data['winner_prize'] = winner_prize
 
-        self.dispatcher.remove_handler(self.winner_prize_handler)
+        # self.dispatcher.remove_handler(self.winner_prize_handler)
         self.__reply_template(update, context)
 
     @send_typing_action
@@ -328,7 +331,7 @@ class BuyContest:
             )
             return ConversationHandler.END
 
-    def __cancel_buy_contest(self, update: Update, context: CallbackContext) -> int:
+    def __cancel_flow(self, update: Update, context: CallbackContext) -> int:
         self.__extract_params(update, context)
 
         if update.callback_query:
@@ -357,16 +360,18 @@ class BuyContest:
         return ConversationHandler.END
 
     def __goto_start_time(self, update: Update, context: CallbackContext):
-        self.dispatcher.add_handler(self.start_time_handler)
+        # self.dispatcher.add_handler(self.start_time_handler)
 
         date_now = datetime.now().strftime(self.DATE_FORMAT)
         update.callback_query.answer()
         update.callback_query.edit_message_text(
             text=set_start_time_template.format(date=date_now),
             parse_mode=ParseMode.HTML)
+        
+        return START_TIME
 
     def __goto_end_time(self, update: Update, context: CallbackContext):
-        self.dispatcher.add_handler(self.end_time_handler)
+        # self.dispatcher.add_handler(self.end_time_handler)
 
         date_now = datetime.now().strftime(self.DATE_FORMAT)
         update.callback_query.answer()
@@ -374,22 +379,28 @@ class BuyContest:
             text=set_end_time_template.format(date=date_now),
             parse_mode=ParseMode.HTML)
 
+        return END_TIME
+
     def __goto_min_buy(self, update: Update, context: CallbackContext):
-        self.dispatcher.add_handler(self.min_buy_handler)
+        # self.dispatcher.add_handler(self.min_buy_handler)
 
         update.callback_query.answer()
         update.callback_query.edit_message_text(
             text=set_min_buy_template,
             parse_mode=ParseMode.HTML)
 
+        return MIN_BUY
+
     def __goto_winner_prize(self, update: Update, context: CallbackContext):
-        self.dispatcher.add_handler(self.winner_prize_handler)
+        # self.dispatcher.add_handler(self.winner_prize_handler)
         logger.info("winner prize handler added")
 
         update.callback_query.answer()
         update.callback_query.edit_message_text(
             text=set_winner_reward_template,
             parse_mode=ParseMode.HTML)
+
+        return WINNER_REWARD
 
     def __goto_start_comp(self, update: Update, context: CallbackContext):
         self.dispatcher.add_handler(self.set_confirm_comp_handler)
@@ -423,10 +434,14 @@ class BuyContest:
             entry_points=[CommandHandler('start_buy_contest', self.__biigest_buy_start), CommandHandler(
                 'raffle_on', self.__raffle_start)],
             states={
+                START_TIME: [self.start_time_handler],
+                END_TIME: [self.end_time_handler],
+                MIN_BUY: [self.min_buy_handler],
+                WINNER_REWARD: [self.winner_prize_handler]
             },
 
             fallbacks=[
-                CommandHandler('cancel', self.__cancel_buy_contest)
+                CommandHandler('cancel', self.__cancel_flow)
             ],
             conversation_timeout=300,
             name='start_contest',
@@ -472,7 +487,7 @@ class BuyContest:
 
     def __create_handlers(self):
         self.set_cancel_handler = CallbackQueryHandler(
-            self.__cancel_buy_contest, pattern='^cancel_bc')
+            self.__cancel_flow, pattern='^cancel_bc')
 
         self.set_start_time_hander = CallbackQueryHandler(
             self.__goto_start_time, pattern='set_start_time')
@@ -521,7 +536,7 @@ class BuyContest:
         self.dispatcher.remove_handler(self.set_start_comp_handler)
         self.dispatcher.remove_handler(self.set_confirm_comp_handler)
 
-        self.dispatcher.remove_handler(self.start_time_handler)
-        self.dispatcher.remove_handler(self.end_time_handler)
-        self.dispatcher.remove_handler(self.min_buy_handler)
-        self.dispatcher.remove_handler(self.winner_prize_handler)
+        # self.dispatcher.remove_handler(self.start_time_handler)
+        # self.dispatcher.remove_handler(self.end_time_handler)
+        # self.dispatcher.remove_handler(self.min_buy_handler)
+        # self.dispatcher.remove_handler(self.winner_prize_handler)
