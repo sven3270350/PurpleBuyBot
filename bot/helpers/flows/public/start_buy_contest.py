@@ -222,7 +222,7 @@ class BuyContest:
                 )
             else:
                 update.message.reply_text(
-                    text="ℹ️ No active competition at the moment",
+                    text="ℹ️ No active contest at the moment",
                     parse_mode=ParseMode.HTML
                 )
         else:
@@ -255,7 +255,7 @@ class BuyContest:
                 )
             else:
                 update.message.reply_text(
-                    text="ℹ️ No active competition at the moment",
+                    text="ℹ️ No active contest at the moment",
                     parse_mode=ParseMode.HTML
                 )
 
@@ -275,7 +275,7 @@ class BuyContest:
             )
         else:
             query.edit_message_text(
-                text="ℹ️ No active competition at the moment",
+                text="ℹ️ No active contest at the moment",
                 parse_mode=ParseMode.HTML
             )
 
