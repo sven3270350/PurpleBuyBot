@@ -446,10 +446,6 @@ class BuyContest:
             entry_points=[
                 CommandHandler('start_buy_contest', self.__biigest_buy_start),
                 CommandHandler('raffle_on', self.__raffle_start),
-                self.set_start_time_hander,
-                self.set_end_time_handler,
-                self.set_min_buy_handler,
-                self.set_winner_prize_handler,
             ],
             states={
                 START_TIME: [self.start_time_handler],
@@ -459,7 +455,12 @@ class BuyContest:
             },
 
             fallbacks=[
-                CommandHandler('cancel', self.__cancel_flow)
+                CommandHandler('cancel', self.__cancel_flow),
+                self.set_start_time_hander,
+                self.set_end_time_handler,
+                self.set_min_buy_handler,
+                self.set_winner_prize_handler,
+                self.set_confirm_comp_handler
             ],
             conversation_timeout=300,
             name='start_contest',
