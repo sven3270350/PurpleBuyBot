@@ -10,23 +10,29 @@ const announcers = {};
 const announcerHandler = async (activeCampaign) => {
   try {
     const ad = await utils.getAd(activeCampaign.group_id);
-    let winnerAddress;
+
     let templates;
 
     if (activeCampaign.campaing_type === "Biggest Buy") {
       // anounce biggest buy campaign winner
       const winner = await queries.getTop5Buys(activeCampaign.id);
-      winnerAddress = winner[0].buyer_address;
+      const winnerAddress = winner[0].buyer_address;
       templates = winnerBiggestBuysTemplate(winner, activeCampaign, ad);
+      await queries.deleteNonTop5Buys(activeCampaign.id);
+
+      // write winner to campaign
+      await queries.writeWinnerToCampaign(winnerAddress, activeCampaign.id);
     } else {
       // anounce raffle campaign winner
       const winner = await queries.getRandomWinner(activeCampaign.id);
-      winnerAddress = winner.buyer_address;
+      const winnerAddress = winner.buyer_address;
       templates = winnerRaffleBuysTemplate(winner, activeCampaign, ad);
-    }
 
-    // write winner to campaign
-    await queries.writeWinnerToCampaign(winnerAddress, activeCampaign.id);
+      // write winner to campaign
+      await queries.writeWinnerToCampaign(winnerAddress, activeCampaign.id);
+
+      await queries.deleteNonRandomWinner(activeCampaign.id);
+    }
 
     // send message to group
     utils.sendHTMLMessage(activeCampaign.group_id, templates);

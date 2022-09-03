@@ -196,6 +196,29 @@ const getTop5Buys = async (campaign_id) => {
   return res.rows;
 };
 
+const deleteNonTop5Buys = async (campaign_id) => {
+  const query = `
+  DELETE FROM public.transactions
+  WHERE campaign_id = $1
+  AND buyer_address NOT IN (
+    SELECT buyer_address
+    FROM (
+      SELECT
+        group_id,
+        buyer_address,
+        SUM(buyer_amount) AS amount
+      FROM public.transactions
+      WHERE campaign_id = $1
+      GROUP BY group_id, buyer_address
+    ) AS t
+    ORDER BY amount DESC LIMIT 5
+  );
+    `;
+  const params = [campaign_id];
+  const res = await db.query(query, params);
+  return res.rows;
+};
+
 const getRandomWinner = async (campaign_id) => {
   const query = `
   SELECT * FROM public.transactions WHERE campaign_id = $1 ORDER BY RANDOM() LIMIT 1;
@@ -203,6 +226,21 @@ const getRandomWinner = async (campaign_id) => {
   const params = [campaign_id];
   const res = await db.query(query, params);
   return res.rows[0];
+};
+
+const deleteNonRandomWinner = async (campaign_id) => {
+  const query = `
+  DELETE FROM public.transactions
+  WHERE campaign_id = $1
+  AND buyer_address != (
+    SELECT campaign_winner
+    FROM public.campaigns
+    WHERE id = $1
+  );
+    `;
+  const params = [campaign_id];
+  const res = await db.query(query, params);
+  return res.rows;
 };
 
 const getOdds = async (campaign_id) => {
@@ -262,4 +300,6 @@ module.exports = {
   writeWinnerToCampaign,
   deleteTrackedToken,
   getGroupIconAndMedia,
+  deleteNonTop5Buys,
+  deleteNonRandomWinner,
 };
