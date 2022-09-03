@@ -440,10 +440,17 @@ class BuyContest:
             'active_contest', self.__get_active_contest))
         self.dispatcher.add_handler(CallbackQueryHandler(
             self.__cancel_contest, pattern='cancel_contest'))
+
         #  Conversation handlers
         self.dispatcher.add_handler(ConversationHandler(
-            entry_points=[CommandHandler('start_buy_contest', self.__biigest_buy_start), CommandHandler(
-                'raffle_on', self.__raffle_start)],
+            entry_points=[
+                CommandHandler('start_buy_contest', self.__biigest_buy_start),
+                CommandHandler('raffle_on', self.__raffle_start),
+                self.set_start_time_hander,
+                self.set_end_time_handler,
+                self.set_min_buy_handler,
+                self.set_winner_prize_handler,
+            ],
             states={
                 START_TIME: [self.start_time_handler],
                 END_TIME: [self.end_time_handler],
