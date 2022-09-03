@@ -226,40 +226,38 @@ class BuyContest:
                     parse_mode=ParseMode.HTML
                 )
         else:
-            group_id = update.effective_chat.id
+            group_id = str(update.effective_chat.id)
             group_title = context.bot.get_chat(
                 group_id).title
 
-            logger.info(
-                f"Group {group_title}({group_id}) is trying to get active contest")
 
-            # active_campaign: Campaigns = CampaignService(
-            # ).get_active_campaigns(group_id)
+            active_campaign: Campaigns = CampaignService(
+            ).get_active_campaigns(group_id)
 
-            # if active_campaign:
-            #     active_campaign = active_campaign[0]
-            #     start_date = active_campaign.start_time.strftime(
-            #         self.DATE_FORMAT)
-            #     end_date = active_campaign.end_time.strftime(
-            #         self.DATE_FORMAT)
+            if active_campaign:
+                active_campaign = active_campaign[0]
+                start_date = active_campaign.start_time.strftime(
+                    self.DATE_FORMAT)
+                end_date = active_campaign.end_time.strftime(
+                    self.DATE_FORMAT)
 
-            #     update.message.reply_text(
-            #         text=active_contest_template.format(
-            #             competition_name=active_campaign.campaing_type,
-            #             group_title=group_title,
-            #             start_date=start_date,
-            #             end_date=end_date,
-            #             minimum_buy=active_campaign.min_amount,
-            #             winner_reward=active_campaign.prize
+                update.message.reply_text(
+                    text=active_contest_template.format(
+                        competition_name=active_campaign.campaing_type,
+                        group_title=group_title,
+                        start_date=start_date,
+                        end_date=end_date,
+                        minimum_buy=active_campaign.min_amount,
+                        winner_reward=active_campaign.prize
 
-            #         ),
-            #         parse_mode=ParseMode.HTML
-            #     )
-            # else:
-            #     update.message.reply_text(
-            #         text="ℹ️ There is no active competition",
-            #         parse_mode=ParseMode.HTML
-            #     )
+                    ),
+                    parse_mode=ParseMode.HTML
+                )
+            else:
+                update.message.reply_text(
+                    text="ℹ️ There is no active competition",
+                    parse_mode=ParseMode.HTML
+                )
 
     def __cancel_contest(self, update: Update, context: CallbackContext):
         query = update.callback_query
