@@ -113,9 +113,14 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
     let amountOut = 0;
 
     if (selectedTrackedToken.token === 1) {
+      const {group_id, token_name, chain_name} = trackedToken;
       console.log(
         "UTILS::swapHanlder::token1",
-        trackedToken,
+        {
+          group_id,
+          token_name,
+          chain_name,
+        },
         data.returnValues
       );
       const token1Decimals = await getTokenDecimals(
