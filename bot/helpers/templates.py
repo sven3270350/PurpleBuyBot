@@ -316,11 +316,11 @@ biggest_buy_competition_alert_template = '''
 
 <i>Token: <b>{token_name}</b></i>
 
-<b>Starts :</b> {start_date}
-<b>Ends:</b> {end_date}
+<b>⏱ Starts :</b> {start_date}
+<b>🕣 Ends:</b> {end_date}
 
-<b>Minimum Buy:</b> ${minimum_buy}
-<b>Winner's Reward:</b> {winner_reward}
+<b>⬇️ Minimum Buy:</b> ${minimum_buy}
+<b>🏆 Winner's Reward:</b> {winner_reward}
 
 ——
 
@@ -328,14 +328,15 @@ biggest_buy_competition_alert_template = '''
 '''
 
 active_contest_template = '''
-<b>{competition_name} Contest</b>
+🎮 <b>{competition_name} Contest</b>
 
-<i>Group: <b>{group_title}</b></i>
+👥 <i>Group: <b>{group_title}</b></i>
 
-<b>Start :</b> {start_date}
-<b>End:</b> {end_date}
-<b>Minimum Buy:</b> ${minimum_buy}
-<b>Winner's Reward:</b> {winner_reward}
+⏱ <b>Start :</b> {start_date}
+🕣 <b>End:</b> {end_date}
+
+⬇️ <b>Minimum Buy:</b> ${minimum_buy}
+🏆 <b>Winner's Reward:</b> {winner_reward}
 '''
 
 

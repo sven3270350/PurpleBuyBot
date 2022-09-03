@@ -99,7 +99,7 @@ ${rankIcon(i + 1)} ${ellipseAddress(buyer_address)} ➖${numberToUsd(amount)}
   return `
 <b>🎉 ${campaign.type} Competition Entry</b>
 
-🕓 Started at: <b>${times.start_time}</b>
+⏱ Started at: <b>${times.start_time}</b>
 ⏳ Ends in: <b>${times.count_down}</b>
 ⬇️ Minimum Buy: <b>${Intl.NumberFormat("en-US", {
     style: "currency",
