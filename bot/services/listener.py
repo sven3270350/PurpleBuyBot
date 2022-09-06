@@ -53,21 +53,27 @@ class Listener(Thread):
             pending_subscription.subscription_type_id)
 
         start_date = datetime.now()
-        end_date = (start_date + timedelta(years=200)) if subscription_type.subscription_type == 'Lifetime' else (
+        end_date = (start_date + timedelta(years=500)) if subscription_type.subscription_type == 'Lifetime' else (
             start_date + timedelta(weeks=pending_subscription.number_of_countable_subscriptions))
 
         if pending_subscription:
-            pending_subscription.start_date = start_date
-            pending_subscription.end_date = end_date
-            pending_subscription.tx_hash = None
-            pending_subscription.status = 'paid',
+            try:
+                pending_subscription.start_date = start_date
+                pending_subscription.end_date = end_date
+                pending_subscription.tx_hash = None
+                pending_subscription.status = 'paid',
 
-            db.session.add(pending_subscription)
-            db.session.commit()
-            self.stop()
+                db.session.add(pending_subscription)
+                db.session.commit()
+                self.stop()
 
-            Web3Service().transfer_balance_to_admin(self.chain_id, self.wallet.id)
+                Web3Service().transfer_balance_to_admin(self.chain_id, self.wallet.id)
 
-            chat_id = self.update.effective_chat.id
-            self.context.bot.send_message(
-                chat_id=chat_id, text=f"✅ Payment received. Subscription started on {start_date} and will expire on {end_date}")
+                chat_id = self.update.effective_chat.id
+                self.context.bot.send_message(
+                    chat_id=chat_id, text=f"✅ Payment received. Subscription started on {start_date} and will expire on {end_date}")
+            except Exception as e:
+                db.session.rollback()
+                print("[Listener::process_payment]", e)
+                self.context.bot.send_message(
+                    chat_id=self.update.effective_chat.id, text="❌ Payment not received. Use /subscribe to check payment.")

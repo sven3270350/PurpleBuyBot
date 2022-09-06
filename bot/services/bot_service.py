@@ -22,6 +22,7 @@ class BotService:
             db.session.commit()
             return True
         except Exception as e:
+            db.session.rollback()
             print("[BotService::create_new_bot_user]", e)
             return False
 
@@ -131,6 +132,7 @@ class BotService:
             db.session.commit()
             return True
         except Exception as e:
+            db.session.rollback()
             print(f"Error deleting tracked token: {e}")
             return False
 

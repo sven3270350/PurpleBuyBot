@@ -258,6 +258,7 @@ class AddToken:
                 return ConversationHandler.END
             except Exception as e:
                 print(e)
+                db.session.rollback()
                 context.bot.send_message(chat_id=self.chatid, text=f"<i> ❌ Error adding token, Try again later.</i>",
                                          parse_mode=ParseMode.HTML)
 
@@ -367,6 +368,7 @@ class AddToken:
                         parse_mode=ParseMode.HTML,
                     )
             except Exception as e:
+                db.session.rollback()
                 update.message.reply_text(
                     text=f"<i> ❌ Invalid icon. Enter a valid icon </i>",
                     parse_mode=ParseMode.HTML,
@@ -454,6 +456,7 @@ class AddToken:
                         parse_mode=ParseMode.HTML,
                     )
             except Exception as e:
+                db.session.rollback()
                 update.message.reply_text(
                     text=f"<i> ❌ Invalid Media Selected. Select a Gif or Image (recommended 1280px x 720px).</i>",
                     parse_mode=ParseMode.HTML,
@@ -527,13 +530,19 @@ class AddToken:
             group_id=group_id).all()
 
         if group_tracked_token:
-            for token in group_tracked_token:
-                token.active_tracking = True
-                db.session.commit()
+            try:
+                for token in group_tracked_token:
+                    token.active_tracking = True
+                    db.session.commit()
 
-            update.callback_query.answer()
-            update.callback_query.edit_message_text(text="<i>✅ Tracking enabled successfully </i>",
-                                                    parse_mode=ParseMode.HTML)
+                    update.callback_query.answer()
+                    update.callback_query.edit_message_text(text="<i>✅ Tracking enabled successfully </i>",
+                                                            parse_mode=ParseMode.HTML)
+            except Exception as e:
+                db.session.rollback()
+                update.callback_query.answer()
+                update.callback_query.edit_message_text(text="<i>❌ Error enabling tracking </i>",
+                                                        parse_mode=ParseMode.HTML)
         self.__remove_enbale_tracking_handler()
 
     def __disable_tracking(self, update: Update, context: CallbackContext):
@@ -542,13 +551,19 @@ class AddToken:
             group_id=group_id, active_tracking=True).all()
 
         if group_tracked_token:
-            for token in group_tracked_token:
-                token.active_tracking = False
-                db.session.commit()
+            try:
+                for token in group_tracked_token:
+                    token.active_tracking = False
+                    db.session.commit()
 
-            update.callback_query.answer()
-            update.callback_query.edit_message_text(text="<i>✅ Tracking disabled successfully </i>",
-                                                    parse_mode=ParseMode.HTML)
+                update.callback_query.answer()
+                update.callback_query.edit_message_text(text="<i>✅ Tracking disabled successfully </i>",
+                                                        parse_mode=ParseMode.HTML)
+            except Exception as e:
+                db.session.rollback()
+                update.callback_query.answer()
+                update.callback_query.edit_message_text(text="<i>❌ Error disabling tracking </i>",
+                                                        parse_mode=ParseMode.HTML)
 
         self.__remove_disable_tracking_handler()
 

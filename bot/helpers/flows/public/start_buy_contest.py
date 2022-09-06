@@ -345,10 +345,8 @@ class BuyContest:
             return ConversationHandler.END
         except Exception as e:
             print(e)
-            update.callback_query.answer()
             db.session.rollback()
-            db.session.flush()
-            db.session.close()
+            update.callback_query.answer()
 
             try_again_and_cancel_btns = [
                 InlineKeyboardButton(

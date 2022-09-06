@@ -23,12 +23,17 @@ class CampaignService:
         return contest
 
     def update_campaign_end_time_by_id(self, campaign_id):
-        constest: Campaigns = Campaigns.query.filter_by(
-            id=campaign_id).first()
-        constest.end_time = datetime.now()
-        constest.start_time = datetime.now()
-        db.session.commit()
-        return constest
+        try:
+            constest: Campaigns = Campaigns.query.filter_by(
+                id=campaign_id).first()
+            constest.end_time = datetime.now()
+            constest.start_time = datetime.now()
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()
+            print("[CampaignService::update_campaign_end_time_by_id]", e)
+            return False
 
     def get_active_campaigns_count(self, group_id):
         stmt = f'''

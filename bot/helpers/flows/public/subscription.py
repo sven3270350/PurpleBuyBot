@@ -318,22 +318,33 @@ class Subscription:
                 block_timestampe + timedelta(weeks=pending_subscription.number_of_countable_subscriptions))
 
             if same_address and same_amount:
-                # update subscription status
-                pending_subscription.tx_hash = transaction_hash
-                pending_subscription.start_date = block_timestampe
-                pending_subscription.end_date = end_date
-                pending_subscription.status = 'paid',
-                db.session.add(pending_subscription)
-                db.session.commit()
+                try:
+                    # update subscription status
+                    pending_subscription.tx_hash = transaction_hash
+                    pending_subscription.start_date = block_timestampe
+                    pending_subscription.end_date = end_date
+                    pending_subscription.status = 'paid',
+                    db.session.add(pending_subscription)
+                    db.session.commit()
 
-                update.message.reply_text(
-                    text=payment_status_template.format(
-                        chain_name=chain.chain_name,
-                        status_message='Transaction confirmed',
-                        transaction_hash=transaction_hash
-                    ),
-                    parse_mode=ParseMode.HTML
-                )
+                    update.message.reply_text(
+                        text=payment_status_template.format(
+                            chain_name=chain.chain_name,
+                            status_message='Transaction confirmed',
+                            transaction_hash=transaction_hash
+                        ),
+                        parse_mode=ParseMode.HTML
+                    )
+                except Exception as e:
+                    db.session.rollback()
+                    update.message.reply_text(
+                        text=payment_status_template.format(
+                            chain_name=chain.chain_name,
+                            status_message='Error occured, try again or contact support',
+                            transaction_hash=transaction_hash
+                        ),
+                        parse_mode=ParseMode.HTML
+                    )
 
             reset_chat_data(context)
             return ConversationHandler.END
@@ -415,6 +426,7 @@ class Subscription:
             return ConversationHandler.END
 
         except Exception as e:
+            db.session.rollback()
             print(e)
             update.callback_query.edit_message_text(
                 text="Error creating subscription",
