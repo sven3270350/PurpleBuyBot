@@ -3,13 +3,34 @@ const appConfig = require("./app_config");
 const UniswapV2Pair = require("./IUniswapV2Pair.json");
 const ERC20 = require("./erc20abi.json");
 const Web3 = require("web3");
+const Web3WsProvider = require("web3-providers-ws");
 const CoinGecko = require("coingecko-api");
 const CoinGeckoClient = new CoinGecko();
 const TelegramBot = require("node-telegram-bot-api");
 
 const bot = new TelegramBot(process.env.PUBLIC_BOT_API_KEY);
 
-const wss = (provider) => new Web3(provider);
+const wss = (provider) => {
+  const options = {
+    timeout: 30000,
+
+    clientConfig: {
+      keepalive: true,
+      keepaliveInterval: 60000,
+    },
+
+    reconnect: {
+      auto: true,
+      delay: 5000, // ms
+      maxAttempts: 5,
+      onTimeout: false,
+    },
+  };
+
+  const ws = new Web3WsProvider(provider, options);
+
+  return new Web3(ws);
+};
 
 const selectTrackedToken = async (trackedToken, contract) => {
   try {
@@ -113,7 +134,7 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
     let amountOut = 0;
 
     if (selectedTrackedToken.token === 1) {
-      const {group_id, token_name, chain_name} = trackedToken;
+      const { group_id, token_name, chain_name } = trackedToken;
       console.log(
         "UTILS::swapHanlder::token1",
         {
