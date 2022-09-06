@@ -354,7 +354,7 @@ class AddToken:
             group: Group = Group.query.filter_by(group_id=group_id).first()
 
             try:
-                if update.message.text:
+                if update.message.text and len(update.message.text) <= 2:
                     group.buy_icon = update.message.text
                     db.session.commit()
                     update.message.reply_text(
@@ -364,13 +364,13 @@ class AddToken:
                     self.__remove_set_icon_handler()
                 else:
                     update.message.reply_text(
-                        text=f"<i> ❌ Invalid icon. Enter a valid icon </i>",
+                        text=f"<i> ❌ Invalid icon. Enter a valid icon; max 2 icons </i>",
                         parse_mode=ParseMode.HTML,
                     )
             except Exception as e:
                 db.session.rollback()
                 update.message.reply_text(
-                    text=f"<i> ❌ Invalid icon. Enter a valid icon </i>",
+                    text=f"<i> ❌ Invalid icon. Enter a valid icon; max 2 icons </i>",
                     parse_mode=ParseMode.HTML,
                 )
 
