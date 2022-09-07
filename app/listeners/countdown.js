@@ -32,6 +32,7 @@ const countdownHandler = async (activeCampaign) => {
 
 const main = async (interval = 1000 * 30) => {
   // get all tracked tokens
+  const maxDelayValue = 2147483647;
 
   try {
     setInterval(async () => {
@@ -72,7 +73,7 @@ const main = async (interval = 1000 * 30) => {
           countdowns[activeCampaign.id] = countdown;
         }
       });
-    }, interval);
+    }, interval > maxDelayValue ? maxDelayValue : interval);
   } catch (error) {
     console.log("[countdown::main]", error);
   }

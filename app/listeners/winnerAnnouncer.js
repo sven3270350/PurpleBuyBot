@@ -43,31 +43,37 @@ const announcerHandler = async (activeCampaign) => {
 
 const main = async (interval = 1000 * 30) => {
   // get all tracked tokens
-
+  const maxDelayValue = 2147483647;
   try {
-    setInterval(async () => {
-      const activeCampaigns = await queries.getAllActiveCampaigns();
+    setInterval(
+      async () => {
+        const activeCampaigns = await queries.getAllActiveCampaigns();
 
-      // for each active campaign, create a announcer
-      activeCampaigns.forEach(async (activeCampaign) => {
-        const timeDiff = new Date(activeCampaign.end_time) - new Date();
-        // check if it's is not in announcers
-        if (!utils.keyInObject(activeCampaign.id, announcers)) {
-          // create a announcer
-          const announcer = setTimeout(async () => {
-            // send reminder message to group
-            await announcerHandler(activeCampaign);
-            // delete announcer
-            delete announcers[activeCampaign.id];
-          }, timeDiff);
+        // for each active campaign, create a announcer
+        activeCampaigns.forEach(async (activeCampaign) => {
+          const timeDiff = new Date(activeCampaign.end_time) - new Date();
+          // check if it's is not in announcers
+          if (!utils.keyInObject(activeCampaign.id, announcers)) {
+            // create a announcer
+            const announcer = setTimeout(
+              async () => {
+                // send reminder message to group
+                await announcerHandler(activeCampaign);
+                // delete announcer
+                delete announcers[activeCampaign.id];
+              },
+              timeDiff > maxDelayValue ? maxDelayValue : timeDiff
+            );
 
-          // add to announcers
-          if (!announcers[activeCampaign.id]) {
-            announcers[activeCampaign.id] = announcer;
+            // add to announcers
+            if (!announcers[activeCampaign.id]) {
+              announcers[activeCampaign.id] = announcer;
+            }
           }
-        }
-      });
-    }, interval);
+        });
+      },
+      interval > maxDelayValue ? maxDelayValue : interval
+    );
   } catch (error) {
     console.log("[announcer::main]", error);
   }

@@ -112,7 +112,8 @@ const subscribe = async (trackedToken, contract) => {
 
 const main = async (interval = 1000 * 30) => {
   // get all tracked tokens
-
+  const maxDelayValue = 2147483647;
+  
   try {
     setInterval(async () => {
       const trackedTokens =
@@ -159,7 +160,7 @@ const main = async (interval = 1000 * 30) => {
           await subscribe(trackedToken, contract);
         }
       });
-    }, interval);
+    }, interval > maxDelayValue ? maxDelayValue : interval);
   } catch (error) {
     console.log("[campaignBuys::main]", error);
   }
