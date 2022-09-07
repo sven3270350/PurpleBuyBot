@@ -7,7 +7,7 @@ const campaignBuyListener = require("./listeners/campaingBuys");
 const winnerAnnouncer = require("./listeners/winnerAnnouncer");
 const utils = require("./utils");
 
-const WORKERS = 3;
+const WORKERS = 1;
 // main function, iterates through all contracts in pairs
 async function start() {
   await utils.cachePrices();
