@@ -12,8 +12,13 @@ const WORKERS = 1;
 async function start() {
   await utils.cachePrices();
   await allBuysListener.main();
-  await countdownListener.main();
+  // await countdownListener.main();
   await campaignBuyListener.main();
+  // await winnerAnnouncer.main();
+}
+
+async function nonPriceListeners() {
+  await countdownListener.main();
   await winnerAnnouncer.main();
 }
 
@@ -21,4 +26,10 @@ throng({
   workers: WORKERS,
   lifetime: Infinity,
   start: start,
+});
+
+throng({
+  workers: WORKERS,
+  lifetime: Infinity,
+  start: nonPriceListeners,
 });
