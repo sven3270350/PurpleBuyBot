@@ -155,17 +155,6 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
 
       amountOut = convertFromWei(data.returnValues.amount1Out, decimals);
       amountIn = convertFromWei(data.returnValues.amount0In, token1Decimals);
-
-      // if (amountOut <= 0 || amountIn <= 0) {
-      //   const token1Decimals = await getTokenDecimals(
-      //     selectedTrackedToken.address,
-      //     chainId
-      //   );
-
-      //   amountOut = convertFromWei(data.returnValues.amount1In, token1Decimals);
-
-      //   amountIn = convertFromWei(data.returnValues.amount0Out, decimals);
-      // }
     } else {
       const token0Decimals = await getTokenDecimals(
         trackedToken.paired_with,
@@ -181,7 +170,23 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
     const price = await getUsdPrice(amountIn, trackedToken.paired_with_name);
 
     if ((amountIn > 0 || amountOut > 0) && price.usdNumber > 1) {
-      callback(trackedToken, amountIn, amountOut, to, tx_link);
+      let marketCap = 0;
+
+      if (trackedToken.circulating_supply) {
+        const unitPrice = amountOut / amountIn;
+        marketCap =
+          trackedToken.circulating_supply * unitPrice * price.usdNumber;
+      }
+
+      callback(
+        trackedToken,
+        amountIn,
+        amountOut,
+        marketCap,
+        price,
+        to,
+        tx_link
+      );
     }
   } catch (error) {
     const { group_id, token_name, chain_name } = trackedToken;
@@ -208,6 +213,49 @@ const setCirculatingSupply = async (trackedToken) => {
     console.log("[Utils::setCirculatingSupply]", error);
   }
 };
+
+// const getUnitPrice = async (trackedToken) => {
+//   const getAmountsOutAbi = [
+//     {
+//       inputs: [
+//         { internalType: "uint256", name: "amountIn", type: "uint256" },
+//         { internalType: "address[]", name: "path", type: "address[]" },
+//       ],
+//       name: "getAmountsOut",
+//       outputs: [
+//         { internalType: "uint256[]", name: "amounts", type: "uint256[]" },
+//       ],
+//       stateMutability: "view",
+//       type: "function",
+//     },
+//   ];
+//   try {
+//     const {
+//       token_address,
+//       token_decimals,
+//       chain_id,
+//       router_address,
+//       paired_with,
+//     } = trackedToken;
+
+//     const web3 = wss(appConfig.getProvider(chain_id));
+//     const router = new web3.eth.Contract(
+//       getAmountsOutAbi,
+//       router_address.toLowerCase()
+//     );
+
+//     const amountIn = 1 * 10 ** token_decimals; // 1 token
+//     const amountsOut = await router.methods
+//       .getAmountsOut(amountIn, [
+//         token_address.toLowerCase(),
+//         paired_with.toLowerCase(),
+//       ])
+//       .call();
+//     return amountsOut[1];
+//   } catch (error) {
+//     console.log("[Utils::getUnitPrice]", error);
+//   }
+// };
 
 const keyInObject = (key, obj) => {
   const length = Object.keys(obj).length;
