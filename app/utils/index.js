@@ -173,7 +173,7 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
       let marketCap = 0;
 
       if (trackedToken.circulating_supply) {
-        const unitPrice = price.usdNumber / (amountOut / amountIn);
+        const unitPrice = (amountOut / amountIn);
         marketCap = unitPrice;
       }
 
