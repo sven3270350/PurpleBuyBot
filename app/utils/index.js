@@ -124,6 +124,7 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
   const explorer = appConfig.getExploerUrl(chainId);
   const tx_link = `${explorer}tx/${tx_hash}`;
   const circ_supply = await queries.getTokenCircSupply(trackedToken.id);
+  console.log("[Utils::swapHanlder] circ_supply", circ_supply);
 
   try {
     if (!circ_supply) {
