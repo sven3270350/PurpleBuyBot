@@ -123,11 +123,10 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
   const chainId = trackedToken.chain_id;
   const explorer = appConfig.getExploerUrl(chainId);
   const tx_link = `${explorer}tx/${tx_hash}`;
-  const circ_supply = await queries.getTokenCircSupply(trackedToken.id);
-  console.log("[Utils::swapHanlder] circ_supply", circ_supply);
+  const {circulating_supply} = await queries.getTokenCircSupply(trackedToken.id);
 
   try {
-    if (!circ_supply) {
+    if (!circulating_supply) {
       await setCirculatingSupply(trackedToken);
     }
 
@@ -174,9 +173,9 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
     if ((amountIn > 0 || amountOut > 0) && price.usdNumber > 1) {
       let marketCap = 0;
 
-      if (circ_supply) {
+      if (circulating_supply) {
         const unitPrice = price.actualPrice / (amountOut / amountIn);
-        marketCap = unitPrice * circ_supply;
+        marketCap = unitPrice * circulating_supply;
       }
 
       callback(
