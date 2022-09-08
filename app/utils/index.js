@@ -292,6 +292,7 @@ const getUsdPrice = async (amount, paired_with) => {
   return {
     usdString: numberToUsd(Number(amount) * price),
     usdNumber: Number(amount) * price,
+    actualPrice: price,
   };
 };
 
