@@ -467,9 +467,17 @@ const genFormatter3dec = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 3,
 });
 
+const compactFormatter = new Intl.NumberFormat("en-US", {
+  notation: "compact",
+  maximumFractionDigits: 2,
+});
+
 const amountFormater = (value) => {
-  if (Number.parseFloat(value) > 0.001) {
+  const parsedValue = Number.parseFloat(value);
+  if (parsedValue > 0.001 && parsedValue <= 9999999) {
     return genFormatter3dec.format(value);
+  } else if (Number.parseFloat(value) > 9999999) {
+    return compactFormatter.format(value);
   } else {
     return Number.parseFloat(value).toExponential(2);
   }
