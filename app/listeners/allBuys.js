@@ -8,12 +8,13 @@ const allBuysHandler = async (
   trackedToken,
   amountIn,
   amountOut,
+  mc,
+  price,
   to,
   tx_link
 ) => {
   try {
-    const { usdString: usdPrice, usdNumber: multiplier } =
-      await utils.getUsdPrice(amountIn, trackedToken.paired_with_name);
+    const { usdString: usdPrice, usdNumber: multiplier } = price;
     const ad = await utils.getAd(trackedToken.group_id);
     const { buy_icon, buy_media } = await utils.getGroupMedia(
       trackedToken.group_id
@@ -23,6 +24,7 @@ const allBuysHandler = async (
       amountOut,
       usdPrice,
       multiplier,
+      mc,
       buyer: to,
     };
 

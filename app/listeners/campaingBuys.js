@@ -12,14 +12,13 @@ const campaignBuysHandler = async (
   trackedToken,
   amountIn,
   amountOut,
+  mc,
+  price,
   to,
   tx_link
 ) => {
   try {
-    const { usdString: usdPrice, usdNumber } = await utils.getUsdPrice(
-      amountIn,
-      trackedToken.paired_with_name
-    );
+    const { usdString: usdPrice, usdNumber } = price;
 
     if (usdNumber >= trackedToken.min_amount) {
       await queries.writeBuysToDB({
@@ -47,6 +46,7 @@ const campaignBuysHandler = async (
         amountOut,
         usdPrice,
         tx_link,
+        mc,
         to: utils.ellipseAddress(to),
         chain_name: trackedToken?.chain_name,
       };
@@ -89,7 +89,15 @@ const campaignBuysHandler = async (
       // send message to group
       utils.sendHTMLMessage(trackedToken.group_id, templates);
     } else {
-      await allBuysHandler(trackedToken, amountIn, amountOut, to, tx_link);
+      await allBuysHandler(
+        trackedToken,
+        amountIn,
+        amountOut,
+        mc,
+        price,
+        to,
+        tx_link
+      );
     }
   } catch (error) {
     console.log("[campaignBuys::allBuysHandler]", error);
@@ -113,54 +121,61 @@ const subscribe = async (trackedToken, contract) => {
 const main = async (interval = 1000 * 30) => {
   // get all tracked tokens
   const maxDelayValue = 2147483647;
-  
+
   try {
-    setInterval(async () => {
-      const trackedTokens =
-        await queries.getAllActivelyTrackedTokensWithActiveCampaign();
+    setInterval(
+      async () => {
+        const trackedTokens =
+          await queries.getAllActivelyTrackedTokensWithActiveCampaign();
 
-      // if no tracked tokens, and subssciptions, unsubscribe from all
-      if (trackedTokens.length === 0 && Object.keys(subscriptions).length > 0) {
+        // if no tracked tokens, and subssciptions, unsubscribe from all
+        if (
+          trackedTokens.length === 0 &&
+          Object.keys(subscriptions).length > 0
+        ) {
+          Object.keys(subscriptions).forEach((id) => {
+            subscriptions[id].unsubscribe();
+            delete subscriptions[id];
+          });
+        }
+
+        // stop subcription if there is no active campaign
         Object.keys(subscriptions).forEach((id) => {
-          subscriptions[id].unsubscribe();
-          delete subscriptions[id];
+          if (
+            !trackedTokens.find(
+              (token) =>
+                `${token.token_address.toLowerCase()}_${token.id}` === id
+            )
+          ) {
+            subscriptions[id].unsubscribe();
+            delete subscriptions[id];
+          }
         });
-      }
 
-      // stop subcription if there is no active campaign
-      Object.keys(subscriptions).forEach((id) => {
-        if (
-          !trackedTokens.find(
-            (token) => `${token.token_address.toLowerCase()}_${token.id}` === id
-          )
-        ) {
-          subscriptions[id].unsubscribe();
-          delete subscriptions[id];
-        }
-      });
+        // for each tracked token, subscribe to the event
+        trackedTokens.forEach(async (trackedToken) => {
+          const provider = utils.getProvider(trackedToken.chain_id);
+          const wss = utils.wss(provider);
 
-      // for each tracked token, subscribe to the event
-      trackedTokens.forEach(async (trackedToken) => {
-        const provider = utils.getProvider(trackedToken.chain_id);
-        const wss = utils.wss(provider);
+          // check if event is not in subscriptions
+          if (
+            !utils.keyInObject(
+              `${trackedToken.token_address.toLowerCase()}_${trackedToken.id}`,
+              subscriptions
+            )
+          ) {
+            // get event from contract
+            const contract = new wss.eth.Contract(
+              utils.UniswapV2Pair.abi,
+              trackedToken.pair
+            );
 
-        // check if event is not in subscriptions
-        if (
-          !utils.keyInObject(
-            `${trackedToken.token_address.toLowerCase()}_${trackedToken.id}`,
-            subscriptions
-          )
-        ) {
-          // get event from contract
-          const contract = new wss.eth.Contract(
-            utils.UniswapV2Pair.abi,
-            trackedToken.pair
-          );
-
-          await subscribe(trackedToken, contract);
-        }
-      });
-    }, interval > maxDelayValue ? maxDelayValue : interval);
+            await subscribe(trackedToken, contract);
+          }
+        });
+      },
+      interval > maxDelayValue ? maxDelayValue : interval
+    );
   } catch (error) {
     console.log("[campaignBuys::main]", error);
   }
