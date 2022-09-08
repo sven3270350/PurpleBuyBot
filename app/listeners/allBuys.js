@@ -15,6 +15,7 @@ const allBuysHandler = async (
 ) => {
   try {
     const { usdString: usdPrice, usdNumber: multiplier } = price;
+    console.log("AllBuysHandler::allbuysHandler", price);
     const ad = await utils.getAd(trackedToken.group_id);
     const { buy_icon, buy_media } = await utils.getGroupMedia(
       trackedToken.group_id
