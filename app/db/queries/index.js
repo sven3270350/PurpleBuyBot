@@ -281,6 +281,15 @@ const stopGroupActiveCampaign = async (group_id) => {
   return res.rows[0];
 };
 
+const stopCampaingByGroup = async (campaign_id) => {
+  const query = `
+  UPDATE public.campaigns SET end_time = NOW() WHERE id = $1;
+  `;
+  const params = [campaign_id];
+  const res = await db.query(query, params);
+  return res.rows[0];
+};
+
 const getGroupIconAndMedia = async (group_id) => {
   const query = `
   SELECT
@@ -312,4 +321,5 @@ module.exports = {
   deleteNonTop5Buys,
   deleteNonRandomWinner,
   stopGroupActiveCampaign,
+  stopCampaingByGroup
 };

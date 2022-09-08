@@ -61,6 +61,9 @@ const main = async (interval = 1000 * 30) => {
                 await announcerHandler(activeCampaign);
                 // delete announcer
                 delete announcers[activeCampaign.id];
+                if (timeDiff > maxDelayValue) {
+                 await queries.stopCampaingByGroup(activeCampaign.id);
+                }
               },
               timeDiff > maxDelayValue ? maxDelayValue : timeDiff
             );
