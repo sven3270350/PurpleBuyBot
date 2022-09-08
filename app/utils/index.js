@@ -125,6 +125,10 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
   const tx_link = `${explorer}tx/${tx_hash}`;
 
   try {
+    if (!trackedToken.circulating_supply) {
+      await setCirculatingSupply(trackedToken);
+    }
+
     const selectedTrackedToken = await selectTrackedToken(
       token_address,
       contract
@@ -190,6 +194,18 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
       },
       error
     );
+  }
+};
+
+const setCirculatingSupply = async (trackedToken) => {
+  try {
+    const { id, token_address, token_decimals, chain_id, group_id } =
+      trackedToken;
+    const totalSupply = await getTokenTotalSupply(token_address, chain_id);
+    const circulatingSupply = convertFromWei(totalSupply, token_decimals);
+    await queries.updateTrackedTokenCircSupply(group_id, id, circulatingSupply);
+  } catch (error) {
+    console.log("[Utils::setCirculatingSupply]", error);
   }
 };
 
