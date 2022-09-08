@@ -207,6 +207,12 @@ const setCirculatingSupply = async (trackedToken) => {
       trackedToken;
     const totalSupply = await getTokenTotalSupply(token_address, chain_id);
     const circulatingSupply = convertFromWei(totalSupply, token_decimals);
+    console.log(
+      "[Utils::setCirculatingSupply]",
+      totalSupply,
+      token_decimals,
+      circulatingSupply
+    );
     await queries.updateTrackedTokenCircSupply(group_id, id, circulatingSupply);
   } catch (error) {
     console.log("[Utils::setCirculatingSupply]", error);
