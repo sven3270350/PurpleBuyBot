@@ -317,6 +317,15 @@ const updateTrackedTokenCircSupply = async (
   return res.rows[0];
 };
 
+const getTokenCircSupply = async (tracked_token_id) => {
+  const query = `
+  SELECT circulating_supply FROM public.tracked_token WHERE id = $1;
+    `;
+  const params = [tracked_token_id];
+  const res = await db.query(query, params);
+  return res.rows[0];
+};
+
 module.exports = {
   getTrackedTokensById,
   getActiveSubscriptionByGroupId,
@@ -338,4 +347,5 @@ module.exports = {
   stopGroupActiveCampaign,
   stopCampaingByGroup,
   updateTrackedTokenCircSupply,
+  getTokenCircSupply,
 };

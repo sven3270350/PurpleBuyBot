@@ -123,9 +123,10 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
   const chainId = trackedToken.chain_id;
   const explorer = appConfig.getExploerUrl(chainId);
   const tx_link = `${explorer}tx/${tx_hash}`;
+  const circ_supply = await getTokenCircSupply(trackedToken.id);
 
   try {
-    if (!trackedToken.circulating_supply) {
+    if (!circ_supply) {
       await setCirculatingSupply(trackedToken);
     }
 
@@ -172,9 +173,9 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
     if ((amountIn > 0 || amountOut > 0) && price.usdNumber > 1) {
       let marketCap = 0;
 
-      if (trackedToken.circulating_supply) {
+      if (circ_supply) {
         const unitPrice = price.actualPrice / (amountOut / amountIn);
-        marketCap = unitPrice * trackedToken.circulating_supply;
+        marketCap = unitPrice * circ_supply;
       }
 
       callback(
@@ -207,12 +208,6 @@ const setCirculatingSupply = async (trackedToken) => {
       trackedToken;
     const totalSupply = await getTokenTotalSupply(token_address, chain_id);
     const circulatingSupply = convertFromWei(totalSupply, token_decimals);
-    console.log(
-      "[Utils::setCirculatingSupply]",
-      totalSupply,
-      token_decimals,
-      circulatingSupply
-    );
     await queries.updateTrackedTokenCircSupply(group_id, id, circulatingSupply);
   } catch (error) {
     console.log("[Utils::setCirculatingSupply]", error);
