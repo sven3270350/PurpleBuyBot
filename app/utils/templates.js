@@ -49,6 +49,11 @@ ${buy_icon.repeat((multiplier > maxIcons ? maxIcons : multiplier) | 1)}
     trackedToken.chain_id
   )}'>${buyer}</a> | <a href='${tx_link}'>Txn</a>
 ${!newBuyer ? "⏫Position: " + percent : "🔥 New Holder"}
+${
+  !!amounts.mc
+    ? "🏪 <b>Market Cap :</b> <i>$" + amountFormater(amounts.mc) + "</i>"
+    : ""
+}
 
 🕸 Chain:${trackedToken.chain_name}
 📊 <a href='${getChart(
@@ -122,6 +127,11 @@ ${templates}
 🤑 <b>Amount :</b> <i>${amountFormater(new_buyer.amountOut)} (~${
     new_buyer.usdPrice
   })</i>
+${
+  !!new_buyer.mc
+    ? "🏪 <b>Market Cap :</b> <i>$" + amountFormater(new_buyer.mc) + "</i>"
+    : ""
+}
 
 ⛓ <b>Bought On:</b> <i>${new_buyer.chain_name}</i>
 
@@ -154,6 +164,11 @@ ${odds}
 🤑 <b>Amount :</b> <i>${amountFormater(new_buyer.amountOut)} (~${
     new_buyer.usdPrice
   })</i>
+${
+  !!new_buyer.mc
+    ? "🏪 <b>Market Cap :</b> <i>$" + amountFormater(new_buyer.mc) + "</i>"
+    : ""
+}
 
 ⛓ <b>Bought On:</b> <i>${new_buyer.chain_name}</i>
 
