@@ -123,7 +123,7 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
   const chainId = trackedToken.chain_id;
   const explorer = appConfig.getExploerUrl(chainId);
   const tx_link = `${explorer}tx/${tx_hash}`;
-  const circ_supply = await getTokenCircSupply(trackedToken.id);
+  const circ_supply = await queries.getTokenCircSupply(trackedToken.id);
 
   try {
     if (!circ_supply) {
