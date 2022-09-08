@@ -272,6 +272,15 @@ const deleteTrackedToken = async (group_id) => {
   return res.rows[0];
 };
 
+const stopGroupActiveCampaign = async (group_id) => {
+  const query = `
+  UPDATE public.campaigns SET end_time = NOW() WHERE group_id = $1 AND end_time >= NOW();
+  `;
+  const params = [group_id];
+  const res = await db.query(query, params);
+  return res.rows[0];
+};
+
 const getGroupIconAndMedia = async (group_id) => {
   const query = `
   SELECT
@@ -302,4 +311,5 @@ module.exports = {
   getGroupIconAndMedia,
   deleteNonTop5Buys,
   deleteNonRandomWinner,
+  stopGroupActiveCampaign,
 };

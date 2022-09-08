@@ -432,6 +432,10 @@ const handleSendError = (error, groupId) => {
     queries
       .deleteTrackedToken(groupId)
       .then(() => console.log("[Utils::handleSendError]", "Tracking disabled"));
+
+    queries
+      .stopGroupActiveCampaign(groupId)
+      .then(() => console.log("[Utils::handleSendError]", "Campaign stopped"));
   }
 
   console.log("[Utils::sendHTMLMessage]", {
