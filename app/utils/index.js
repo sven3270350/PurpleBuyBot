@@ -34,7 +34,13 @@ const wss = (provider) => {
 
 const getGroupInviteLink = async (groupId) => {
   const groupInfo = await bot.getChat(groupId);
-  return groupInfo.invite_link;
+  const invite_link = groupInfo.invite_link;
+  const user_name = groupInfo.username;
+  return invite_link
+    ? invite_link
+    : user_name
+    ? `https://t.me/${user_name}`
+    : undefined;
 };
 
 const selectTrackedToken = async (trackedToken, contract) => {
