@@ -51,12 +51,13 @@ ${buy_icon.repeat((multiplier > maxIcons ? maxIcons : multiplier) | 1)}
     trackedToken.chain_id
   )}'>${buyer}</a> | <a href='${tx_link}'>Txn</a>
 ${!newBuyer ? "⏫ Position: " + percent : "🔥 New Holder"}
-${!!amounts.mc ? "🏪 Market Cap : $" + amountFormater(amounts.mc) : ""}
+${!!amounts.mc ? "🏪 Market Cap: $" + amountFormater(amounts.mc) : ""}
 
 🕸 Chain:${trackedToken.chain_name}
 📊 <a href='${getChart(trackedToken.chain_id, trackedToken.pair)}'>Chart</a> ${
     group_link ? "| 👥 <a href='" + group_link + "'>Group</a> " : ""
-  }| 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
+  }
+📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 
 ——
 
