@@ -6,6 +6,7 @@ const {
   getBuyerLink,
   isNewBuyer,
   getChart,
+  getGroupInviteLink,
   percentageFormatter,
 } = require(".");
 
@@ -27,6 +28,7 @@ const generalBuyTemplate = async (
     trackedToken.chain_id
   );
 
+  const group_link = await getGroupInviteLink(trackedToken.group_id);
   const buy_icon = group_icon || "🟢";
 
   const percent =
@@ -48,18 +50,13 @@ ${buy_icon.repeat((multiplier > maxIcons ? maxIcons : multiplier) | 1)}
     amounts.buyer,
     trackedToken.chain_id
   )}'>${buyer}</a> | <a href='${tx_link}'>Txn</a>
-${!newBuyer ? "⏫Position: " + percent : "🔥 New Holder"}
-${
-  !!amounts.mc
-    ? "🏪 <b>Market Cap :</b> <i>$" + amountFormater(amounts.mc) + "</i>"
-    : ""
-}
+${!newBuyer ? "⏫ Position: " + percent : "🔥 New Holder"}
+${!!amounts.mc ? "🏪 Market Cap : $" + amountFormater(amounts.mc) : ""}
 
 🕸 Chain:${trackedToken.chain_name}
-📊 <a href='${getChart(
-    trackedToken.chain_id,
-    trackedToken.pair
-  )}'>Chart</a> | 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
+📊 <a href='${getChart(trackedToken.chain_id, trackedToken.pair)}'>Chart</a> ${
+    group_link ? "| 👥 <a href=" + group_link + ">Group</a>" : ""
+  }| 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 
 ——
 
