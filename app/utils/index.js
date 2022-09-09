@@ -32,6 +32,11 @@ const wss = (provider) => {
   return new Web3(ws);
 };
 
+const getGroupInviteLink = async (groupId) => {
+  const groupInfo = await bot.getChat(groupId);
+  return groupInfo.invite_link;
+};
+
 const selectTrackedToken = async (trackedToken, contract) => {
   try {
     const token0 = await getToken0(contract);
@@ -123,7 +128,9 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
   const chainId = trackedToken.chain_id;
   const explorer = appConfig.getExploerUrl(chainId);
   const tx_link = `${explorer}tx/${tx_hash}`;
-  const {circulating_supply} = await queries.getTokenCircSupply(trackedToken.id);
+  const { circulating_supply } = await queries.getTokenCircSupply(
+    trackedToken.id
+  );
 
   try {
     if (!circulating_supply) {
@@ -519,6 +526,7 @@ const handleSendError = (error, groupId) => {
 
 module.exports = {
   ...appConfig,
+  getGroupInviteLink,
   selectTrackedToken,
   getToken0,
   getToken1,
