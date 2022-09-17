@@ -93,7 +93,6 @@ class Campaigns(db.Model):
     end_time = db.Column(db.DateTime)
     count_down = db.Column(db.Integer)
     interval = db.Column(db.Integer)
-    elapsed_time = db.Column(db.Integer)
     campaign_winner = db.Column(db.String(100))
     min_amount = db.Column(db.Float)
     campaing_type = db.Column(db.String(120))
