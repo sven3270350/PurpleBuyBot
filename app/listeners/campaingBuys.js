@@ -94,7 +94,7 @@ const campaignBuysHandler = async (
             );
             break;
           case "Last Buy":
-            clearInterval(lastBuyer);
+            clearTimeout(lastBuyer);
             lastBuyer = setTimeout(async () => {
               await queries.setWinnerAndEndContest(
                 to,
