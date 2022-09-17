@@ -230,7 +230,6 @@ class BuyContest:
             group_title = context.bot.get_chat(
                 group_id).title
 
-
             active_campaign: Campaigns = CampaignService(
             ).get_active_campaigns(group_id)
 
@@ -303,6 +302,7 @@ class BuyContest:
 
         minimum_buy = int(chat_data['minimum_buy'])
         winner_reward = chat_data['winner_prize']
+        interval = int(chat_data['interval'])
 
         try:
             ad = SubscriptionService().get_ad(group_id)
@@ -312,6 +312,7 @@ class BuyContest:
                 start_time=start_date,
                 end_time=end_date,
                 count_down=5,
+                interval=interval,
                 min_amount=minimum_buy,
                 campaing_type=self.COMPETITION_NAME,
                 prize=winner_reward
