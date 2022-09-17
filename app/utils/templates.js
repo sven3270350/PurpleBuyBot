@@ -179,7 +179,7 @@ ${
 const campaignLastBuyTemplate = (times, new_buyer, campaign, ad) => {
   return `
   <b>🎉 ${campaign.type} Competition Entry</b>
-  <i>Countdown Reset</i>
+  <i>Countdown Reset (after ${campaign.resetAfter}s)</i>
 
 🕓 Started at: <b>${times.start_time}</b>
 ⏳ Ends in: <b>${times.count_down}</b>
