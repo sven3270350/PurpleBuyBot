@@ -40,6 +40,11 @@ class BuyContest:
         self.COMPETITION_NAME = "Raffle"
         return self.__start(update, context)
 
+    @send_typing_action
+    def __last_buy_start(self, update: Update, context: CallbackContext):
+        self.COMPETITION_NAME = "Last Buy"
+        return self.__start(update, context)
+
     def __start(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
         self.__set_button_handlers()
@@ -473,6 +478,8 @@ class BuyContest:
             entry_points=[
                 CommandHandler('start_buy_contest', self.__biggest_buy_start),
                 CommandHandler('raffle_on', self.__raffle_start),
+                CommandHandler('start_lastbuy_contest',
+                               self.__last_buy_start),
             ],
             states={
                 START_TIME: [self.start_time_handler],
