@@ -242,14 +242,14 @@ ${templates}
 
 const winnerRaffleBuysTemplate = (winner, campaign, ad) => {
   return `
-<b>${campaign.campaing_type} Competition Completed</b>
+<b>${campaign?.campaing_type} Competition Completed</b>
 
 🎉 🎉 🎉 🎉 🎉 🎉 🎉 🎉 🎉
 <b>Winner</b>
 <code>${winner.buyer_address} ➖ ${numberToUsd(winner.buyer_amount)}</code>
 
 
-🏆 Prize: <b>${campaign.prize}</b>
+🏆 Prize: <b>${campaign?.prize}</b>
 
 ——
 
