@@ -393,7 +393,7 @@ const sendHTMLMessage = async (groupId, messageTemplate) => {
 };
 
 const sendAnimationWithCaption = async (groupId, animation, caption) => {
-  bot
+  return bot
     .sendAnimation(groupId, animation, {
       parse_mode: "HTML",
       disable_web_page_preview: true,
@@ -405,7 +405,7 @@ const sendAnimationWithCaption = async (groupId, animation, caption) => {
 };
 
 const sendPhotoWithCaption = async (groupId, photo, caption) => {
-  bot
+  return bot
     .sendPhoto(groupId, photo, {
       parse_mode: "HTML",
       disable_web_page_preview: true,
