@@ -25,19 +25,20 @@ Follow these simple steps
 
 def start_template(group_title): return f'''
 
-Follow these simple steps to get started:
+Quick help:
 
 <i>Group: <b>{group_title}</b></i>
 
-<b>Adding a token:</b>
-Use command /add_token then follow the prompt to complete
-
-<b>Removing a token:</b>
-Use command /remove_token and select the token to remove
+<b>Managin Tokens:</b>
+Add, use /add_token
+Remove, use /remove_token
+List tracked tokens, use /tracked_tokens
 
 <b>Run Contest:</b>
-To run a Buy contest, use /start_buy_contest and follow the prompt
-For Raffle contests, use /raffle_on and follow the prompt
+Biggest Buy contest, use /start_buy_contest
+Raffle contests, use /raffle_on
+Last Buy contests, use /start_lastbuy_contest
+End Contest, use /active_contest
 
 <i>Note: Only one contest (Buy or Raffle) can be active per group at anytime.</i>
     '''
@@ -53,6 +54,7 @@ help_template = '''
 /tracked_tokens - List tracked tokens
 /start_buy_contest - Initiate a biggest buy contest
 /raffle_on - Start raffle buy contest
+/start_lastbuy_contest - Start last buy contest
 /active_contest - Show active contest and cancel if needed
 /subscribe - Subscribe to premium to remove ads
 /chains - Show a list of supported chains
@@ -60,18 +62,26 @@ help_template = '''
 /set_buy_icon - Set buy icon
 /set_buy_media - Set a gif or image to show with buys
 
-<b>Adding a token:</b>
-Use command /add_token then follow the prompt to complete
-
-<b>Removing a token:</b>
-Use command /remove_token and select the token to remove
+<b>Managin Tokens:</b>
+Add, use /add_token
+Remove, use /remove_token
+List tracked tokens, use /tracked_tokens
 
 <b>Run Contest:</b>
-To run a Buy contest, use /start_buy_contest and follow the prompt
-For Raffle contests, use /raffle_on and follow the prompt
+Biggest Buy contest, use /start_buy_contest
+Raffle contests, use /raffle_on
+Last Buy contests, use /start_lastbuy_contest
+End Contest, use /active_contest
 
 <b>Toggle Tracking:</b>
 Use /active_tracking to toggle tracking of buys
+
+<b>Subscriptions:</b>
+Use /subscribe to subscribe to premium to remove ads
+
+<b>Other Settings:</b>
+Set Icon, use /set_buy_icon
+Set Banner, /set_buy_media
 
 <i>Note: Only one contest (Buy or Raffle) can be active per period.</i>
 '''
@@ -217,7 +227,9 @@ no_trackecd_tokens_template = '''
 use `/add_token` to add a token
 '''
 
-start_biggest_buy_contest_template = '''
+
+def start_biggest_buy_contest_template(competition_name, group_title, token_name, start_date, end_date, countdown, minimum_buy, winner_reward):
+    return f'''
 <b>Start {competition_name} Contest Settings</b>
 
 <i>Group: <b>{group_title}</b></i>
@@ -228,12 +240,14 @@ Select <b>Start Competition</b> to start the contest with the following settings
 
 <b>Starts :</b> <code>{start_date}</code> UTC
 <b>Ends:</b> <code>{end_date}</code> UTC
+{('<b>Countdown:</b> ' + countdown + 's') if countdown else ''}
 
 <b>Minimum Buy:</b> ${minimum_buy}
 <b>Winner's Reward:</b> {winner_reward}
 
 <i>Note: You can only have one contest at a time</i>
 '''
+
 
 set_start_time_template = '''
 <b>Set Start Time: </b>
@@ -276,6 +290,15 @@ not_valid_value_template = '''
     <code> 100 </code> for $100
 '''
 
+invalid_countdown_template = '''
+<b> ❌ Invalid countdown.</b>
+
+<i> Please enter a valid countdown in seconds</i>
+
+<i> Example: </i>
+    <code>100</code> for 100 seconds
+'''
+
 
 set_min_buy_template = '''
 <b>Set Minimum Buy value: </b>
@@ -293,7 +316,17 @@ eg 100, double, Testa etc
 
 '''
 
-start_competition_confirmation_template = '''
+set_countdown_template = '''
+<b>Set Countdown: </b>
+
+Set the countdown for the contest in seconds.
+eg 100, 200, 1000 etc
+
+'''
+
+
+def start_competition_confirmation_template(token_name, start_date, end_date, minimum_buy, winner_reward, countdown):
+    return f'''
 <b>Confirm </b>
 
 <b>Token:</b> {token_name}
@@ -303,37 +336,45 @@ start_competition_confirmation_template = '''
 
 <b>Minimum Buy:</b> ${minimum_buy}
 <b>Winner's Reward:</b> {winner_reward}
+{('<b>Countdown:</b> ' + countdown + 's') if countdown else ''}
 
 <i>Click Confirm to start the contest</i>
 
 '''
 
-biggest_buy_competition_alert_template = '''
-📢 📢 📢 📢 📢 📢 📢
-<b>New {competition_name} Competition Alert</b>
 
-<i>Group: <b>{group_title}</b></i>
+def biggest_buy_competition_alert_template(competition_name, group_title, token_name, start_date, end_date, minimum_buy, winner_reward, countdown, ad):
+    return f'''
+  📢 📢 📢 📢 📢 📢 📢
+  <b>New {competition_name} Competition Alert</b>
 
-<i>Token: <b>{token_name}</b></i>
+  <i>Group: <b>{group_title}</b></i>
 
-<b>⏱ Starts :</b> {start_date}
-<b>🕣 Ends:</b> {end_date}
+  <i>Token: <b>{token_name}</b></i>
 
-<b>⬇️ Minimum Buy:</b> ${minimum_buy}
-<b>🏆 Winner's Reward:</b> {winner_reward}
+  <b>⏱ Starts: </b> {start_date}
+  <b>🕣 Ends: </b> {end_date}
+  {('<b>🕣 Countdown:</b> ' + countdown + 's') if countdown else ''}
 
-——
 
-<i>{ad}</i>
-'''
+  <b>⬇️ Minimum Buy:</b> ${minimum_buy}
+  <b>🏆 Winner's Reward:</b> {winner_reward}
 
-active_contest_template = '''
+  ——
+
+  <i>{ad}</i>
+  '''
+
+
+def active_contest_template(competition_name, group_title, start_date, end_date, minimum_buy, winner_reward, countdown):
+    return f'''
 🎮 <b>{competition_name} Contest</b>
 
 👥 <i>Group: <b>{group_title}</b></i>
 
 ⏱ <b>Start :</b> {start_date}
 🕣 <b>End:</b> {end_date}
+{('<b>🕣 Countdown:</b> ' + countdown + 's') if countdown else ''}
 
 ⬇️ <b>Minimum Buy:</b> ${minimum_buy}
 🏆 <b>Winner's Reward:</b> {winner_reward}
