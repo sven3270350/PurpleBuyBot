@@ -124,7 +124,17 @@ const campaignBuysHandler = async (
               await queries.deleteNonRandomWinner(trackedToken.campaign_id);
             }, activeCampaign.interval * 1000);
 
-            templates = campaignLastBuyTemplate(times, new_buyer, campaign, ad);
+            const lastBuyCampaign = {
+              ...campaign,
+              interval: activeCampaign?.interval,
+            };
+
+            templates = campaignLastBuyTemplate(
+              times,
+              new_buyer,
+              lastBuyCampaign,
+              ad
+            );
             break;
           default:
             break;
