@@ -27,14 +27,17 @@ bot = telegram.Bot(token=telegram_bot_token)
 updater = Updater(token=telegram_bot_token, use_context=True)
 dispatcher = updater.dispatcher
 
+
 def error_handler(update: object, context: CallbackContext) -> None:
     """Log the error and send a telegram message to notify the developer."""
     # Log the error before we do anything else, so we can see it even if something breaks.
-    logger.error(msg="Exception while handling an update:", exc_info=context.error)
+    logger.error(msg="Exception while handling an update:",
+                 exc_info=context.error)
 
     # traceback.format_exception returns the usual python message about an exception, but as a
     # list of strings rather than a single string, so we have to join them together.
-    tb_list = traceback.format_exception(None, context.error, context.error.__traceback__)
+    tb_list = traceback.format_exception(
+        None, context.error, context.error.__traceback__)
     tb_string = "".join(tb_list)
 
     # Build the message with some markup and additional information about what happened.
@@ -63,9 +66,11 @@ def start_bot():
                                           ("tracked_tokens",
                                            "List tracked tokens"),
                                           ("start_buy_contest",
-                                           "Initiate a biggest buy contest"),
+                                           "Start a biggest buy contest"),
                                           ("raffle_on",
                                            "Start raffle buy contest"),
+                                          ("start_lastbuy_contest",
+                                           "Start a last buy contest"),
                                           ("active_contest",
                                            "Show active contest and cancel if needed"),
                                           ("subscribe",
