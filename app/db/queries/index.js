@@ -228,6 +228,15 @@ const getRandomWinner = async (campaign_id) => {
   return res.rows[0];
 };
 
+const getLastBuy = async (campaign_id) => {
+  const query = `
+  SELECT * FROM public.transactions WHERE campaign_id = $1 ORDER BY id DESC LIMIT 1;
+    `;
+  const params = [campaign_id];
+  const res = await db.query(query, params);
+  return res.rows[0];
+};
+
 const deleteNonRandomWinner = async (campaign_id) => {
   const query = `
   DELETE FROM public.transactions
@@ -360,4 +369,5 @@ module.exports = {
   updateTrackedTokenCircSupply,
   getTokenCircSupply,
   setWinnerAndEndContest,
+  getLastBuy,
 };
