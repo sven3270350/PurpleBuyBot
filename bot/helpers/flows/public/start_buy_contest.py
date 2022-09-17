@@ -8,12 +8,12 @@ from helpers.utils import is_private_chat, is_group_admin, send_typing_action, r
 from helpers.templates import (
     no_trackecd_tokens_template, start_biggest_buy_contest_template,
     set_start_time_template, set_end_time_template, set_min_buy_template,
-    set_winner_reward_template, start_competition_confirmation_template,
+    set_winner_reward_template, set_countdown_template, invalid_countdown_template, start_competition_confirmation_template,
     biggest_buy_competition_alert_template, invalid_time_template, not_valid_value_template, active_contest_template)
 from datetime import datetime, timedelta
 import logging
 
-START_TIME, END_TIME, MIN_BUY, WINNER_REWARD = range(4)
+START_TIME, END_TIME, MIN_BUY, WINNER_REWARD, COUNTDOWN = range(5)
 
 # Enable logging
 logging.basicConfig(
@@ -93,6 +93,9 @@ class BuyContest:
             context.chat_data['minimum_buy'] = '500'
             context.chat_data['winner_prize'] = '200'
 
+            if self.COMPETITION_NAME == "Last Buy":
+                context.chat_data['countdown'] = '60'  # 60 Seconds
+
             self.__reply_template(update, context)
 
             return START_TIME
@@ -106,6 +109,10 @@ class BuyContest:
     def __set_start_time(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
         timestring = update.message.text
+
+        if not BotService().is_group_in_focus(update, context):
+            reset_chat_data(context)
+            return ConversationHandler.END
 
         try:
             start_time = datetime.strptime(timestring, self.DATE_FORMAT)
@@ -132,6 +139,10 @@ class BuyContest:
         self.__extract_params(update, context)
         timestring = update.message.text
 
+        if not BotService().is_group_in_focus(update, context):
+            reset_chat_data(context)
+            return ConversationHandler.END
+
         try:
             end_time = datetime.strptime(timestring, self.DATE_FORMAT)
 
@@ -157,6 +168,10 @@ class BuyContest:
         self.__extract_params(update, context)
         min_buy = update.message.text
 
+        if not BotService().is_group_in_focus(update, context):
+            reset_chat_data(context)
+            return ConversationHandler.END
+
         if int(min_buy) > 0:
             context.chat_data['minimum_buy'] = min_buy
 
@@ -175,12 +190,37 @@ class BuyContest:
         self.__extract_params(update, context)
         winner_prize = update.message.text
 
+        if not BotService().is_group_in_focus(update, context):
+            reset_chat_data(context)
+            return ConversationHandler.END
+
         context.chat_data['winner_prize'] = winner_prize
 
         # self.dispatcher.remove_handler(self.winner_prize_handler)
         self.__reply_template(update, context)
 
         return WINNER_REWARD
+
+    @send_typing_action
+    def __set_countdown(self, update: Update, context: CallbackContext):
+        self.__extract_params(update, context)
+        countdown = update.message.text
+
+        if not BotService().is_group_in_focus(update, context):
+            reset_chat_data(context)
+            return ConversationHandler.END
+
+        if int(countdown) > 0:
+            context.chat_data['countdown'] = countdown
+
+            self.__reply_template(update, context)
+        else:
+            update.message.reply_text(
+                text=invalid_countdown_template,
+                parse_mode=ParseMode.HTML
+            )
+
+        return COUNTDOWN
 
     @send_typing_action
     def __get_active_contest(self, update: Update, context: CallbackContext):
@@ -212,13 +252,14 @@ class BuyContest:
                     text="Cancel Contest", callback_data="cancel_contest")
 
                 update.message.reply_text(
-                    text=active_contest_template.format(
+                    text=active_contest_template(
                         competition_name=active_campaign.campaing_type,
                         group_title=context.chat_data['group_title'],
                         start_date=start_date,
                         end_date=end_date,
                         minimum_buy=active_campaign.min_amount,
-                        winner_reward=active_campaign.prize
+                        winner_reward=active_campaign.prize,
+                        countdown=str(active_campaign.interval)
 
                     ),
                     parse_mode=ParseMode.HTML,
@@ -267,6 +308,10 @@ class BuyContest:
         query = update.callback_query
         query.answer()
 
+        if not BotService().is_group_in_focus(update, context):
+            reset_chat_data(context)
+            return ConversationHandler.END
+
         group_id = context.chat_data.get('group_id', None)
         active_campaign: Campaigns = CampaignService(
         ).get_active_campaigns(group_id)[0]
@@ -307,7 +352,7 @@ class BuyContest:
 
         minimum_buy = int(chat_data['minimum_buy'])
         winner_reward = chat_data['winner_prize']
-        interval = int(chat_data['interval'])
+        interval = chat_data['countdown']
 
         try:
             ad = SubscriptionService().get_ad(group_id)
@@ -317,7 +362,7 @@ class BuyContest:
                 start_time=start_date,
                 end_time=end_date,
                 count_down=5,
-                interval=interval,
+                interval=int(interval),
                 min_amount=minimum_buy,
                 campaing_type=self.COMPETITION_NAME,
                 prize=winner_reward
@@ -325,12 +370,13 @@ class BuyContest:
             db.session.add(contest)
             db.session.commit()
 
-            template = biggest_buy_competition_alert_template.format(
+            template = biggest_buy_competition_alert_template(
                 competition_name=self.COMPETITION_NAME,
                 group_title=group_title,
                 token_name=token_name,
                 start_date=start_date,
                 end_date=end_date,
+                countdown=interval,
                 minimum_buy=minimum_buy,
                 winner_reward=winner_reward,
                 ad=ad
@@ -369,7 +415,7 @@ class BuyContest:
             )
 
             update.callback_query.edit_message_text(
-                text="❌ Failed to create context. Please try again",
+                text="❌ Failed to create contest. Please try again",
                 parse_mode=ParseMode.HTML,
                 reply_markup=try_again_and_cancel_keyboard,
             )
@@ -404,7 +450,9 @@ class BuyContest:
         return ConversationHandler.END
 
     def __goto_start_time(self, update: Update, context: CallbackContext):
-        # self.dispatcher.add_handler(self.start_time_handler)
+        if not BotService().is_group_in_focus(update, context):
+            reset_chat_data(context)
+            return ConversationHandler.END
 
         date_now = datetime.now().strftime(self.DATE_FORMAT)
         update.callback_query.answer()
@@ -415,7 +463,9 @@ class BuyContest:
         return START_TIME
 
     def __goto_end_time(self, update: Update, context: CallbackContext):
-        # self.dispatcher.add_handler(self.end_time_handler)
+        if not BotService().is_group_in_focus(update, context):
+            reset_chat_data(context)
+            return ConversationHandler.END
 
         date_now = datetime.now().strftime(self.DATE_FORMAT)
         update.callback_query.answer()
@@ -426,8 +476,9 @@ class BuyContest:
         return END_TIME
 
     def __goto_min_buy(self, update: Update, context: CallbackContext):
-        # self.dispatcher.add_handler(self.min_buy_handler)
-
+        if not BotService().is_group_in_focus(update, context):
+            reset_chat_data(context)
+            return ConversationHandler.END
         update.callback_query.answer()
         update.callback_query.edit_message_text(
             text=set_min_buy_template,
@@ -436,7 +487,9 @@ class BuyContest:
         return MIN_BUY
 
     def __goto_winner_prize(self, update: Update, context: CallbackContext):
-        # self.dispatcher.add_handler(self.winner_prize_handler)
+        if not BotService().is_group_in_focus(update, context):
+            reset_chat_data(context)
+            return ConversationHandler.END
 
         update.callback_query.answer()
         update.callback_query.edit_message_text(
@@ -445,11 +498,27 @@ class BuyContest:
 
         return WINNER_REWARD
 
+    def __goto_countdown(self, update: Update, context: CallbackContext):
+        if not BotService().is_group_in_focus(update, context):
+            reset_chat_data(context)
+            return ConversationHandler.END
+
+        update.callback_query.answer()
+        update.callback_query.edit_message_text(
+            text=set_countdown_template,
+            parse_mode=ParseMode.HTML)
+
+        return COUNTDOWN
+
     def __goto_start_comp(self, update: Update, context: CallbackContext):
+        if not BotService().is_group_in_focus(update, context):
+            reset_chat_data(context)
+            return ConversationHandler.END
+
         self.dispatcher.add_handler(self.set_confirm_comp_handler)
 
         update.callback_query.answer()
-        chat_data = context.chat_data
+        chat_data: dict = context.chat_data
 
         confirm = InlineKeyboardMarkup([
             [InlineKeyboardButton('Confirm', callback_data='confirm_bc')],
@@ -457,12 +526,13 @@ class BuyContest:
         ])
 
         update.callback_query.edit_message_text(
-            text=start_competition_confirmation_template.format(
-                token_name=chat_data['tracked_token'],
-                start_date=chat_data['start_time'],
-                end_date=chat_data['end_time'],
-                minimum_buy=chat_data['minimum_buy'],
-                winner_reward=chat_data['winner_prize']
+            text=start_competition_confirmation_template(
+                token_name=chat_data.get('tracked_token', 'N/A'),
+                start_date=chat_data.get('start_time', 'N/A'),
+                end_date=chat_data.get('end_time', 'N/A'),
+                minimum_buy=chat_data.get('minimum_buy', 'N/A'),
+                winner_reward=chat_data.get('winner_prize', 'N/A'),
+                countdown=chat_data.get('countdown', None)
             ),
             parse_mode=ParseMode.HTML, reply_markup=confirm)
 
@@ -485,7 +555,8 @@ class BuyContest:
                 START_TIME: [self.start_time_handler],
                 END_TIME: [self.end_time_handler],
                 MIN_BUY: [self.min_buy_handler],
-                WINNER_REWARD: [self.winner_prize_handler]
+                WINNER_REWARD: [self.winner_prize_handler],
+                COUNTDOWN: [self.countdown_handler],
             },
 
             fallbacks=[
@@ -494,7 +565,8 @@ class BuyContest:
                 self.set_end_time_handler,
                 self.set_min_buy_handler,
                 self.set_winner_prize_handler,
-                self.set_confirm_comp_handler
+                self.set_confirm_comp_handler,
+                self.set_countdown_handler,
             ],
             conversation_timeout=300,
             name='start_contest',
@@ -511,8 +583,10 @@ class BuyContest:
 
     def __reply_template(self, update: Update, context: CallbackContext):
         chat_data: dict = context.chat_data
+        countdown_button = InlineKeyboardButton(
+            'Set Countdown (seconds)', callback_data='set_countdown')
 
-        buttons = InlineKeyboardMarkup([
+        buttons_list = [
             [InlineKeyboardButton('Set start time', callback_data='set_start_time'),
                 InlineKeyboardButton('Set end time', callback_data='set_end_time')],
             [InlineKeyboardButton('Set minimum buy', callback_data='set_min_buy'),
@@ -521,17 +595,23 @@ class BuyContest:
                 'Set start competition', callback_data='start_bc_competition')],
             [InlineKeyboardButton(
                 'Cancel', callback_data='cancel_bc')]
-        ])
+        ]
+
+        if self.COMPETITION_NAME == 'Last Buy':
+            buttons_list.insert(2, [countdown_button])
+
+        buttons = InlineKeyboardMarkup(buttons_list)
 
         update.message.reply_text(
-            text=start_biggest_buy_contest_template.format(
+            text=start_biggest_buy_contest_template(
                 competition_name=self.COMPETITION_NAME,
                 group_title=chat_data.get('group_title', self.chattitle),
                 token_name=chat_data.get('tracked_token', "N/A"),
                 start_date=chat_data.get('start_time', "N/A"),
                 end_date=chat_data.get('end_time', "N/A"),
                 minimum_buy=chat_data.get('minimum_buy', "N/A"),
-                winner_reward=chat_data.get('winner_prize', "N/A")
+                winner_reward=chat_data.get('winner_prize', "N/A"),
+                countdown=chat_data.get('countdown', None)
             ),
             reply_markup=buttons,
             parse_mode=ParseMode.HTML
@@ -565,6 +645,12 @@ class BuyContest:
 
         self.winner_prize_handler = MessageHandler(
             Filters.text, self.__set_winner_prize)
+
+        self.set_countdown_handler = CallbackQueryHandler(
+            self.__goto_countdown, pattern='set_countdown')
+
+        self.countdown_handler = MessageHandler(
+            Filters.regex('^\d+$'), self.__set_countdown)
 
         self.set_start_comp_handler = CallbackQueryHandler(
             self.__goto_start_comp, pattern='start_bc_competition')
