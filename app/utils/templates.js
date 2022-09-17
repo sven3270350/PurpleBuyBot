@@ -176,6 +176,41 @@ ${
 `;
 };
 
+const campaignLastBuyTemplate = (times, new_buyer, campaign, ad) => {
+  return `
+  <b>🎉 ${campaign.type} Competition Entry</b>
+  <i>Countdown Reset</i>
+
+🕓 Started at: <b>${times.start_time}</b>
+⏳ Ends in: <b>${times.count_down}</b>
+⬇️ Minimum Buy: <b>${Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(campaign.min_buy)}</b>
+🏆 Prize: <b>${campaign.prize}</b>
+🕓 Countdown Interval: <b>${campaign.interval}</b>
+
+🆕 <b>Last Buyer:</b>
+<i> Wins the prize if no one buys in the next ${times.interval} seconds</i>
+
+😎 <b>Buyer :</b> <i><a href='${new_buyer.tx_link}'>${ellipseAddress(
+    new_buyer.to
+  )}</a></i>
+🤑 <b>Amount :</b> <i>${amountFormater(new_buyer.amountOut)} (~${
+    new_buyer.usdPrice
+  })</i>
+${
+  !!new_buyer.mc
+    ? "🏪 <b>Market Cap :</b> <i>$" + amountFormater(new_buyer.mc) + "</i>"
+    : ""
+}
+
+——
+
+<i>${ad || "Premium"}</i>
+  `;
+};
+
 const winnerBiggestBuysTemplate = (leaderboard, campaign, ad) => {
   let templates = ``;
 
@@ -227,6 +262,7 @@ module.exports = {
   countdowToStartTemplate,
   campaignBiggestBuysTemplate,
   campaignRaffleBuysTemplate,
+  campaignLastBuyTemplate,
   winnerBiggestBuysTemplate,
   winnerRaffleBuysTemplate,
 };
