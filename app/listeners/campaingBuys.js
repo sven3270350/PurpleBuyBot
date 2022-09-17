@@ -3,6 +3,7 @@ const utils = require("../utils");
 const {
   campaignBiggestBuysTemplate,
   campaignRaffleBuysTemplate,
+  campaignLastBuyTemplate,
 } = require("../utils/templates");
 const { allBuysHandler } = require("./allBuys");
 
@@ -59,32 +60,42 @@ const campaignBuysHandler = async (
 
       let templates;
 
-      if (activeCampaign?.campaing_type === "Biggest Buy") {
-        const ranking = await queries.getTop5Buys(trackedToken.campaign_id);
-        const leaderboard = {
-          leading: {
-            address: ranking[0]?.buyer_address,
-            amount: ranking[0]?.amount,
-          },
-          others: ranking,
-        };
+      if (activeCampaign?.campaing_type) {
+        switch (activeCampaign?.campaing_type) {
+          case "Biggest Buy":
+            const ranking = await queries.getTop5Buys(trackedToken.campaign_id);
+            const leaderboard = {
+              leading: {
+                address: ranking[0]?.buyer_address,
+                amount: ranking[0]?.amount,
+              },
+              others: ranking,
+            };
 
-        templates = campaignBiggestBuysTemplate(
-          times,
-          new_buyer,
-          leaderboard,
-          campaign,
-          ad
-        );
-      } else if (activeCampaign?.campaing_type === "Raffle") {
-        const odds = await queries.getOdds(trackedToken.campaign_id);
-        templates = campaignRaffleBuysTemplate(
-          times,
-          new_buyer,
-          campaign,
-          ad,
-          odds
-        );
+            templates = campaignBiggestBuysTemplate(
+              times,
+              new_buyer,
+              leaderboard,
+              campaign,
+              ad
+            );
+            break;
+          case "Raffle":
+            const odds = await queries.getOdds(trackedToken.campaign_id);
+            templates = campaignRaffleBuysTemplate(
+              times,
+              new_buyer,
+              campaign,
+              ad,
+              odds
+            );
+            break;
+          case "Last Buy":
+            templates = campaignLastBuyTemplate(times, new_buyer, campaign, ad);
+            break;
+          default:
+            break;
+        }
       }
       // send message to group
       utils.sendHTMLMessage(trackedToken.group_id, templates);
