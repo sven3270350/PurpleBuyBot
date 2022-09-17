@@ -108,7 +108,10 @@ const campaignBuysHandler = async (
             };
 
             lastBuy.winner = winner;
-            const resetAfter = (new Date() - lastBuy.lastTimeSet) / 1000;
+            const resetAfter =
+              lastBuy.lastTimeSet > 0
+                ? Math.round((new Date() - lastBuy.lastTimeSet) / 1000)
+                : 0;
 
             lastBuy.timeout = setTimeout(async () => {
               await queries.setWinnerAndEndContest(
