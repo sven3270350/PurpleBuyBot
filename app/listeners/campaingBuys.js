@@ -9,7 +9,13 @@ const {
 const { allBuysHandler } = require("./allBuys");
 
 const subscriptions = {};
-let lastBuyer;
+let lastBuy = {
+  timout: null,
+  winner: {
+    buyer_address: null,
+    buyer_amount: null,
+  },
+};
 
 const campaignBuysHandler = async (
   trackedToken,
@@ -94,18 +100,30 @@ const campaignBuysHandler = async (
             );
             break;
           case "Last Buy":
-            clearTimeout(lastBuyer);
-            lastBuyer = setTimeout(async () => {
+            clearTimeout(lastBuy.timout);
+            lastBuy.timout = setTimeout(async () => {
               await queries.setWinnerAndEndContest(
                 to,
                 trackedToken.campaign_id
               );
 
+              // winner
+              const winner = {
+                buyer_address: new_buyer.to,
+                buyer_amount: new_buyer.usdPrice,
+              };
+
+              lastBuy.winner = winner;
+
               // announce winner
-              let template = winnerRaffleBuysTemplate(to, activeCampaign, ad);
+              let template = winnerRaffleBuysTemplate(
+                lastBuy.winner,
+                activeCampaign,
+                ad
+              );
               utils.sendHTMLMessage(trackedToken.group_id, template);
               await queries.deleteNonRandomWinner(trackedToken.campaign_id);
-            }, activeCampaign.interval);
+            }, activeCampaign.interval * 1000);
 
             templates = campaignLastBuyTemplate(times, new_buyer, campaign, ad);
             break;
