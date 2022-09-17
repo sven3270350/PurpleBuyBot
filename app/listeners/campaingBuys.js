@@ -10,11 +10,12 @@ const { allBuysHandler } = require("./allBuys");
 
 const subscriptions = {};
 let lastBuy = {
-  timout: null,
+  timeout: null,
   winner: {
     buyer_address: null,
     buyer_amount: null,
   },
+  lastTimeSet: 0,
 };
 
 const campaignBuysHandler = async (
@@ -100,15 +101,16 @@ const campaignBuysHandler = async (
             );
             break;
           case "Last Buy":
-            clearTimeout(lastBuy.timout);
+            clearTimeout(lastBuy.timeout);
             const winner = {
               buyer_address: to,
               buyer_amount: new_buyer.usdPrice,
             };
 
             lastBuy.winner = winner;
+            const resetAfter = (new Date() - lastBuy.lastTimeSet) / 1000;
 
-            lastBuy.timout = setTimeout(async () => {
+            lastBuy.timeout = setTimeout(async () => {
               await queries.setWinnerAndEndContest(
                 to,
                 trackedToken.campaign_id
@@ -127,6 +129,7 @@ const campaignBuysHandler = async (
             const lastBuyCampaign = {
               ...campaign,
               interval: activeCampaign?.interval,
+              resetAfter,
             };
 
             templates = campaignLastBuyTemplate(
@@ -135,6 +138,7 @@ const campaignBuysHandler = async (
               lastBuyCampaign,
               ad
             );
+            lastBuy.lastTimeSet = new Date();
             break;
           default:
             break;
