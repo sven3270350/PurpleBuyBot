@@ -481,6 +481,11 @@ const genFormatter3dec = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 3,
 });
 
+const genFormatter = new Intl.NumberFormat("en-US", {
+  notation: "standard",
+  maximumFractionDigits: 0,
+});
+
 const compactFormatter = new Intl.NumberFormat("en-US", {
   notation: "compact",
   maximumFractionDigits: 2,
@@ -488,9 +493,20 @@ const compactFormatter = new Intl.NumberFormat("en-US", {
 
 const amountFormater = (value) => {
   const parsedValue = Number.parseFloat(value);
-  if (parsedValue > 0.001 && parsedValue <= 9999999) {
+  if (parsedValue > 0.001 && parsedValue <= 999999999) {
     return genFormatter3dec.format(value);
-  } else if (Number.parseFloat(value) > 9999999) {
+  } else if (Number.parseFloat(value) > 999999999) {
+    return compactFormatter.format(value);
+  } else {
+    return Number.parseFloat(value).toExponential(2);
+  }
+};
+
+const amountFormater2 = (value) => {
+  const parsedValue = Number.parseFloat(value);
+  if (parsedValue > 0.001 && parsedValue <= 999999999) {
+    return genFormatter.format(value);
+  } else if (Number.parseFloat(value) > 999999999) {
     return compactFormatter.format(value);
   } else {
     return Number.parseFloat(value).toExponential(2);
@@ -561,5 +577,6 @@ module.exports = {
   getChart,
   convertFromWei,
   getGroupMedia,
+  amountFormater2,
   percentageFormatter,
 };

@@ -3,6 +3,7 @@ const {
   numberToUsd,
   rankIcon,
   amountFormater,
+  amountFormater2,
   getBuyerLink,
   isNewBuyer,
   getChart,
@@ -51,7 +52,7 @@ ${buy_icon.repeat((multiplier > maxIcons ? maxIcons : multiplier) | 1)}
     trackedToken.chain_id
   )}'>${buyer}</a> | <a href='${tx_link}'>Txn</a>
 ${!newBuyer ? "⏫ Position: " + percent : "🔥 New Holder"}
-${!!amounts.mc ? "🏪 Market Cap: $" + amountFormater(amounts.mc) : ""}
+${!!amounts.mc ? "🏪 Market Cap: $" + amountFormater2(amounts.mc) : ""}
 
 🕸 Chain:${trackedToken.chain_name}
 📊 <a href='${getChart(trackedToken.chain_id, trackedToken.pair)}'>Chart</a> ${
@@ -127,7 +128,7 @@ ${templates}
   })</i>
 ${
   !!new_buyer.mc
-    ? "🏪 <b>Market Cap :</b> <i>$" + amountFormater(new_buyer.mc) + "</i>"
+    ? "🏪 <b>Market Cap :</b> <i>$" + amountFormater2(new_buyer.mc) + "</i>"
     : ""
 }
 
@@ -164,7 +165,7 @@ ${odds}
   })</i>
 ${
   !!new_buyer.mc
-    ? "🏪 <b>Market Cap :</b> <i>$" + amountFormater(new_buyer.mc) + "</i>"
+    ? "🏪 <b>Market Cap :</b> <i>$" + amountFormater2(new_buyer.mc) + "</i>"
     : ""
 }
 
@@ -202,7 +203,7 @@ const campaignLastBuyTemplate = (times, new_buyer, campaign, ad) => {
   })</i>
 ${
   !!new_buyer.mc
-    ? "🏪 <b>Market Cap :</b> <i>$" + amountFormater(new_buyer.mc) + "</i>"
+    ? "🏪 <b>Market Cap :</b> <i>$" + amountFormater2(new_buyer.mc) + "</i>"
     : ""
 }
 
