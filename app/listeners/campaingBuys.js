@@ -101,19 +101,18 @@ const campaignBuysHandler = async (
             break;
           case "Last Buy":
             clearTimeout(lastBuy.timout);
+            const winner = {
+              buyer_address: to,
+              buyer_amount: new_buyer.usdPrice,
+            };
+
+            lastBuy.winner = winner;
+
             lastBuy.timout = setTimeout(async () => {
               await queries.setWinnerAndEndContest(
                 to,
                 trackedToken.campaign_id
               );
-
-              // winner
-              const winner = {
-                buyer_address: new_buyer.to,
-                buyer_amount: new_buyer.usdPrice,
-              };
-
-              lastBuy.winner = winner;
 
               // announce winner
               let template = winnerRaffleBuysTemplate(
