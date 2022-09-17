@@ -188,7 +188,7 @@ const campaignLastBuyTemplate = (times, new_buyer, campaign, ad) => {
     currency: "USD",
   }).format(campaign.min_buy)}</b>
 🏆 Prize: <b>${campaign.prize}</b>
-🕓 Countdown Interval: <b>${campaign.interval}</b>
+🕓 Countdown Interval: <b>${campaign.interval}s</b>
 
 🆕 <b>Last Buyer:</b>
 
