@@ -4,10 +4,12 @@ const {
   campaignBiggestBuysTemplate,
   campaignRaffleBuysTemplate,
   campaignLastBuyTemplate,
+  winnerRaffleBuysTemplate,
 } = require("../utils/templates");
 const { allBuysHandler } = require("./allBuys");
 
 const subscriptions = {};
+let lastBuyer;
 
 const campaignBuysHandler = async (
   trackedToken,
@@ -22,6 +24,10 @@ const campaignBuysHandler = async (
     const { usdString: usdPrice, usdNumber } = price;
 
     if (usdNumber >= trackedToken.min_amount) {
+      const activeCampaign = await queries.getGroupActiveCampaign(
+        trackedToken.group_id
+      );
+
       await queries.writeBuysToDB({
         group_id: trackedToken.group_id,
         campaign_id: trackedToken.campaign_id,
@@ -33,9 +39,6 @@ const campaignBuysHandler = async (
       });
 
       const ad = await utils.getAd(trackedToken.group_id);
-      const activeCampaign = await queries.getGroupActiveCampaign(
-        trackedToken.group_id
-      );
       const endDate = new Date(activeCampaign?.end_time);
       const times = {
         start_time: new Date(activeCampaign?.start_time).toLocaleString(),
@@ -91,6 +94,19 @@ const campaignBuysHandler = async (
             );
             break;
           case "Last Buy":
+            clearInterval(lastBuyer);
+            lastBuyer = setTimeout(async () => {
+              await queries.setWinnerAndEndContest(
+                to,
+                trackedToken.campaign_id
+              );
+
+              // announce winner
+              let template = winnerRaffleBuysTemplate(to, activeCampaign, ad);
+              utils.sendHTMLMessage(trackedToken.group_id, template);
+              await queries.deleteNonRandomWinner(trackedToken.campaign_id);
+            }, activeCampaign.interval);
+
             templates = campaignLastBuyTemplate(times, new_buyer, campaign, ad);
             break;
           default:
