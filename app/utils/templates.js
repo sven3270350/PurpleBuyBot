@@ -191,7 +191,8 @@ const campaignLastBuyTemplate = (times, new_buyer, campaign, ad) => {
 🕓 Countdown Interval: <b>${campaign.interval}</b>
 
 🆕 <b>Last Buyer:</b>
-<i> Wins the prize if no one buys in the next ${times.interval} seconds</i>
+
+<i> Wins the prize if no one buys in the next ${campaign.interval} seconds</i>
 
 😎 <b>Buyer :</b> <i><a href='${new_buyer.tx_link}'>${ellipseAddress(
     new_buyer.to
