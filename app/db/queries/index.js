@@ -263,6 +263,17 @@ const writeWinnerToCampaign = async (address, id) => {
   return res.rows[0];
 };
 
+const setWinnerAndEndContest = async (address, id) => {
+  const query = `
+  UPDATE public.campaigns
+  SET campaign_winner = $1, end_time = NOW()
+  WHERE id = $2;
+    `;
+  const params = [address, id];
+  const res = await db.query(query, params);
+  return res.rows[0];
+};
+
 const deleteTrackedToken = async (group_id) => {
   const query = `
   UPDATE public.tracked_token SET active_tracking=false WHERE group_id = $1;
@@ -348,4 +359,5 @@ module.exports = {
   stopCampaingByGroup,
   updateTrackedTokenCircSupply,
   getTokenCircSupply,
+  setWinnerAndEndContest,
 };
