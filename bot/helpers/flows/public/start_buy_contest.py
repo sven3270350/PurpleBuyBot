@@ -31,7 +31,7 @@ class BuyContest:
         self.__add_handlers()
 
     @send_typing_action
-    def __biigest_buy_start(self, update: Update, context: CallbackContext):
+    def __biggest_buy_start(self, update: Update, context: CallbackContext):
         self.COMPETITION_NAME = "Biggest Buy"
         return self.__start(update, context)
 
@@ -471,7 +471,7 @@ class BuyContest:
         #  Conversation handlers
         self.dispatcher.add_handler(ConversationHandler(
             entry_points=[
-                CommandHandler('start_buy_contest', self.__biigest_buy_start),
+                CommandHandler('start_buy_contest', self.__biggest_buy_start),
                 CommandHandler('raffle_on', self.__raffle_start),
             ],
             states={
