@@ -588,8 +588,3 @@ class BuyContest:
         self.dispatcher.remove_handler(self.set_winner_prize_handler)
         self.dispatcher.remove_handler(self.set_start_comp_handler)
         self.dispatcher.remove_handler(self.set_confirm_comp_handler)
-
-        # self.dispatcher.remove_handler(self.start_time_handler)
-        # self.dispatcher.remove_handler(self.end_time_handler)
-        # self.dispatcher.remove_handler(self.min_buy_handler)
-        # self.dispatcher.remove_handler(self.winner_prize_handler)
