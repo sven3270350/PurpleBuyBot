@@ -98,8 +98,7 @@ class Subscription:
 
                 update.message.reply_text(
                     text=active_subscription_template.format(
-                        group_title=chat_data[
-                            'group_title'],
+                        group_title=chat_data.get('group_title', None),
                         package=f'{active_subscription.subscription_type} {f"({extra})" if extra else ""}',
                         start_date=active_subscription.start_date,
                         end_date=active_subscription.end_date
@@ -125,7 +124,7 @@ class Subscription:
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 update.message.reply_text(
                     text=no_active_subscription_template.format(
-                        group_title=chat_data['group_title']),
+                        group_title=chat_data.get('group_title', None)),
                     reply_markup=reply_markup,
                     parse_mode=ParseMode.HTML)
 
@@ -183,9 +182,9 @@ class Subscription:
     @send_typing_action
     def __weekly_subscription(self,  update: Update, context: CallbackContext) -> int:
         self.__extract_params(update, context)
-        chat_data = context.chat_data
+        chat_data: dict = context.chat_data
         self.dispatcher.remove_handler(
-            chat_data['select_number_of_weeks'])
+            chat_data.get('select_number_of_weeks', None))
 
         return self.__send_confirmation_message(update, context)
 
@@ -257,10 +256,10 @@ class Subscription:
     @send_typing_action
     def __check_payment_hash(self, update: Update, context: CallbackContext) -> int:
         self.__extract_params(update, context)
-        chat_data = context.chat_data
+        chat_data: dict = context.chat_data
         group_id = chat_data['group_id']
         transaction_hash = update.message.text
-        chain: SupportedChain = chat_data['chain']
+        chain: SupportedChain = chat_data.get('chain', None)
         pending_subscription: SubscriptionModel = SubscriptionService(
         ).get_group_pending_subscription(group_id)
 
@@ -370,10 +369,11 @@ class Subscription:
             return not_group_admin(update)
 
         update.callback_query.answer()
-        subscription_type: SubscriptionType = context.chat_data['subscription_type']
-        wallet: Wallet = BotService().get_group_wallet(chat_data['group_id'])
-        subscription_count = int(chat_data['subscription_count'])
-        chain_id = context.chat_data['chain'].chain_id
+        subscription_type: SubscriptionType = chat_data.get(
+            'subscription_type', None)
+        wallet: Wallet = BotService().get_group_wallet(chat_data.get('group_id', None))
+        subscription_count = int(chat_data.get('subscription_count', 1))
+        chain_id = chat_data.get('chain', None).chain_id
 
         if not subscription_type:
             update.callback_query.edit_message_text(
@@ -454,7 +454,7 @@ class Subscription:
 
     def __send_confirmation_message(self, update: Update, context: CallbackContext):
         self.__extract_params(update, context)
-        chat_data = context.chat_data
+        chat_data: dict = context.chat_data
 
         subscription: SubscriptionType = context.chat_data['subscription_type']
         supported_chains: list[SupportedChain] = BotService(
@@ -477,7 +477,7 @@ class Subscription:
             context.chat_data['subscription_count'] = message
             update.message.reply_text(
                 text=subscription_confirmation_template.format(
-                    group_title=chat_data['group_title'],
+                    group_title=chat_data.get('group_title', None),
                     package=f'{subscription.subscription_type} {f"({message})" if message else ""}',
                     total_cost=f'${subscription.usd_price * (int(message) if message else 1)}'),
                 parse_mode=ParseMode.HTML,
@@ -486,7 +486,7 @@ class Subscription:
             update.callback_query.answer()
             update.callback_query.message.edit_text(
                 text=subscription_confirmation_template.format(
-                    group_title=chat_data['group_title'],
+                    group_title=chat_data.get('group_title', None),
                     package=f'{subscription.subscription_type}',
                     total_cost=f'${subscription.usd_price }'),
                 parse_mode=ParseMode.HTML,
@@ -499,7 +499,7 @@ class Subscription:
         self.__extract_params(update, context)
         update.callback_query.answer()
 
-        chat_data = context.chat_data
+        chat_data: dict = context.chat_data
 
         query = update.callback_query.data
         chain_id = query.split(':')[1]
@@ -527,7 +527,7 @@ class Subscription:
 
         update.callback_query.message.edit_text(
             text=final_subscription_review_template.format(
-                group_title=chat_data['group_title'],
+                group_title=chat_data.get('group_title', None),
                 package=f'{subscription.subscription_type} {f"({count})" if count else ""}',
                 total_cost=f'{web3.Web3.fromWei(BotService().usd_to_native_price_by_chain(subscription.usd_price, count, chain_id), "ether")} {chain.native_symbol}',
                 chain_name=chain.chain_name,

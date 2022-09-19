@@ -100,7 +100,7 @@ class RemoveToken:
     @send_typing_action
     def __select_token_to_remove(self, update: Update, context: CallbackContext) -> int:
         self.__extract_params(update, context)
-        chat_data = context.chat_data
+        chat_data: dict = context.chat_data
         message_id = update.callback_query.message.message_id
 
         if not is_group_admin(update, context):
@@ -119,7 +119,7 @@ class RemoveToken:
 
         context.bot.edit_message_text(
             remove_token_confirmation_template.format(
-                group_title=chat_data['group_title'],
+                group_title=chat_data.get('group_title', None),
                 token_name=token.token_name,
                 token_address=token.token_address,
                 chain_name=token.chain[0].chain_name),
