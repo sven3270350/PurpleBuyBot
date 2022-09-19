@@ -181,8 +181,8 @@ class BotService:
 
     def get_user_tracked_token_name(self, group_id):
         token_name = TrackedToken.query.filter_by(
-            group_id=group_id).first().token_name
-        return token_name
+            group_id=group_id).first()
+        return token_name.token_name if token_name else None
 
     def get_all_tracked_tokens(self):
         tracked_tokens = TrackedToken.query.all()
