@@ -287,7 +287,7 @@ class BuyContest:
                     self.DATE_FORMAT)
 
                 update.message.reply_text(
-                    text=active_contest_template.format(
+                    text=active_contest_template(
                         competition_name=active_campaign.campaing_type,
                         group_title=group_title,
                         start_date=start_date,
