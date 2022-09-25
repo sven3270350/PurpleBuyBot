@@ -351,13 +351,13 @@ class BuyContest:
             chat_data['end_time'], self.DATE_FORMAT)
 
         minimum_buy = int(chat_data.get('minimum_buy', 0))
-        winner_reward=chat_data.get('winner_prize', 0)
-        interval=chat_data.get('countdown', 0)
+        winner_reward = chat_data.get('winner_prize', 0)
+        interval = chat_data.get('countdown', 0)
 
         try:
-            ad=SubscriptionService().get_ad(group_id)
+            ad = SubscriptionService().get_ad(group_id)
             # save context
-            contest=Campaigns(
+            contest = Campaigns(
                 group_id=group_id,
                 start_time=start_date,
                 end_time=end_date,
@@ -370,7 +370,7 @@ class BuyContest:
             db.session.add(contest)
             db.session.commit()
 
-            template=biggest_buy_competition_alert_template(
+            template = biggest_buy_competition_alert_template(
                 competition_name=self.COMPETITION_NAME,
                 group_title=group_title,
                 token_name=token_name,
@@ -400,7 +400,7 @@ class BuyContest:
             db.session.rollback()
             update.callback_query.answer()
 
-            try_again_and_cancel_btns=[
+            try_again_and_cancel_btns = [
                 InlineKeyboardButton(
                     text="Try again",
                     callback_data="confirm_bc"
@@ -410,7 +410,7 @@ class BuyContest:
                     callback_data="cancel_bc"
                 )
             ]
-            try_again_and_cancel_keyboard=InlineKeyboardMarkup(
+            try_again_and_cancel_keyboard = InlineKeyboardMarkup(
                 inline_keyboard=[try_again_and_cancel_btns]
             )
 
@@ -454,7 +454,7 @@ class BuyContest:
             reset_chat_data(context)
             return ConversationHandler.END
 
-        date_now=datetime.now().strftime(self.DATE_FORMAT)
+        date_now = datetime.now().strftime(self.DATE_FORMAT)
         update.callback_query.answer()
         update.callback_query.edit_message_text(
             text=set_start_time_template.format(date=date_now),
@@ -467,7 +467,7 @@ class BuyContest:
             reset_chat_data(context)
             return ConversationHandler.END
 
-        date_now=datetime.now().strftime(self.DATE_FORMAT)
+        date_now = datetime.now().strftime(self.DATE_FORMAT)
         update.callback_query.answer()
         update.callback_query.edit_message_text(
             text=set_end_time_template.format(date=date_now),
@@ -518,9 +518,9 @@ class BuyContest:
         self.dispatcher.add_handler(self.set_confirm_comp_handler)
 
         update.callback_query.answer()
-        chat_data: dict=context.chat_data
+        chat_data: dict = context.chat_data
 
-        confirm=InlineKeyboardMarkup([
+        confirm = InlineKeyboardMarkup([
             [InlineKeyboardButton('Confirm', callback_data='confirm_bc')],
             [InlineKeyboardButton('Cancel', callback_data='cancel_bc')]
         ])
@@ -574,19 +574,19 @@ class BuyContest:
         ))
 
     def __extract_params(self, update: Update, context: CallbackContext):
-        self.chattype=update.effective_chat.type
-        self.chatid=str(update.effective_chat.id)
-        self.chattitle=update.effective_chat.title
-        self.chatusername=update.effective_chat.username
-        self.group_message_sent_by=update.effective_user.username
-        self.bot_name=context.bot.username
+        self.chattype = update.effective_chat.type
+        self.chatid = str(update.effective_chat.id)
+        self.chattitle = update.effective_chat.title
+        self.chatusername = update.effective_chat.username
+        self.group_message_sent_by = update.effective_user.username if update.effective_user.username else update.message.from_user.username
+        self.bot_name = context.bot.username
 
     def __reply_template(self, update: Update, context: CallbackContext):
-        chat_data: dict=context.chat_data
-        countdown_button=InlineKeyboardButton(
+        chat_data: dict = context.chat_data
+        countdown_button = InlineKeyboardButton(
             'Set Countdown (seconds)', callback_data='set_countdown')
 
-        buttons_list=[
+        buttons_list = [
             [InlineKeyboardButton('Set start time', callback_data='set_start_time'),
                 InlineKeyboardButton('Set end time', callback_data='set_end_time')],
             [InlineKeyboardButton('Set minimum buy', callback_data='set_min_buy'),
@@ -600,7 +600,7 @@ class BuyContest:
         if self.COMPETITION_NAME == 'Last Buy':
             buttons_list.insert(2, [countdown_button])
 
-        buttons=InlineKeyboardMarkup(buttons_list)
+        buttons = InlineKeyboardMarkup(buttons_list)
 
         update.message.reply_text(
             text=start_biggest_buy_contest_template(
@@ -619,43 +619,43 @@ class BuyContest:
         )
 
     def __create_handlers(self):
-        self.set_cancel_handler=CallbackQueryHandler(
+        self.set_cancel_handler = CallbackQueryHandler(
             self.__cancel_flow, pattern='^cancel_bc')
 
-        self.set_start_time_hander=CallbackQueryHandler(
+        self.set_start_time_hander = CallbackQueryHandler(
             self.__goto_start_time, pattern='set_start_time')
 
-        self.start_time_handler=MessageHandler(Filters.regex(
+        self.start_time_handler = MessageHandler(Filters.regex(
             '(\d?\d\/){2}(\d{4}) (?:2[0-3]|[01]?[0-9])(:[0-5]?[0-9]){2}$'), self.__set_start_time)
 
-        self.set_end_time_handler=CallbackQueryHandler(
+        self.set_end_time_handler = CallbackQueryHandler(
             self.__goto_end_time, pattern='set_end_time')
 
-        self.end_time_handler=MessageHandler(Filters.regex(
+        self.end_time_handler = MessageHandler(Filters.regex(
             '(\d?\d\/){2}(\d{4}) (?:2[0-3]|[01]?[0-9])(:[0-5]?[0-9]){2}$'), self.__set_end_time)
 
-        self.set_min_buy_handler=CallbackQueryHandler(
+        self.set_min_buy_handler = CallbackQueryHandler(
             self.__goto_min_buy, pattern='set_min_buy')
 
-        self.min_buy_handler=MessageHandler(Filters.regex(
+        self.min_buy_handler = MessageHandler(Filters.regex(
             '^\d+$'), self.__set_min_buy)
 
-        self.set_winner_prize_handler=CallbackQueryHandler(
+        self.set_winner_prize_handler = CallbackQueryHandler(
             self.__goto_winner_prize, pattern='set_winner_prize')
 
-        self.winner_prize_handler=MessageHandler(
+        self.winner_prize_handler = MessageHandler(
             Filters.text, self.__set_winner_prize)
 
-        self.set_countdown_handler=CallbackQueryHandler(
+        self.set_countdown_handler = CallbackQueryHandler(
             self.__goto_countdown, pattern='set_countdown')
 
-        self.countdown_handler=MessageHandler(
+        self.countdown_handler = MessageHandler(
             Filters.regex('^\d+$'), self.__set_countdown)
 
-        self.set_start_comp_handler=CallbackQueryHandler(
+        self.set_start_comp_handler = CallbackQueryHandler(
             self.__goto_start_comp, pattern='start_bc_competition')
 
-        self.set_confirm_comp_handler=CallbackQueryHandler(
+        self.set_confirm_comp_handler = CallbackQueryHandler(
             self.__start_competition, pattern='confirm_bc')
 
     def __set_button_handlers(self):
