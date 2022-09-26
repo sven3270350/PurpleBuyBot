@@ -54,7 +54,6 @@ ${buy_icon.repeat((multiplier > maxIcons ? maxIcons : multiplier) | 1)}
 ${!newBuyer ? "⏫ Position: " + percent : "🔥 New Holder"}
 ${!!amounts.mc ? "🏪 Market Cap: $" + amountFormater2(amounts.mc) : ""}
 
-🕸 Chain:${trackedToken.chain_name}
 📊 <a href='${getChart(trackedToken.chain_id, trackedToken.pair)}'>Chart</a> ${
     group_link ? "| 👥 <a href='" + group_link + "'>Group</a> " : ""
   }
