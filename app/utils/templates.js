@@ -59,10 +59,7 @@ ${!!amounts.mc ? "🏪 Market Cap: $" + amountFormater2(amounts.mc) : ""}
     group_link ? "| 👥 <a href='" + group_link + "'>Group</a> " : ""
   }
 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
-
-——
-
-<i>${ad || "Premium"}</i>
+${ad ? "\n\n——\n\n" + ad : ""}
 `;
 };
 
@@ -74,10 +71,7 @@ const countdowToStartTemplate = (startCountdown, EndCountdown, ad) => {
 
 <b>Starts: <i>${startCountdown}</i></b>
 <b>Ends: <i>${EndCountdown}</i></b>
-
-——
-
-<i>${ad || "Premium"}</i>
+${ad ? "\n\n——\n\n" + ad : ""}
 `;
 };
 
@@ -133,10 +127,7 @@ ${
 }
 
 ⛓ <b>Bought On:</b> <i>${new_buyer.chain_name}</i>
-
-——
-
-<i>${ad || "Premium"}</i>
+${ad ? "\n\n——\n\n" + ad : ""}
 `;
 };
 
@@ -170,10 +161,7 @@ ${
 }
 
 ⛓ <b>Bought On:</b> <i>${new_buyer.chain_name}</i>
-
-——
-
-<i>${ad || "Premium"}</i>
+${ad ? "\n\n——\n\n" + ad : ""}
 `;
 };
 
@@ -206,10 +194,7 @@ ${
     ? "🏪 <b>Market Cap :</b> <i>$" + amountFormater2(new_buyer.mc) + "</i>"
     : ""
 }
-
-——
-
-<i>${ad || "Premium"}</i>
+${ad ? "\n\n——\n\n" + ad : ""}
   `;
 };
 
@@ -235,10 +220,7 @@ ${rankIcon(i + 1)} ${ellipseAddress(buyer_address)} ➖${numberToUsd(amount)}
 ${templates}
 
 🏆 Prize: <b>${campaign.prize}</b>
-
-——
-
-<i>${ad || "Premium"}</i>
+${ad ? "\n\n——\n\n" + ad : ""}
 `;
 };
 
@@ -252,10 +234,7 @@ const winnerRaffleBuysTemplate = (winner, campaign, ad) => {
 
 
 🏆 Prize: <b>${campaign?.prize}</b>
-
-——
-
-<i>${ad || "Premium"}</i>
+${ad ? "\n\n——\n\n" + ad : ""}
 `;
 };
 
