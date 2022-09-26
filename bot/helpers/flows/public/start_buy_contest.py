@@ -578,7 +578,8 @@ class BuyContest:
         self.chatid = str(update.effective_chat.id)
         self.chattitle = update.effective_chat.title
         self.chatusername = update.effective_chat.username
-        self.group_message_sent_by = update.effective_user.username if update.effective_user.username else update.message.from_user.username
+        self.group_message_sent_by = update.effective_user.username if update.effective_user.username else (
+            update.message.from_user.username or None)
         self.bot_name = context.bot.username
 
     def __reply_template(self, update: Update, context: CallbackContext):
