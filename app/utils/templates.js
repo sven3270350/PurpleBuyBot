@@ -125,8 +125,6 @@ ${
     ? "🏪 <b>Market Cap :</b> <i>$" + amountFormater2(new_buyer.mc) + "</i>"
     : ""
 }
-
-⛓ <b>Bought On:</b> <i>${new_buyer.chain_name}</i>
 ${ad ? "\n\n——\n\n" + ad : ""}
 `;
 };
@@ -159,8 +157,6 @@ ${
     ? "🏪 <b>Market Cap :</b> <i>$" + amountFormater2(new_buyer.mc) + "</i>"
     : ""
 }
-
-⛓ <b>Bought On:</b> <i>${new_buyer.chain_name}</i>
 ${ad ? "\n\n——\n\n" + ad : ""}
 `;
 };
