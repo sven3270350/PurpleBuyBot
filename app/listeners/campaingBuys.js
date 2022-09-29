@@ -56,6 +56,7 @@ const campaignBuysHandler = async (
         amountIn,
         amountOut,
         usdPrice,
+        usdNumber,
         tx_link,
         mc,
         to: utils.ellipseAddress(to),
@@ -71,6 +72,9 @@ const campaignBuysHandler = async (
       let templates;
 
       if (activeCampaign?.campaing_type) {
+        const { buy_icon, buy_media } = await utils.getGroupMedia(
+          trackedToken.group_id
+        );
         switch (activeCampaign?.campaing_type) {
           case "Biggest Buy":
             const ranking = await queries.getTop5Buys(trackedToken.campaign_id);
@@ -85,6 +89,7 @@ const campaignBuysHandler = async (
             templates = campaignBiggestBuysTemplate(
               times,
               new_buyer,
+              buy_icon,
               leaderboard,
               campaign,
               ad
@@ -95,6 +100,7 @@ const campaignBuysHandler = async (
             templates = campaignRaffleBuysTemplate(
               times,
               new_buyer,
+              buy_icon,
               campaign,
               ad,
               odds
@@ -138,6 +144,7 @@ const campaignBuysHandler = async (
             templates = campaignLastBuyTemplate(
               times,
               new_buyer,
+              buy_icon,
               lastBuyCampaign,
               ad
             );

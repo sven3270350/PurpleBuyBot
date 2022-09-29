@@ -47,12 +47,12 @@ ${buy_icon.repeat((multiplier > maxIcons ? maxIcons : multiplier) | 1)}
     amounts.usdPrice
   })
 🚀 ${amountFormater(amounts.amountOut)} ${trackedToken.token_symbol}
-👤 Buyer <a href='${getBuyerLink(
+👤 <b>Buyer</b> <a href='${getBuyerLink(
     amounts.buyer,
     trackedToken.chain_id
   )}'>${buyer}</a> | <a href='${tx_link}'>Txn</a>
-${!newBuyer ? "⏫ Position: " + percent : "🔥 New Holder"}
-${!!amounts.mc ? "🏪 Market Cap: $" + amountFormater2(amounts.mc) : ""}
+${!newBuyer ? "⏫ <b>Position:</b> " + percent : "🔥 <b>New Holder</b>"}
+${!!amounts.mc ? "🏪 <b>Market Cap</b>: $" + amountFormater2(amounts.mc) : ""}
 
 📊 <a href='${getChart(trackedToken.chain_id, trackedToken.pair)}'>Chart</a> ${
     group_link ? "| 👥 <a href='" + group_link + "'>Group</a> " : ""
@@ -77,6 +77,7 @@ ${ad ? "\n\n——\n\n" + ad : ""}
 const campaignBiggestBuysTemplate = (
   times,
   new_buyer,
+  group_icon,
   leaderboard,
   campaign,
   ad
@@ -93,8 +94,12 @@ ${rankIcon(i + 1)} ${ellipseAddress(buyer_address)} ➖${numberToUsd(amount)}
 `;
   }
 
+  const multiplier = Math.round(new_buyer.usdNumber / 10);
+  const buy_icon = group_icon || "🟢";
+
   return `
 <b>🎉 ${campaign.type} Competition Entry</b>
+${buy_icon.repeat((multiplier > 3667 ? 3667 : multiplier) | 1)}
 
 ⏱ Started at: <b>${times.start_time}</b>
 ⏳ Ends in: <b>${times.count_down}</b>
@@ -128,9 +133,22 @@ ${ad ? "\n\n——\n\n" + ad : ""}
 `;
 };
 
-const campaignRaffleBuysTemplate = (times, new_buyer, campaign, ad, odds) => {
+const campaignRaffleBuysTemplate = (
+  times,
+  new_buyer,
+  group_icon,
+  campaign,
+  ad,
+  odds
+) => {
+  const multiplier = Math.round(new_buyer.usdNumber / 10);
+  const buy_icon = group_icon || "🟢";
+
+  const maxIcons = has_media ? 300 : 3667;
+
   return `
 <b>🎉 ${campaign.type} Competition Entry</b>
+${buy_icon.repeat((multiplier > maxIcons ? maxIcons : multiplier) | 1)}
 
 🕓 Started at: <b>${times.start_time}</b>
 ⏳ Ends in: <b>${times.count_down}</b>
@@ -160,10 +178,23 @@ ${ad ? "\n\n——\n\n" + ad : ""}
 `;
 };
 
-const campaignLastBuyTemplate = (times, new_buyer, campaign, ad) => {
+const campaignLastBuyTemplate = (
+  times,
+  new_buyer,
+  group_icon,
+  campaign,
+  ad
+) => {
+  const multiplier = Math.round(new_buyer.usdNumber / 10);
+  const buy_icon = group_icon || "🟢";
+
+  const maxIcons = has_media ? 300 : 3667;
+
   return `
   <b>🎉 ${campaign.type} Competition Entry</b>
-  <i>Countdown Reset (after ${campaign.resetAfter}s)</i>
+  ${buy_icon.repeat((multiplier > maxIcons ? maxIcons : multiplier) | 1)}
+
+  <b><i>Countdown Started (${campaign.resetAfter}s after previous start)</i></b>
 
 🕓 Started at: <b>${times.start_time}</b>
 ⏳ Ends in: <b>${times.count_down}</b>
