@@ -379,6 +379,8 @@ const sendHTMLMessage = async (groupId, messageTemplate) => {
         messageTemplate
       );
 
+      console.log("Animation", messageTemplate);
+
       // send to trending channel
       trendingQueue.add({
         type: "animation",
@@ -387,6 +389,7 @@ const sendHTMLMessage = async (groupId, messageTemplate) => {
       });
     } else if (buy_media?.type === "photo") {
       await sendPhotoWithCaption(groupId, buy_media.file_id, messageTemplate);
+      console.log("Photo", messageTemplate);
       // send to trending channel
       trendingQueue.add({
         type: "photo",
@@ -403,6 +406,7 @@ const sendHTMLMessage = async (groupId, messageTemplate) => {
           handleSendError(error, groupId);
         });
 
+      console.log("Normal", messageTemplate);
       // send to trending channel
       trendingQueue.add({
         type: "",
