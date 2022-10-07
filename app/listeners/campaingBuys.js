@@ -97,6 +97,7 @@ const campaignBuysHandler = async (
             break;
           case "Raffle":
             const odds = await queries.getOdds(trackedToken.campaign_id);
+            console.log("[Odds]", odds);
             templates = campaignRaffleBuysTemplate(
               times,
               new_buyer,
