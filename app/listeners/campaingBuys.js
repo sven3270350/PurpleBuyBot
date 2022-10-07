@@ -111,7 +111,6 @@ const campaignBuysHandler = async (
             break;
           case "Last Buy":
             clearTimeout(lastBuy.timeout);
-            console.log("[Last buy]", lastBuy);
             const winner = {
               buyer_address: to,
               buyer_amount: new_buyer.usdPrice,

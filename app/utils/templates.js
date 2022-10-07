@@ -168,6 +168,7 @@ async function campaignRaffleBuysTemplate(
 ) {
   const multiplier = Math.round(new_buyer.usdNumber / 10);
   const buy_icon = group_icon || "🟢";
+  const group_link = await getGroupInviteLink(campaign?.trackedToken?.group_id);
 
   const maxIcons = has_media ? 300 : 3667;
 
@@ -221,6 +222,7 @@ async function campaignLastBuyTemplate(
 ) {
   const multiplier = Math.round(new_buyer.usdNumber / 10);
   const buy_icon = group_icon || "🟢";
+  const group_link = await getGroupInviteLink(campaign?.trackedToken?.group_id);
 
   const maxIcons = has_media ? 300 : 3667;
 
