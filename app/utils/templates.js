@@ -70,8 +70,10 @@ ${
       "</b>\n"
     : ""
 }
-📊 <a href='${getChart(trackedToken.chain_id, trackedToken.pair)}'>Chart</a> 
-📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
+📊 <a href='${getChart(
+    trackedToken.chain_id,
+    trackedToken.pair
+  )}'>Chart</a> 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 ${ad ? "\n\n——\n\n" + ad : ""}
 `;
 };
@@ -115,6 +117,7 @@ ${rankIcon(i + 1)} ${ellipseAddress(buyer_address)} ➖${numberToUsd(amount)}
 
   return `
 <b>🎉 ${campaign.type} Competition Entry</b>
+
 ${buy_icon.repeat((multiplier > maxIcons ? maxIcons : multiplier) | 1)}
 
 ⏱ Started at: <b>${times.start_time}</b>
