@@ -61,11 +61,15 @@ ${!!amounts.mc ? "🏪 <b>Market Cap</b>: $" + amountFormater2(amounts.mc) : ""}
 
 ${
   contest?.count_down
-    ? "⏳ " + contest?.name + " Ends in: <b>" + contest?.count_down + "</b>"
+    ? "<b>⏳ " +
+      contest?.name +
+      " Contest Ends in: " +
+      contest?.count_down +
+      "</b>"
     : ""
 }
 
-${contest?.prize ? "🏆 Prize: <b>" + contest?.prize + "</b>" : ""}
+${contest?.prize ? "<b>🏆 Prize: " + contest?.prize + "</b>" : ""}
 
 📊 <a href='${getChart(trackedToken.chain_id, trackedToken.pair)}'>Chart</a> 
 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
