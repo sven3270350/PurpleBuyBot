@@ -65,7 +65,7 @@ ${
     : ""
 }
 
-${constest?.prize ? "🏆 Prize: <b>" + contest?.prize + "</b>" : ""}
+${contest?.prize ? "🏆 Prize: <b>" + contest?.prize + "</b>" : ""}
 
 📊 <a href='${getChart(trackedToken.chain_id, trackedToken.pair)}'>Chart</a> 
 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
