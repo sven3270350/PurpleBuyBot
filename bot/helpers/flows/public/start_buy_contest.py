@@ -593,7 +593,7 @@ class BuyContest:
             [InlineKeyboardButton('Set minimum buy', callback_data='set_min_buy'),
              InlineKeyboardButton('Set winner prize', callback_data='set_winner_prize')],
             [InlineKeyboardButton(
-                'Set start competition', callback_data='start_bc_competition')],
+                'Start competition', callback_data='start_bc_competition')],
             [InlineKeyboardButton(
                 'Cancel', callback_data='cancel_bc')]
         ]
