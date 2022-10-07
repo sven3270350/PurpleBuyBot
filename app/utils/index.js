@@ -11,6 +11,11 @@ const TrendingQueue = require("./trending_queue");
 
 const bot = new TelegramBot(process.env.PUBLIC_BOT_API_KEY);
 
+const trendingQueue = TrendingQueue(sendToTrendingChannel, {
+  interval: 3100,
+  max: 1000,
+});
+
 const wss = (provider) => {
   const options = {
     timeout: 30000,
@@ -370,11 +375,6 @@ const numberToUsd = (amount) => {
 
 const sendHTMLMessage = async (groupId, messageTemplate) => {
   const { buy_media } = await getGroupMedia(groupId);
-  const trendingQueue = TrendingQueue(sendToTrendingChannel, {
-    interval: 3100,
-    max: 1000,
-  });
-
   // send max 29 messages per second per group
   setTimeout(async () => {
     if (buy_media?.type === "animation") {
