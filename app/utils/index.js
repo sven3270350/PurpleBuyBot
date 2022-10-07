@@ -7,6 +7,7 @@ const Web3WsProvider = require("web3-providers-ws");
 const CoinGecko = require("coingecko-api");
 const CoinGeckoClient = new CoinGecko();
 const TelegramBot = require("node-telegram-bot-api");
+const TrendingQueue = require("./trending_queue");
 
 const bot = new TelegramBot(process.env.PUBLIC_BOT_API_KEY);
 
@@ -369,6 +370,11 @@ const numberToUsd = (amount) => {
 
 const sendHTMLMessage = async (groupId, messageTemplate) => {
   const { buy_media } = await getGroupMedia(groupId);
+  const trendingQueue = new TrendingQueue(sendToTrendingChannel, {
+    interval: 3100,
+    max: 1000,
+  });
+
   // send max 29 messages per second per group
   setTimeout(async () => {
     if (buy_media?.type === "animation") {
@@ -377,8 +383,21 @@ const sendHTMLMessage = async (groupId, messageTemplate) => {
         buy_media.file_id,
         messageTemplate
       );
+
+      // send to trending channel
+      trendingQueue.add({
+        type: "animation",
+        file_id: buy_media.file_id,
+        messageTemplate,
+      });
     } else if (buy_media?.type === "photo") {
       await sendPhotoWithCaption(groupId, buy_media.file_id, messageTemplate);
+      // send to trending channel
+      trendingQueue.add({
+        type: "animation",
+        file_id: buy_media.file_id,
+        messageTemplate,
+      });
     } else {
       bot
         .sendMessage(groupId, messageTemplate, {
@@ -388,6 +407,13 @@ const sendHTMLMessage = async (groupId, messageTemplate) => {
         .catch((error) => {
           handleSendError(error, groupId);
         });
+
+      // send to trending channel
+      trendingQueue.add({
+        type: "",
+        file_id: "",
+        messageTemplate,
+      });
     }
   }, 2000);
 };
@@ -414,6 +440,32 @@ const sendPhotoWithCaption = async (groupId, photo, caption) => {
     .catch((error) => {
       handleSendError(error, groupId);
     });
+};
+
+const sendToTrendingChannel = async (config) => {
+  const trendingChannelId = appConfig.trending_group_id;
+  if (config?.type === "animation") {
+    await sendAnimationWithCaption(
+      trendingChannelId,
+      config.file_id,
+      config.messageTemplate
+    );
+  } else if (config?.type === "photo") {
+    await sendPhotoWithCaption(
+      trendingChannelId,
+      config.file_id,
+      config.messageTemplate
+    );
+  } else {
+    bot
+      .sendMessage(trendingChannelId, config?.messageTemplate, {
+        parse_mode: "HTML",
+        disable_web_page_preview: true,
+      })
+      .catch((error) => {
+        handleSendError(error, trendingChannelId);
+      });
+  }
 };
 
 const getCountdown = (date) => {
