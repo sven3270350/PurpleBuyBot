@@ -40,7 +40,9 @@ const generalBuyTemplate = async (
   const maxIcons = has_media ? 300 : 3667;
 
   return `
- <b>${trackedToken.token_name} Buy!</b>
+ <b>${
+  group_link ? "| 👥 <a href='" + group_link + "'>"+trackedToken.token_name+"</a> " : trackedToken.token_name
+} Buy!</b>
 ${buy_icon.repeat((multiplier > maxIcons ? maxIcons : multiplier) | 1)}
 
 💸 ${amountFormater(amounts.amountIn)} ${trackedToken.paired_with_name} (${
@@ -54,9 +56,7 @@ ${buy_icon.repeat((multiplier > maxIcons ? maxIcons : multiplier) | 1)}
 ${!newBuyer ? "⏫ <b>Position:</b> " + percent : "🔥 <b>New Holder</b>"}
 ${!!amounts.mc ? "🏪 <b>Market Cap</b>: $" + amountFormater2(amounts.mc) : ""}
 
-📊 <a href='${getChart(trackedToken.chain_id, trackedToken.pair)}'>Chart</a> ${
-    group_link ? "| 👥 <a href='" + group_link + "'>Group</a> " : ""
-  }
+📊 <a href='${getChart(trackedToken.chain_id, trackedToken.pair)}'>Chart</a> 
 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 ${ad ? "\n\n——\n\n" + ad : ""}
 `;
