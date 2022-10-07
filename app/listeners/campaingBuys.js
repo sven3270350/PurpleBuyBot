@@ -87,7 +87,7 @@ const campaignBuysHandler = async (
               others: ranking,
             };
 
-            templates = campaignBiggestBuysTemplate(
+            templates = await campaignBiggestBuysTemplate(
               times,
               new_buyer,
               buy_icon,
@@ -99,7 +99,7 @@ const campaignBuysHandler = async (
             break;
           case "Raffle":
             const odds = await queries.getOdds(trackedToken.campaign_id);
-            templates = campaignRaffleBuysTemplate(
+            templates = await campaignRaffleBuysTemplate(
               times,
               new_buyer,
               buy_icon,
@@ -134,7 +134,7 @@ const campaignBuysHandler = async (
                 activeCampaign,
                 ad
               );
-              utils.sendHTMLMessage(trackedToken.group_id, template);
+              await utils.sendHTMLMessage(trackedToken.group_id, template);
               await queries.deleteNonRandomWinner(trackedToken.campaign_id);
             }, activeCampaign.interval * 1000);
 
@@ -144,7 +144,7 @@ const campaignBuysHandler = async (
               resetAfter,
             };
 
-            templates = campaignLastBuyTemplate(
+            templates = await campaignLastBuyTemplate(
               times,
               new_buyer,
               buy_icon,
