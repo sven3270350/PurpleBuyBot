@@ -293,7 +293,8 @@ class BuyContest:
                         start_date=start_date,
                         end_date=end_date,
                         minimum_buy=active_campaign.min_amount,
-                        winner_reward=active_campaign.prize
+                        winner_reward=active_campaign.prize,
+                        countdown=str(active_campaign.interval)
 
                     ),
                     parse_mode=ParseMode.HTML
