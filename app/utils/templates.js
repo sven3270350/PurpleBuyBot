@@ -37,7 +37,7 @@ async function generalBuyTemplate(
       ? percentageFormatter.format(percentageIncrease)
       : "10000%+";
 
-  const maxIcons = has_media ? 300 : 3667;
+  const maxIcons = has_media ? 100 : 3667;
 
   return `
  <b>${trackedToken.token_name} Buy!</b>
@@ -110,7 +110,7 @@ ${rankIcon(i + 1)} ${ellipseAddress(buyer_address)} ➖${numberToUsd(amount)}
 
   const multiplier = Math.round(new_buyer.usdNumber / 10);
   const buy_icon = group_icon || "🟢";
-  const maxIcons = has_media ? 300 : 3667;
+  const maxIcons = has_media ? 100 : 3667;
 
   return `
 <b>🎉 ${campaign.type} Competition Entry</b>
@@ -170,7 +170,7 @@ async function campaignRaffleBuysTemplate(
   const buy_icon = group_icon || "🟢";
   const group_link = await getGroupInviteLink(campaign?.trackedToken?.group_id);
 
-  const maxIcons = has_media ? 300 : 3667;
+  const maxIcons = has_media ? 100 : 3667;
 
   return `
 <b>🎉 ${campaign.type} Competition Entry</b>
@@ -224,7 +224,7 @@ async function campaignLastBuyTemplate(
   const buy_icon = group_icon || "🟢";
   const group_link = await getGroupInviteLink(campaign?.trackedToken?.group_id);
 
-  const maxIcons = has_media ? 300 : 3667;
+  const maxIcons = has_media ? 100 : 3667;
 
   return `
   <b>🎉 ${campaign.type} Competition Entry</b>
