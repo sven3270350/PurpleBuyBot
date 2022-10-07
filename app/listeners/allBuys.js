@@ -25,7 +25,7 @@ const allBuysHandler = async (
 
     const contest = {
       count_down: utils.getCountdownString(new Date(activeContest?.end_time)),
-      name: activeContest?.name,
+      name: activeContest?.campaing_type,
       prize: activeContest?.prize,
     };
 
