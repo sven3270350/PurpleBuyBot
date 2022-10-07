@@ -41,7 +41,7 @@ const generalBuyTemplate = async (
 
   return `
  <b>${
-  group_link ? "| 👥 <a href='" + group_link + "'>"+trackedToken.token_name+"</a> " : trackedToken.token_name
+  group_link ? "<a href='" + group_link + "'>"+trackedToken.token_name+"</a> " : trackedToken.token_name
 } Buy!</b>
 ${buy_icon.repeat((multiplier > maxIcons ? maxIcons : multiplier) | 1)}
 
