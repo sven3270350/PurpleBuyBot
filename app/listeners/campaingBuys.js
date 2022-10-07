@@ -90,6 +90,7 @@ const campaignBuysHandler = async (
               times,
               new_buyer,
               buy_icon,
+              !!buy_media,
               leaderboard,
               campaign,
               ad
@@ -102,6 +103,7 @@ const campaignBuysHandler = async (
               times,
               new_buyer,
               buy_icon,
+              !!buy_media,
               campaign,
               ad,
               odds
@@ -146,6 +148,7 @@ const campaignBuysHandler = async (
               times,
               new_buyer,
               buy_icon,
+              !!buy_media,
               lastBuyCampaign,
               ad
             );

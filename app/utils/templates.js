@@ -41,8 +41,10 @@ const generalBuyTemplate = async (
 
   return `
  <b>${
-  group_link ? "<a href='" + group_link + "'>"+trackedToken.token_name+"</a> " : trackedToken.token_name
-} Buy!</b>
+   group_link
+     ? "<a href='" + group_link + "'>" + trackedToken.token_name + "</a> "
+     : trackedToken.token_name
+ } Buy!</b>
 ${buy_icon.repeat((multiplier > maxIcons ? maxIcons : multiplier) | 1)}
 
 💸 ${amountFormater(amounts.amountIn)} ${trackedToken.paired_with_name} (${
@@ -78,6 +80,7 @@ const campaignBiggestBuysTemplate = (
   times,
   new_buyer,
   group_icon,
+  has_media,
   leaderboard,
   campaign,
   ad
@@ -96,10 +99,11 @@ ${rankIcon(i + 1)} ${ellipseAddress(buyer_address)} ➖${numberToUsd(amount)}
 
   const multiplier = Math.round(new_buyer.usdNumber / 10);
   const buy_icon = group_icon || "🟢";
+  const maxIcons = has_media ? 300 : 3667;
 
   return `
 <b>🎉 ${campaign.type} Competition Entry</b>
-${buy_icon.repeat((multiplier > 3667 ? 3667 : multiplier) | 1)}
+${buy_icon.repeat((multiplier > maxIcons ? maxIcons : multiplier) | 1)}
 
 ⏱ Started at: <b>${times.start_time}</b>
 ⏳ Ends in: <b>${times.count_down}</b>
@@ -137,6 +141,7 @@ const campaignRaffleBuysTemplate = (
   times,
   new_buyer,
   group_icon,
+  has_media,
   campaign,
   ad,
   odds
@@ -182,6 +187,7 @@ const campaignLastBuyTemplate = (
   times,
   new_buyer,
   group_icon,
+  has_media,
   campaign,
   ad
 ) => {
