@@ -389,7 +389,7 @@ const sendHTMLMessage = async (groupId, messageTemplate) => {
       await sendPhotoWithCaption(groupId, buy_media.file_id, messageTemplate);
       // send to trending channel
       trendingQueue.add({
-        type: "animation",
+        type: "photo",
         file_id: buy_media.file_id,
         messageTemplate,
       });
