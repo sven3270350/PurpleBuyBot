@@ -370,7 +370,7 @@ const numberToUsd = (amount) => {
 
 const sendHTMLMessage = async (groupId, messageTemplate) => {
   const { buy_media } = await getGroupMedia(groupId);
-  const trendingQueue = new TrendingQueue(sendToTrendingChannel, {
+  const trendingQueue = TrendingQueue(sendToTrendingChannel, {
     interval: 3100,
     max: 1000,
   });
