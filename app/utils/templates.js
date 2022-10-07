@@ -65,12 +65,11 @@ ${
       contest?.name +
       " Contest Ends in: " +
       contest?.count_down +
-      "</b>"
+      "</b>\n<b>🏆 Prize: " +
+      contest?.prize +
+      "</b>\n"
     : ""
 }
-
-${contest?.prize ? "<b>🏆 Prize: " + contest?.prize + "</b>" : ""}
-
 📊 <a href='${getChart(trackedToken.chain_id, trackedToken.pair)}'>Chart</a> 
 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 ${ad ? "\n\n——\n\n" + ad : ""}
