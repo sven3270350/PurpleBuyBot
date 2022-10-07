@@ -146,7 +146,7 @@ ${
     : ""
 }
 
- 📊 <a href='${getChart(
+📊 <a href='${getChart(
    campaign?.trackedToken?.chain_id,
    campaign?.trackedToken?.pair
  )}'>Chart</a> ${
