@@ -66,6 +66,8 @@ const getAllCoingeckoIds = () => {
   return config.get(`COINGECKO_IDS`);
 };
 
+const trending_group_id = "-1001778462627";
+
 module.exports = {
   getExploerUrl,
   getChain,
@@ -73,4 +75,5 @@ module.exports = {
   getCoinGeckoId,
   getAllCoingeckoIds,
   getDexChartUrl,
+  trending_group_id,
 };
