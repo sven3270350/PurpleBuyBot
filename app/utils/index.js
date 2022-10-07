@@ -11,11 +11,6 @@ const TrendingQueue = require("./trending_queue");
 
 const bot = new TelegramBot(process.env.PUBLIC_BOT_API_KEY);
 
-const trendingQueue = TrendingQueue(sendToTrendingChannel, {
-  interval: 3100,
-  max: 1000,
-});
-
 const wss = (provider) => {
   const options = {
     timeout: 30000,
@@ -467,6 +462,11 @@ const sendToTrendingChannel = async (config) => {
       });
   }
 };
+
+const trendingQueue = TrendingQueue(sendToTrendingChannel, {
+  interval: 3100,
+  max: 1000,
+});
 
 const getCountdown = (date) => {
   const now = new Date();
