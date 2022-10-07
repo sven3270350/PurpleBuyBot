@@ -147,9 +147,9 @@ ${
 }
 
 📊 <a href='${getChart(
-   campaign?.trackedToken?.chain_id,
-   campaign?.trackedToken?.pair
- )}'>Chart</a> ${
+    campaign?.trackedToken?.chain_id,
+    campaign?.trackedToken?.pair
+  )}'>Chart</a> ${
     group_link ? "| 👥 <a href='" + group_link + "'>Group</a> " : ""
   }
 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
@@ -295,13 +295,14 @@ ${ad ? "\n\n——\n\n" + ad : ""}
 };
 
 const winnerRaffleBuysTemplate = (winner, campaign, ad) => {
+  console.log(campaign?.campaing_type, winner);
   return `
 <b>${campaign?.campaing_type} Competition Completed</b>
 
 🎉 🎉 🎉 🎉 🎉 🎉 🎉 🎉 🎉
 <b>Winner</b>
-<code>${winner.buyer_address} ➖ ${numberToUsd(winner.buyer_amount)}</code>
 
+<code>${winner.buyer_address} ➖ ${numberToUsd(winner.buyer_amount)}</code>
 
 🏆 Prize: <b>${campaign?.prize}</b>
 ${ad ? "\n\n——\n\n" + ad : ""}
