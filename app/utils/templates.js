@@ -11,16 +11,15 @@ const {
   percentageFormatter,
 } = require(".");
 
-const generalBuyTemplate = async (
+async function generalBuyTemplate(
   trackedToken,
   amounts,
   buyer,
-  tx_link,
   group_icon,
   has_media,
   contest,
   ad = ""
-) => {
+) {
   const multiplier = Math.round(amounts.multiplier / 10);
   const { newBuyer, percentageIncrease } = await isNewBuyer(
     amounts.buyer,
@@ -41,11 +40,8 @@ const generalBuyTemplate = async (
   const maxIcons = has_media ? 300 : 3667;
 
   return `
- <b>${
-   group_link
-     ? "<a href='" + group_link + "'>" + trackedToken.token_name + "</a> "
-     : trackedToken.token_name
- } Buy!</b>
+ <b>${trackedToken.token_name} Buy!</b>
+
 ${buy_icon.repeat((multiplier > maxIcons ? maxIcons : multiplier) | 1)}
 
 💸 ${amountFormater(amounts.amountIn)} ${trackedToken.paired_with_name} (${
@@ -55,7 +51,7 @@ ${buy_icon.repeat((multiplier > maxIcons ? maxIcons : multiplier) | 1)}
 👤 <b>Buyer</b> <a href='${getBuyerLink(
     amounts.buyer,
     trackedToken.chain_id
-  )}'>${buyer}</a> | <a href='${tx_link}'>Txn</a>
+  )}'>${buyer?.address}</a> | <a href='${buyer?.tx_link}'>Txn</a>
 ${!newBuyer ? "⏫ <b>Position:</b> " + percent : "🔥 <b>New Holder</b>"}
 ${!!amounts.mc ? "🏪 <b>Market Cap</b>: $" + amountFormater2(amounts.mc) : ""}
 
@@ -70,13 +66,13 @@ ${
       "</b>\n"
     : ""
 }
-📊 <a href='${getChart(
-    trackedToken.chain_id,
-    trackedToken.pair
-  )}'>Chart</a> 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
+ 📊 <a href='${getChart(trackedToken.chain_id, trackedToken.pair)}'>Chart</a> ${
+    group_link ? "| 👥 <a href='" + group_link + "'>Group</a> " : ""
+  }
+📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 ${ad ? "\n\n——\n\n" + ad : ""}
 `;
-};
+}
 
 const countdowToStartTemplate = (startCountdown, EndCountdown, ad) => {
   return `
@@ -90,7 +86,7 @@ ${ad ? "\n\n——\n\n" + ad : ""}
 `;
 };
 
-const campaignBiggestBuysTemplate = (
+async function campaignBiggestBuysTemplate(
   times,
   new_buyer,
   group_icon,
@@ -98,9 +94,10 @@ const campaignBiggestBuysTemplate = (
   leaderboard,
   campaign,
   ad
-) => {
+) {
   const top5 = leaderboard.others;
   const leading = leaderboard.leading;
+  const group_link = await getGroupInviteLink(campaign?.trackedToken?.group_id);
 
   let templates = ``;
 
@@ -148,11 +145,19 @@ ${
     ? "🏪 <b>Market Cap :</b> <i>$" + amountFormater2(new_buyer.mc) + "</i>"
     : ""
 }
+
+ 📊 <a href='${getChart(
+   campaign?.trackedToken?.chain_id,
+   campaign?.trackedToken?.pair
+ )}'>Chart</a> ${
+    group_link ? "| 👥 <a href='" + group_link + "'>Group</a> " : ""
+  }
+📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 ${ad ? "\n\n——\n\n" + ad : ""}
 `;
-};
+}
 
-const campaignRaffleBuysTemplate = (
+async function campaignRaffleBuysTemplate(
   times,
   new_buyer,
   group_icon,
@@ -160,7 +165,7 @@ const campaignRaffleBuysTemplate = (
   campaign,
   ad,
   odds
-) => {
+) {
   const multiplier = Math.round(new_buyer.usdNumber / 10);
   const buy_icon = group_icon || "🟢";
 
@@ -194,18 +199,26 @@ ${
     ? "🏪 <b>Market Cap :</b> <i>$" + amountFormater2(new_buyer.mc) + "</i>"
     : ""
 }
+
+📊 <a href='${getChart(
+    campaign?.trackedToken?.chain_id,
+    campaign?.trackedToken?.pair
+  )}'>Chart</a> ${
+    group_link ? "| 👥 <a href='" + group_link + "'>Group</a> " : ""
+  }
+📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 ${ad ? "\n\n——\n\n" + ad : ""}
 `;
-};
+}
 
-const campaignLastBuyTemplate = (
+async function campaignLastBuyTemplate(
   times,
   new_buyer,
   group_icon,
   has_media,
   campaign,
   ad
-) => {
+) {
   const multiplier = Math.round(new_buyer.usdNumber / 10);
   const buy_icon = group_icon || "🟢";
 
@@ -241,9 +254,17 @@ ${
     ? "🏪 <b>Market Cap :</b> <i>$" + amountFormater2(new_buyer.mc) + "</i>"
     : ""
 }
+
+📊 <a href='${getChart(
+    campaign?.trackedToken?.chain_id,
+    campaign?.trackedToken?.pair
+  )}'>Chart</a> ${
+    group_link ? "| 👥 <a href='" + group_link + "'>Group</a> " : ""
+  }
+📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 ${ad ? "\n\n——\n\n" + ad : ""}
   `;
-};
+}
 
 const winnerBiggestBuysTemplate = (leaderboard, campaign, ad) => {
   let templates = ``;

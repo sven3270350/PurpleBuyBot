@@ -38,11 +38,15 @@ const allBuysHandler = async (
       buyer: to,
     };
 
+    const buyer = {
+      address: utils.ellipseAddress(to),
+      tx_link,
+    };
+
     const templates = await generalBuyTemplate(
       trackedToken,
       amounts,
-      utils.ellipseAddress(to),
-      tx_link,
+      buyer,
       buy_icon,
       !!buy_media,
       contest,

@@ -67,6 +67,7 @@ const campaignBuysHandler = async (
         min_buy: activeCampaign?.min_amount,
         type: activeCampaign?.campaing_type,
         prize: activeCampaign?.prize,
+        trackedToken,
       };
 
       let templates;
