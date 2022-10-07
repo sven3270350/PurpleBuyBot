@@ -18,6 +18,7 @@ const generalBuyTemplate = async (
   tx_link,
   group_icon,
   has_media,
+  contest,
   ad = ""
 ) => {
   const multiplier = Math.round(amounts.multiplier / 10);
@@ -57,6 +58,14 @@ ${buy_icon.repeat((multiplier > maxIcons ? maxIcons : multiplier) | 1)}
   )}'>${buyer}</a> | <a href='${tx_link}'>Txn</a>
 ${!newBuyer ? "⏫ <b>Position:</b> " + percent : "🔥 <b>New Holder</b>"}
 ${!!amounts.mc ? "🏪 <b>Market Cap</b>: $" + amountFormater2(amounts.mc) : ""}
+
+${
+  contest?.count_down
+    ? "⏳ " + contest?.name + " Ends in: <b>" + contest?.count_down + "</b>"
+    : ""
+}
+
+${constest?.prize ? "🏆 Prize: <b>" + contest?.prize + "</b>" : ""}
 
 📊 <a href='${getChart(trackedToken.chain_id, trackedToken.pair)}'>Chart</a> 
 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>

@@ -19,6 +19,16 @@ const allBuysHandler = async (
     const { buy_icon, buy_media } = await utils.getGroupMedia(
       trackedToken.group_id
     );
+    const activeContest = await queries.getGroupActiveCampaign(
+      trackedToken.group_id
+    );
+
+    const contest = {
+      count_down: utils.getCountdownString(new Date(activeContest?.end_time)),
+      name: activeContest?.name,
+      prize: activeContest?.prize,
+    };
+
     const amounts = {
       amountIn,
       amountOut,
@@ -35,6 +45,7 @@ const allBuysHandler = async (
       tx_link,
       buy_icon,
       !!buy_media,
+      contest,
       ad
     );
 
