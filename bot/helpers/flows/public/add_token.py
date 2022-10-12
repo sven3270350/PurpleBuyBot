@@ -539,6 +539,7 @@ class AddToken:
                     update.callback_query.edit_message_text(text="<i>✅ Tracking enabled successfully </i>",
                                                             parse_mode=ParseMode.HTML)
             except Exception as e:
+                print(e)
                 db.session.rollback()
                 update.callback_query.answer()
                 update.callback_query.edit_message_text(text="<i>❌ Error enabling tracking </i>",
