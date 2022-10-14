@@ -532,6 +532,55 @@ class AddToken:
                                       parse_mode=ParseMode.HTML)
 
     @send_typing_action
+    def __set_group_link(self, update: Update, context: CallbackContext):
+        self.__extract_params(update, context)
+        if is_private_chat(update):
+            if not BotService().is_group_in_focus(update, context):
+                reset_chat_data(context)
+                return ConversationHandler.END
+
+            group_id = context.chat_data.get('group_id', None)
+            if not is_group_admin(update, context):
+                return not_group_admin(update, context)
+
+            group: Group = Group.query.filter_by(group_id=group_id).first()
+
+            if group.group_link:
+                update.message.reply_text(
+                    text=f"<i>Current group link is <b>{group.group_link}</b>. Enter a valid link to change.</i>",
+                    parse_mode=ParseMode.HTML,
+                )
+            else:
+                try:
+                    is_bot_admin = context.bot.get_chat_member(
+                        group_id, context.bot.id).status == 'administrator'
+                    if is_bot_admin:
+                        invite_link = context.bot.create_chat_invite_link(
+                            group_id)
+                        group.group_link = invite_link.invite_link
+                        db.session.commit()
+
+                        update.message.reply_text(
+                            text=f"<i>A new link '{invite_link}' was created.</i>",
+                            parse_mode=ParseMode.HTML,
+                        )
+                    else:
+                        update.message.reply_text(
+                            text=f"<i>❌ The bot is not an admin in this group. Please add it as an admin and try again.</i>",
+                            parse_mode=ParseMode.HTML,
+                        )
+                except Exception as e:
+                    logger.error(e)
+                    db.session.rollback()
+                    update.message.reply_text(
+                        text=f"<i>❌ Error creating new link. Try again.</i>",
+                        parse_mode=ParseMode.HTML,
+                    )
+        else:
+            if is_group_admin(update, context):
+                response_for_group(self, update)
+
+    @send_typing_action
     def __cancel_add_token(self, update: Update, context: CallbackContext) -> int:
         update.message.reply_text(text="<i>❌ Add Token Sesssion Cancelled. </i>",
                                   parse_mode=ParseMode.HTML)
@@ -548,6 +597,8 @@ class AddToken:
             'set_buy_media', self.__set_buy_media))
         self.dispatcher.add_handler(CommandHandler(
             'set_min_usd_amount', self.__set_min_usd_amount))
+        self.dispatcher.add_handler(CommandHandler(
+            'set_group_link', self.__set_group_link))
 
         self.dispatcher.add_handler(
             ConversationHandler(
