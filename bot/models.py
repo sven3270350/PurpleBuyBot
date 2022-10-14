@@ -13,6 +13,7 @@ class Group(db.Model):
     sign_up_date = db.Column(db.DateTime, default=db.func.now())
     buy_icon = db.Column(db.String(2), default="🟢")
     buy_media = db.Column(db.Text)
+    group_link = db.Column(db.Text)
     subscriptions = db.relationship(
         'Subscription', backref='group', lazy='dynamic')
     tracked_tokens = db.relationship(
@@ -71,6 +72,7 @@ class TrackedToken(db.Model):
     token_symbol = db.Column(db.String(20))
     token_decimals = db.Column(db.Integer)
     circulating_supply = db.Column(db.Float)
+    min_usd_amount = db.Column(db.Float)
     pair_address = db.Column(db.String(100))
     active_tracking = db.Column(db.Boolean, default=True)
     chain = db.relationship(
@@ -176,6 +178,13 @@ class Transactions(db.Model):
     def __repr__(self):
         return '<Transactions %r>' % f"{self.group_id}_{self.biggest_buy_campaign_id}_{self.id}"
 
+class Blacklist(db.Model):
+    __tablename__ = 'blacklist'
+    id = db.Column(db.Integer, primary_key=True)
+    address = db.Column(db.String(100))
+
+    def __repr__(self):
+        return '<Blacklist %r>' % self.address
 
 class Advertisement(db.Model):
     __tablename__ = "advertisement"
