@@ -76,28 +76,3 @@ def response_for_group(self, update: Update):
     )
     update.message.reply_text(text="Please click the button below to continue",
                               parse_mode=ParseMode.HTML, reply_markup=button)
-
-
-def set_commands(context: CallbackContext, enable=False):
-    if enable:
-        context.bot.set_my_commands(commands=[("help", "Show supported commands"),
-                                              ("add_token", "Add the token to be monitored requires token address"),
-                                              ("remove_token",
-                                               "Remove monitored token"),
-                                              ("tracked_tokens",
-                                               "List tracked tokens"),
-                                              ("start_buy_contest",
-                                               "Initiate a biggest buy contest"),
-                                              ("raffle_on",
-                                               "Start raffle buy contest"),
-                                              ("active_contest",
-                                               "Show active contest and cancel if needed"),
-                                              ("subscribe",
-                                               "Subscribe to premium to remove ads"),
-                                              ("chains", " Show a list of supported chains"),
-                                              ("active_tracking",
-                                               "Toggle active buy tracking"),
-                                              ("set_buy_icon", "Set buy icon"),
-                                              ("set_buy_media",
-                                               "Set a gif or image to show with buys"),
-                                              ("cancel", "cancel flow"), ])

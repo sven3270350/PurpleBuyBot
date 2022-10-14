@@ -11,7 +11,7 @@ from services.bot_service import BotService
 from services.subscriptions_service import SubscriptionService
 from helpers.utils import (
     is_private_chat, is_group_admin,
-    send_typing_action, reset_chat_data, not_group_admin, set_commands, response_for_group)
+    send_typing_action, reset_chat_data, not_group_admin, response_for_group)
 from helpers.templates import (
     no_active_subscription_template, active_subscription_template,
     weekly_subscription_template, subscription_confirmation_template,
@@ -42,8 +42,6 @@ class Subscription:
             if not BotService().is_group_in_focus(update, context):
                 reset_chat_data(context)
                 return ConversationHandler.END
-
-            set_commands(context, True)
 
             group_id = context.chat_data.get('group_id', None)
             context.chat_data['group_title'] = context.bot.get_chat(
