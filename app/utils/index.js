@@ -136,6 +136,7 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
   const token_address = trackedToken.token_address.toLowerCase();
   const decimals = trackedToken.token_decimals;
   const chainId = trackedToken.chain_id;
+  const minBuyAmount = trackedToken.min_usd_amount ?? 1;
   const explorer = appConfig.getExploerUrl(chainId);
   const tx_link = `${explorer}tx/${tx_hash}`;
   const { circulating_supply } = await queries.getTokenCircSupply(
@@ -177,7 +178,7 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
     const to = data.returnValues.to;
     const price = await getUsdPrice(amountIn, trackedToken.paired_with_name);
 
-    if ((amountIn > 0 || amountOut > 0) && price.usdNumber > 1) {
+    if ((amountIn > 0 || amountOut > 0) && price.usdNumber >= minBuyAmount) {
       let marketCap = 0;
 
       if (circulating_supply) {
