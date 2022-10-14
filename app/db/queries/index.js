@@ -358,6 +358,18 @@ const getTokenCircSupply = async (tracked_token_id) => {
   return res.rows[0];
 };
 
+const getMinUSDBuyAmount = async (group_id) => {
+  const query = `
+  SELECT
+  MAX(min_usd_amount) as min_usd_amount
+  FROM public.tracked_token
+  WHERE group_id = $1;
+    `;
+  const params = [group_id];
+  const res = await db.query(query, params);
+  return res.rows[0];
+};
+
 module.exports = {
   getTrackedTokensById,
   getActiveSubscriptionByGroupId,
@@ -383,4 +395,5 @@ module.exports = {
   setWinnerAndEndContest,
   getLastBuy,
   getGroupInviteLink,
+  getMinUSDBuyAmount,
 };
