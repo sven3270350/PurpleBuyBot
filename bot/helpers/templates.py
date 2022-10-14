@@ -62,6 +62,7 @@ help_template = '''
 /set_buy_icon - Set buy icon
 /set_buy_media - Set a gif or image to show with buys
 /set_group_link - Create and set a new invite link for the group
+/delete_group_link - Delete the group link
 
 <b>Managin Tokens:</b>
 Add, use /add_token

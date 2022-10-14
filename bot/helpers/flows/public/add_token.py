@@ -545,7 +545,7 @@ class AddToken:
 
             if group.group_link:
                 update.message.reply_text(
-                    text=f"<i>Current group link is <b>{group.group_link}</b>. Enter a valid link to change.</i>",
+                    text=f"<i>Current group link is <b>{group.group_link}</b>. Use /delete_group_link to delete.</i>",
                     parse_mode=ParseMode.HTML,
                 )
             else:
@@ -578,6 +578,37 @@ class AddToken:
                 response_for_group(self, update)
 
     @send_typing_action
+    def __delete_group_link(self, update: Update, context: CallbackContext):
+        self.__extract_params(update, context)
+        if is_private_chat(update):
+            if not BotService().is_group_in_focus(update, context):
+                reset_chat_data(context)
+                return ConversationHandler.END
+
+            group_id = context.chat_data.get('group_id', None)
+            if not is_group_admin(update, context):
+                return not_group_admin(update, context)
+
+            group: Group = Group.query.filter_by(group_id=group_id).first()
+
+            if group.group_link:
+                group.group_link = None
+                db.session.commit()
+
+                update.message.reply_text(
+                    text=f"<i>✅ Group link deleted.</i>",
+                    parse_mode=ParseMode.HTML,
+                )
+            else:
+                update.message.reply_text(
+                    text=f"<i>❌ You haven't set a group link yet.</i>",
+                    parse_mode=ParseMode.HTML,
+                )
+        else:
+            if is_group_admin(update, context):
+                response_for_group(self, update)
+
+    @send_typing_action
     def __cancel_add_token(self, update: Update, context: CallbackContext) -> int:
         update.message.reply_text(text="<i>❌ Add Token Sesssion Cancelled. </i>",
                                   parse_mode=ParseMode.HTML)
@@ -596,6 +627,8 @@ class AddToken:
             'set_min_usd_amount', self.__set_min_usd_amount))
         self.dispatcher.add_handler(CommandHandler(
             'set_group_link', self.__set_group_link))
+        self.dispatcher.add_handler(CommandHandler(
+            'delete_group_link', self.__delete_group_link))
 
         self.dispatcher.add_handler(
             ConversationHandler(

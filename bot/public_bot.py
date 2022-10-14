@@ -85,6 +85,8 @@ def start_bot():
                                            "Set a gif or image to show with buys"),
                                           ("set_group_link",
                                            "Create and set a new invite link for the group"),
+                                          ("delete_group_link",
+                                           "Delete the group invite link"),
                                           ("cancel", "cancel flow"), ])
 
     updater.start_webhook(listen="0.0.0.0",
