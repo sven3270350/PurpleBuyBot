@@ -322,6 +322,18 @@ const getGroupIconAndMedia = async (group_id) => {
   return res.rows[0];
 };
 
+const getGroupInviteLink = async (group_id) => {
+  const query = `
+  SELECT
+  group_link
+  FROM public.group
+  WHERE group_id = $1;
+    `;
+  const params = [group_id];
+  const res = await db.query(query, params);
+  return res.rows[0];
+};
+
 const updateTrackedTokenCircSupply = async (
   group_id,
   tracked_token_id,
@@ -370,4 +382,5 @@ module.exports = {
   getTokenCircSupply,
   setWinnerAndEndContest,
   getLastBuy,
+  getGroupInviteLink,
 };
