@@ -7,7 +7,15 @@ from services.bot_service import BotService
 from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin, set_commands, response_for_group
 from helpers.templates import add_token_confirmation_template, add_token_chain_select_template, add_token_dex_select_template, add_token_pair_select_template
 import json
+import logging
+
 DEX, PAIR, ADDRESS, CONFIRM = range(4)
+
+# Enable logging
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+)
+logger = logging.getLogger(__name__)
 
 
 class AddToken:
@@ -216,7 +224,7 @@ class AddToken:
                         parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(button))
                     return CONFIRM
                 except Exception as e:
-                    print(e)
+                    logger.error(e)
                     update.message.reply_text(text=f"<i> ❌ <b>{token_address}</b> is not a valid token. Enter a valid token address </i>",
                                               parse_mode=ParseMode.HTML)
                     return CONFIRM
@@ -257,7 +265,7 @@ class AddToken:
                 reset_chat_data(context)
                 return ConversationHandler.END
             except Exception as e:
-                print(e)
+                logger.error(e)
                 db.session.rollback()
                 context.bot.send_message(chat_id=self.chatid, text=f"<i> ❌ Error adding token, Try again later.</i>",
                                          parse_mode=ParseMode.HTML)
@@ -368,6 +376,7 @@ class AddToken:
                         parse_mode=ParseMode.HTML,
                     )
             except Exception as e:
+                logger.error(e)
                 db.session.rollback()
                 update.message.reply_text(
                     text=f"<i> ❌ Invalid icon. Enter a valid icon; max 2 icons </i>",
@@ -456,11 +465,71 @@ class AddToken:
                         parse_mode=ParseMode.HTML,
                     )
             except Exception as e:
+                logger.error(e)
                 db.session.rollback()
                 update.message.reply_text(
                     text=f"<i> ❌ Invalid Media Selected. Select a Gif or Image (recommended 1280px x 720px).</i>",
                     parse_mode=ParseMode.HTML,
                 )
+
+    @send_typing_action
+    def __set_min_usd_amount(self, update: Update, context: CallbackContext):
+        self.__extract_params(update, context)
+        if is_private_chat(update):
+            if not BotService().is_group_in_focus(update, context):
+                reset_chat_data(context)
+                return ConversationHandler.END
+
+            group_id = context.chat_data.get('group_id', None)
+            if not is_group_admin(update, context):
+                return not_group_admin(update, context)
+
+            group_tracked_token: TrackedToken = TrackedToken.query.filter_by(
+                group_id=group_id).first()
+
+            if group_tracked_token.min_usd_amount:
+                update.message.reply_text(
+                    text=f"<i>Current minimum USD amount is <b>{group_tracked_token.min_usd_amount}</b>. Enter a new amount to change.</i>",
+                    parse_mode=ParseMode.HTML,
+                )
+            else:
+                update.message.reply_text(
+                    text=f"<i>You haven't set a minimum USD amount yet; default is set to $1. Enter a new amount to set.</i>",
+                    parse_mode=ParseMode.HTML,
+                )
+
+            self.__add_set_min_usd_amount_handler()
+        else:
+            if is_group_admin(update, context):
+                response_for_group(self, update)
+
+    def __set_min_buy(self, update: Update, context: CallbackContext):
+        self.__extract_params(update, context)
+        group_id = context.chat_data.get('group_id', None)
+        min_usd_buy = update.message.text
+
+        if float(min_usd_buy) > 1:
+
+            group_tracked_token: list[TrackedToken] = TrackedToken.query.filter_by(
+                group_id=group_id).all()
+
+            if group_tracked_token:
+                try:
+                    for token in group_tracked_token:
+                        token.min_usd_amount = float(min_usd_buy)
+                        db.session.commit()
+
+                    update.message.reply_text(text=f"<i>✅ Minimum buy set to <b>${min_usd_buy}</b> </i>",
+                                              parse_mode=ParseMode.HTML)
+                    self.__remove_set_min_usd_amount_handler()
+                except Exception as e:
+                    logger.error(e)
+                    db.session.rollback()
+                    update.message.reply_text(text="<i>❌ Error setting minimum buy. Try again. </i>",
+                                              parse_mode=ParseMode.HTML)
+        else:
+            update.message.reply_text(text="<i>❌ Minimum buy must be greater than 1 </i>",
+                                      parse_mode=ParseMode.HTML)
 
     @send_typing_action
     def __cancel_add_token(self, update: Update, context: CallbackContext) -> int:
@@ -477,6 +546,8 @@ class AddToken:
             'set_buy_icon', self.__set_buy_icon))
         self.dispatcher.add_handler(CommandHandler(
             'set_buy_media', self.__set_buy_media))
+        self.dispatcher.add_handler(CommandHandler(
+            'set_min_usd_amount', self.__set_min_usd_amount))
 
         self.dispatcher.add_handler(
             ConversationHandler(
@@ -511,8 +582,6 @@ class AddToken:
                 ],
                 conversation_timeout=300,
                 name='add_token',
-
-
             )
         )
 
@@ -535,11 +604,11 @@ class AddToken:
                     token.active_tracking = True
                     db.session.commit()
 
-                    update.callback_query.answer()
-                    update.callback_query.edit_message_text(text="<i>✅ Tracking enabled successfully </i>",
-                                                            parse_mode=ParseMode.HTML)
+                update.callback_query.answer()
+                update.callback_query.edit_message_text(text="<i>✅ Tracking enabled successfully </i>",
+                                                        parse_mode=ParseMode.HTML)
             except Exception as e:
-                print(e)
+                logger.error(e)
                 db.session.rollback()
                 update.callback_query.answer()
                 update.callback_query.edit_message_text(text="<i>❌ Error enabling tracking </i>",
@@ -561,6 +630,7 @@ class AddToken:
                 update.callback_query.edit_message_text(text="<i>✅ Tracking disabled successfully </i>",
                                                         parse_mode=ParseMode.HTML)
             except Exception as e:
+                logger.error(e)
                 db.session.rollback()
                 update.callback_query.answer()
                 update.callback_query.edit_message_text(text="<i>❌ Error disabling tracking </i>",
@@ -604,3 +674,11 @@ class AddToken:
     def __remove_set_media_handler(self):
         self.dispatcher.remove_handler(self.set_media_handler1)
         self.dispatcher.remove_handler(self.set_media_handler2)
+
+    def __add_set_min_usd_amount_handler(self):
+        self.set_min_buy_handler = MessageHandler(
+            Filters.regex('\d+\.?\d*'), self.__set_min_buy)
+        self.dispatcher.add_handler(self.set_min_buy_handler)
+
+    def __remove_set_min_usd_amount_handler(self):
+        self.dispatcher.remove_handler(self.set_min_buy_handler)
