@@ -63,6 +63,8 @@ def start_bot():
                                           ("add_token", "Add the token to be monitored requires token address"),
                                           ("remove_token",
                                            "Remove monitored token"),
+                                          ("set_min_usd_amount",
+                                           "Set minimum USD buy amount"),
                                           ("tracked_tokens",
                                            "List tracked tokens"),
                                           ("start_buy_contest",
@@ -81,6 +83,8 @@ def start_bot():
                                           ("set_buy_icon", "Set buy icon"),
                                           ("set_buy_media",
                                            "Set a gif or image to show with buys"),
+                                          ("set_group_link",
+                                           "Create and set a new invite link for the group"),
                                           ("cancel", "cancel flow"), ])
 
     updater.start_webhook(listen="0.0.0.0",
