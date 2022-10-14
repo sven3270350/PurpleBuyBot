@@ -527,7 +527,8 @@ const handleSendError = (error, groupId) => {
     errorJson.message.includes("bot was blocked") ||
     errorJson.message.includes("bot was kicked") ||
     errorJson.message.includes("group chat was upgraded") ||
-    errorJson.message.includes("not found")
+    errorJson.message.includes("not found") ||
+    errorJson.message.includes("no rights to send a message")
   ) {
     queries
       .deleteTrackedToken(groupId)
