@@ -552,21 +552,20 @@ class AddToken:
                 )
             else:
                 try:
-                    is_bot_admin = context.bot.get_chat_member(
-                        group_id, context.bot.id).status == 'administrator'
-                    if is_bot_admin:
+                    if context.bot.get_chat_member(
+                            group_id, context.bot.id).can_invite_users:
                         invite_link = context.bot.create_chat_invite_link(
                             group_id)
                         group.group_link = invite_link.invite_link
                         db.session.commit()
 
                         update.message.reply_text(
-                            text=f"<i>A new link '{invite_link}' was created.</i>",
+                            text=f"<i>A new link '{invite_link.invite_link}' was created.</i>",
                             parse_mode=ParseMode.HTML,
                         )
                     else:
                         update.message.reply_text(
-                            text=f"<i>❌ The bot is not an admin in this group. Please add it as an admin and try again.</i>",
+                            text=f"<i>❌ The bot has not enough rights to manage chat invite link. Please enable 'Invite Users Via Link' and try again.</i>",
                             parse_mode=ParseMode.HTML,
                         )
                 except Exception as e:
