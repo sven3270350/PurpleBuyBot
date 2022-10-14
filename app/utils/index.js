@@ -35,9 +35,12 @@ const wss = (provider) => {
 
 const getGroupInviteLink = async (groupId) => {
   const groupInfo = await bot.getChat(groupId);
+  const groupLink = await queries.getGroupInviteLink(groupId);
   const invite_link = groupInfo.invite_link;
   const user_name = groupInfo.username;
-  return invite_link
+  return groupLink
+    ? groupLink
+    : invite_link
     ? invite_link
     : user_name
     ? `https://t.me/${user_name}`
