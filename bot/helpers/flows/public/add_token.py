@@ -8,6 +8,7 @@ from helpers.utils import is_private_chat, is_group_admin, send_typing_action, r
 from helpers.templates import add_token_confirmation_template, add_token_chain_select_template, add_token_dex_select_template, add_token_pair_select_template
 import json
 import logging
+import re
 
 DEX, PAIR, ADDRESS, CONFIRM = range(4)
 
@@ -506,28 +507,33 @@ class AddToken:
         group_id = context.chat_data.get('group_id', None)
         min_usd_buy = update.message.text
 
-        if float(min_usd_buy) > 1:
-            group_tracked_token: list[TrackedToken] = TrackedToken.query.filter_by(
-                group_id=group_id).all()
+        _float_regexp = re.compile(r"^\d+\.?\d*$")
+        if _float_regexp.match(min_usd_buy):
 
-            if group_tracked_token:
-                try:
-                    for token in group_tracked_token:
-                        token.min_usd_amount = float(min_usd_buy)
-                        db.session.commit()
+            if float(min_usd_buy) > 1:
+                group_tracked_token: list[TrackedToken] = TrackedToken.query.filter_by(
+                    group_id=group_id).all()
 
-                    update.message.reply_text(text=f"<i>✅ Minimum buy set to <b>${min_usd_buy}</b> </i>",
-                                              parse_mode=ParseMode.HTML)
-                except Exception as e:
-                    logger.error(e)
-                    db.session.rollback()
-                    update.message.reply_text(text="<i>❌ Error setting minimum buy. Try again. </i>",
-                                              parse_mode=ParseMode.HTML)
+                if group_tracked_token:
+                    try:
+                        for token in group_tracked_token:
+                            token.min_usd_amount = float(min_usd_buy)
+                            db.session.commit()
+
+                        update.message.reply_text(text=f"<i>✅ Minimum buy set to <b>${min_usd_buy}</b> </i>",
+                                                  parse_mode=ParseMode.HTML)
+                    except Exception as e:
+                        logger.error(e)
+                        db.session.rollback()
+                        update.message.reply_text(text="<i>❌ Error setting minimum buy. Try again. </i>",
+                                                  parse_mode=ParseMode.HTML)
+            else:
+                update.message.reply_text(text="<i>❌ Minimum buy must be greater than 1 </i>",
+                                          parse_mode=ParseMode.HTML)
+            self.__remove_set_min_usd_amount_handler()
+
         else:
-            update.message.reply_text(text="<i>❌ Minimum buy must be greater than 1 </i>",
-                                      parse_mode=ParseMode.HTML)
-
-        self.__remove_set_min_usd_amount_handler()
+            return
 
     @send_typing_action
     def __set_group_link(self, update: Update, context: CallbackContext):
@@ -758,7 +764,7 @@ class AddToken:
 
     def __add_set_min_usd_amount_handler(self):
         self.set_min_buy_handler = MessageHandler(
-            Filters.regex('\d+\.?\d*'), self.__set_min_buy)
+            Filters.regex('^\d+\.?\d*$'), self.__set_min_buy)
         self.dispatcher.add_handler(self.set_min_buy_handler)
 
     def __remove_set_min_usd_amount_handler(self):
