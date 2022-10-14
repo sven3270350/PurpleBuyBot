@@ -153,16 +153,6 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
     let amountOut = 0;
 
     if (selectedTrackedToken.token === 1) {
-      const { group_id, token_name, chain_name } = trackedToken;
-      console.log(
-        "UTILS::swapHanlder::token1",
-        {
-          group_id,
-          token_name,
-          chain_name,
-        },
-        data.returnValues
-      );
       const token1Decimals = await getTokenDecimals(
         trackedToken.paired_with,
         chainId
@@ -227,49 +217,6 @@ const setCirculatingSupply = async (trackedToken) => {
     console.log("[Utils::setCirculatingSupply]", error);
   }
 };
-
-// const getUnitPrice = async (trackedToken) => {
-//   const getAmountsOutAbi = [
-//     {
-//       inputs: [
-//         { internalType: "uint256", name: "amountIn", type: "uint256" },
-//         { internalType: "address[]", name: "path", type: "address[]" },
-//       ],
-//       name: "getAmountsOut",
-//       outputs: [
-//         { internalType: "uint256[]", name: "amounts", type: "uint256[]" },
-//       ],
-//       stateMutability: "view",
-//       type: "function",
-//     },
-//   ];
-//   try {
-//     const {
-//       token_address,
-//       token_decimals,
-//       chain_id,
-//       router_address,
-//       paired_with,
-//     } = trackedToken;
-
-//     const web3 = wss(appConfig.getProvider(chain_id));
-//     const router = new web3.eth.Contract(
-//       getAmountsOutAbi,
-//       router_address.toLowerCase()
-//     );
-
-//     const amountIn = 1 * 10 ** token_decimals; // 1 token
-//     const amountsOut = await router.methods
-//       .getAmountsOut(amountIn, [
-//         token_address.toLowerCase(),
-//         paired_with.toLowerCase(),
-//       ])
-//       .call();
-//     return amountsOut[1];
-//   } catch (error) {
-//     console.log("[Utils::getUnitPrice]", error);
-//   }
-// };
 
 const keyInObject = (key, obj) => {
   const length = Object.keys(obj).length;
