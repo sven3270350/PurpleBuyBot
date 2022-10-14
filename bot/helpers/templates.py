@@ -61,11 +61,13 @@ help_template = '''
 /active_tracking - Toggle active buy tracking
 /set_buy_icon - Set buy icon
 /set_buy_media - Set a gif or image to show with buys
+/set_group_link - Create and set a new invite link for the group
 
 <b>Managin Tokens:</b>
 Add, use /add_token
 Remove, use /remove_token
 List tracked tokens, use /tracked_tokens
+Set minimum buy, use /set_min_usd_amount
 
 <b>Run Contest:</b>
 Biggest Buy contest, use /start_buy_contest
