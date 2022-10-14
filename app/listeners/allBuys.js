@@ -54,7 +54,7 @@ const allBuysHandler = async (
     );
 
     // send message to group
-    utils.sendHTMLMessage(trackedToken.group_id, templates);
+    await utils.sendHTMLMessage(trackedToken.group_id, templates);
   } catch (error) {
     const { group_id, token_name, chain_name } = trackedToken;
     console.log(
