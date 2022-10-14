@@ -509,7 +509,6 @@ class AddToken:
         min_usd_buy = update.message.text
 
         if float(min_usd_buy) > 1:
-
             group_tracked_token: list[TrackedToken] = TrackedToken.query.filter_by(
                 group_id=group_id).all()
 
@@ -521,7 +520,6 @@ class AddToken:
 
                     update.message.reply_text(text=f"<i>✅ Minimum buy set to <b>${min_usd_buy}</b> </i>",
                                               parse_mode=ParseMode.HTML)
-                    self.__remove_set_min_usd_amount_handler()
                 except Exception as e:
                     logger.error(e)
                     db.session.rollback()
@@ -530,6 +528,8 @@ class AddToken:
         else:
             update.message.reply_text(text="<i>❌ Minimum buy must be greater than 1 </i>",
                                       parse_mode=ParseMode.HTML)
+
+        self.__remove_set_min_usd_amount_handler()
 
     @send_typing_action
     def __set_group_link(self, update: Update, context: CallbackContext):
