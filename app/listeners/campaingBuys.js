@@ -172,7 +172,9 @@ const campaignBuysHandler = async (
       );
     }
   } catch (error) {
-    console.log("[campaignBuys::allBuysHandler]", error);
+    const { group_id } = trackedToken;
+    console.log("[campaignBuys::allBuysHandler]");
+    utils.handleSendError(error, group_id);
   }
 };
 
