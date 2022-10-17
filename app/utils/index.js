@@ -35,6 +35,13 @@ const wss = (provider) => {
 
 const getGroupInviteLink = async (groupId) => {
   const groupInfo = await bot.getChat(groupId);
+  // groupInfo.permissions.can_pin_messages
+  // bot.pinChatMessage(groupInfo.id, nessageId);
+  // bot.editMessageText(text, {
+  //   chat_id: groupInfo.id,
+  //   message_id: messageId,
+  //   parse_mode: "HTML",
+  // });
   const { group_link } = await queries.getGroupInviteLink(groupId);
   const invite_link = groupInfo.invite_link;
   const user_name = groupInfo.username;
