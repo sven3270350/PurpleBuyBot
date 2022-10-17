@@ -75,6 +75,7 @@ ${ad ? "\n\n——\n\n" + ad : ""}
 }
 
 const countdowToStartTemplate = (
+  contestname,
   startCountdown,
   EndCountdown,
   groupLink,
@@ -83,7 +84,7 @@ const countdowToStartTemplate = (
   return `
 🕐🕐🕐🕐🕐🕐🕐🕐🕐🕐🕐
 
-<b>Countdown to buy contest</b>
+<b>Countdown to ${contestname} Contest</b>
 
 <b>Starts: <i>${startCountdown}</i></b>
 <b>Ends: <i>${EndCountdown}</i></b>

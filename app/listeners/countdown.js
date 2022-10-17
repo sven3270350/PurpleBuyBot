@@ -19,6 +19,7 @@ const countdownHandler = async (activeCampaign) => {
       new Date() > startDate ? "Started" : startCountdownString;
 
     const templates = countdowToStartTemplate(
+      activeCampaign.campaing_type,
       startCountdownToUse,
       endCountDownString,
       groupLink,
