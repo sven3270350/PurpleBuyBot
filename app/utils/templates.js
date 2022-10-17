@@ -74,7 +74,12 @@ ${ad ? "\n\n——\n\n" + ad : ""}
 `;
 }
 
-const countdowToStartTemplate = (startCountdown, EndCountdown, ad) => {
+const countdowToStartTemplate = (
+  startCountdown,
+  EndCountdown,
+  groupLink,
+  ad
+) => {
   return `
 🕐🕐🕐🕐🕐🕐🕐🕐🕐🕐🕐
 
@@ -82,6 +87,8 @@ const countdowToStartTemplate = (startCountdown, EndCountdown, ad) => {
 
 <b>Starts: <i>${startCountdown}</i></b>
 <b>Ends: <i>${EndCountdown}</i></b>
+ ${groupLink ? "\n👥 <a href='" + groupLink + "'>Group</a> " : ""}
+📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 ${ad ? "\n\n——\n\n" + ad : ""}
 `;
 };
