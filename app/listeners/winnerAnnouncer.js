@@ -21,7 +21,7 @@ const announcerHandler = async (activeCampaign) => {
           // anounce biggest buy campaign winner
           winner = await queries.getTop5Buys(activeCampaign.id);
           winnerAddress = winner[0].buyer_address;
-          templates = winnerBiggestBuysTemplate(winner, activeCampaign, ad);
+          templates = await winnerBiggestBuysTemplate(winner, activeCampaign, ad);
           await queries.deleteNonTop5Buys(activeCampaign.id);
 
           // write winner to campaign
@@ -31,7 +31,7 @@ const announcerHandler = async (activeCampaign) => {
           // anounce raffle campaign winner
           winner = await queries.getRandomWinner(activeCampaign.id);
           winnerAddress = winner.buyer_address;
-          templates = winnerRaffleBuysTemplate(winner, activeCampaign, ad);
+          templates = await winnerRaffleBuysTemplate(winner, activeCampaign, ad);
 
           // write winner to campaign
           await queries.writeWinnerToCampaign(winnerAddress, activeCampaign.id);
@@ -43,7 +43,7 @@ const announcerHandler = async (activeCampaign) => {
           winner = await queries.getLastBuy(activeCampaign.id);
           winnerAddress = winner.buyer_address;
 
-          templates = winnerRaffleBuysTemplate(winner, activeCampaign, ad);
+          templates = await winnerRaffleBuysTemplate(winner, activeCampaign, ad);
 
           // write winner to campaign
           await queries.writeWinnerToCampaign(winnerAddress, activeCampaign.id);

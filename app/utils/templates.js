@@ -276,8 +276,9 @@ ${ad ? "\n\n——\n\n" + ad : ""}
   `;
 }
 
-const winnerBiggestBuysTemplate = (leaderboard, campaign, ad) => {
+const winnerBiggestBuysTemplate = async (leaderboard, campaign, ad) => {
   let templates = ``;
+  const group_link = await getGroupInviteLink(campaign?.group_id);
 
   for (let i = 0; i < leaderboard.length; i++) {
     const { buyer_address, amount } = leaderboard[i];
@@ -298,12 +299,15 @@ ${rankIcon(i + 1)} ${ellipseAddress(buyer_address)} ➖${numberToUsd(amount)}
 ${templates}
 
 🏆 Prize: <b>${campaign.prize}</b>
+${group_link ? "\n👥 <a href='" + group_link + "'>Group</a> " : ""}
+📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 ${ad ? "\n\n——\n\n" + ad : ""}
 `;
 };
 
-const winnerRaffleBuysTemplate = (winner, campaign, ad) => {
-  console.log(campaign?.campaing_type, winner);
+const winnerRaffleBuysTemplate = async (winner, campaign, ad) => {
+  const group_link = await getGroupInviteLink(campaign?.group_id);
+
   return `
 <b>${campaign?.campaing_type} Competition Completed</b>
 
@@ -314,7 +318,9 @@ const winnerRaffleBuysTemplate = (winner, campaign, ad) => {
     winner.buyer_amount ? numberToUsd(winner.buyer_amount) : ""
   }</code>
 
-🏆 Prize: <b>${campaign?.prize}</b>
+🏆 Prize: <b>${campaign?.prize}</b> 
+${group_link ? "\n👥 <a href='" + group_link + "'>Group</a> " : ""}
+📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 ${ad ? "\n\n——\n\n" + ad : ""}
 `;
 };

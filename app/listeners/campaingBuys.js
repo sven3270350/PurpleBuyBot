@@ -129,7 +129,7 @@ const campaignBuysHandler = async (
               );
 
               // announce winner
-              let template = winnerRaffleBuysTemplate(
+              let template = await winnerRaffleBuysTemplate(
                 lastBuy.winner,
                 activeCampaign,
                 ad
