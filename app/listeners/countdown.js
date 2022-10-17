@@ -13,6 +13,7 @@ const countdownHandler = async (activeCampaign) => {
 
   try {
     const ad = await utils.getAd(activeCampaign.group_id);
+    const groupLink = await utils.getGroupInviteLink(activeCampaign.group_id);
 
     const startCountdownToUse =
       new Date() > startDate ? "Started" : startCountdownString;
@@ -20,6 +21,7 @@ const countdownHandler = async (activeCampaign) => {
     const templates = countdowToStartTemplate(
       startCountdownToUse,
       endCountDownString,
+      groupLink,
       ad
     );
 
@@ -35,45 +37,52 @@ const main = async (interval = 1000 * 30) => {
   const maxDelayValue = 2147483647;
 
   try {
-    setInterval(async () => {
-      const activeCampaigns = await queries.getAllUpcomingCampaigns();
+    setInterval(
+      async () => {
+        const activeCampaigns = await queries.getAllUpcomingCampaigns();
 
-      // if no active campaigns, and countdowns, then stop all countdowns
-      if (activeCampaigns.length === 0 && Object.keys(countdowns).length > 0) {
+        // if no active campaigns, and countdowns, then stop all countdowns
+        if (
+          activeCampaigns.length === 0 &&
+          Object.keys(countdowns).length > 0
+        ) {
+          Object.keys(countdowns).forEach((id) => {
+            clearInterval(countdowns[id]);
+            delete countdowns[id];
+          });
+        }
+
+        // stop countdowns that are no longer active
         Object.keys(countdowns).forEach((id) => {
-          clearInterval(countdowns[id]);
-          delete countdowns[id];
+          const campaign = activeCampaigns.find(
+            (c) => Number(c.id) === Number(id)
+          );
+          if (!campaign) {
+            clearInterval(countdowns[id]);
+            delete countdowns[id];
+          }
         });
-      }
 
-      // stop countdowns that are no longer active
-      Object.keys(countdowns).forEach((id) => {
-        const campaign = activeCampaigns.find(
-          (c) => Number(c.id) === Number(id)
-        );
-        if (!campaign) {
-          clearInterval(countdowns[id]);
-          delete countdowns[id];
-        }
-      });
+        // for each active campaign, create a countdown
+        activeCampaigns.forEach(async (activeCampaign) => {
+          const countdownInterval =
+            1000 * 60 * (activeCampaign.count_down ?? 10);
 
-      // for each active campaign, create a countdown
-      activeCampaigns.forEach(async (activeCampaign) => {
-        const countdownInterval = 1000 * 60 * (activeCampaign.count_down ?? 10);
+          // check if it's is not in countdowns
+          if (!utils.keyInObject(activeCampaign.id, countdowns)) {
+            // create a countdown
+            const countdown = setInterval(async () => {
+              // send reminder message to group
+              await countdownHandler(activeCampaign);
+            }, countdownInterval);
 
-        // check if it's is not in countdowns
-        if (!utils.keyInObject(activeCampaign.id, countdowns)) {
-          // create a countdown
-          const countdown = setInterval(async () => {
-            // send reminder message to group
-            await countdownHandler(activeCampaign);
-          }, countdownInterval);
-
-          // add to countdowns
-          countdowns[activeCampaign.id] = countdown;
-        }
-      });
-    }, interval > maxDelayValue ? maxDelayValue : interval);
+            // add to countdowns
+            countdowns[activeCampaign.id] = countdown;
+          }
+        });
+      },
+      interval > maxDelayValue ? maxDelayValue : interval
+    );
   } catch (error) {
     console.log("[countdown::main]", error);
   }
