@@ -153,6 +153,7 @@ const writeAllBuysToDB = async(buys) => {
   INSERT INTO public.all_transactions (
     buyer_address,
     buyer_amount,
+    token_name,
     transaction_link,
     transaction_chain,
     group_id
@@ -162,6 +163,7 @@ const writeAllBuysToDB = async(buys) => {
   const params = [
     buys.buyer_address,
     buys.buyer_amount,
+    buys.token_name,
     buys.transaction_link,
     buys.transaction_chain,
     buys.group_id,

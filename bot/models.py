@@ -184,6 +184,7 @@ class AllTransactions(db.Model):
     at = db.Column(db.DateTime, default=db.func.now())
     buyer_address = db.Column(db.String(100))
     buyer_amount = db.Column(db.Float)
+    token_name = db.Column(db.String(100))
     transaction_link = db.Column(db.String(100))
     transaction_chain = db.Column(db.String(20))
     group_id = db.Column(db.String(80), db.ForeignKey('group.group_id'))
