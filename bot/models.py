@@ -178,6 +178,18 @@ class Transactions(db.Model):
     def __repr__(self):
         return '<Transactions %r>' % f"{self.group_id}_{self.biggest_buy_campaign_id}_{self.id}"
 
+class AllTransactions(db.Model):
+    __tablename__ = 'all_transactions'
+    id = db.Column(db.Integer, primary_key=True)
+    buyer_address = db.Column(db.String(100))
+    buyer_amount = db.Column(db.Float)
+    transaction_link = db.Column(db.String(100))
+    transaction_chain = db.Column(db.String(20))
+    group_id = db.Column(db.String(80), db.ForeignKey('group.group_id'))
+
+    def __repr__(self):
+        return '<AllTransactions %r>' % f"{self.group_id}_{self.id}"
+    
 class Blacklist(db.Model):
     __tablename__ = 'blacklist'
     id = db.Column(db.Integer, primary_key=True)
