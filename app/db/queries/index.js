@@ -148,7 +148,7 @@ const getActiveAd = async () => {
   return res.rows;
 };
 
-const writeAllBuysToDB = async(buys) => {
+const writeAllBuysToDB = async (buys) => {
   const query = `
   INSERT INTO public.all_transactions (
     buyer_address,
@@ -170,7 +170,7 @@ const writeAllBuysToDB = async(buys) => {
   ];
   const res = await db.query(query, params);
   return res.rows[0];
-}
+};
 
 const writeBuysToDB = async (buys) => {
   const query = `
@@ -307,6 +307,25 @@ const setWinnerAndEndContest = async (address, id) => {
   return res.rows[0];
 };
 
+const getTrendingGroups = async () => {
+  const query = `
+  SELECT
+      group_id,
+      count(*) as transaction_number,
+      sum(buyer_amount) as transaction_volume
+  FROM all_transactions
+  WHERE
+      at_time > (NOW() - INTERVAL 10 MINUTE)
+  GROUP BY group_id
+  ORDER BY
+      transaction_number DESC,
+      transaction_volume DESC
+  LIMIT 10
+  `;
+  const res = await db.query(query);
+  return res.rows;
+};
+
 const deleteTrackedToken = async (group_id) => {
   const query = `
   UPDATE public.tracked_token SET active_tracking=false WHERE group_id = $1;
@@ -405,6 +424,7 @@ module.exports = {
   getGroupActiveCampaign,
   writeAllBuysToDB,
   writeBuysToDB,
+  getTrendingGroups,
   getTop5Buys,
   getRandomWinner,
   getOdds,
