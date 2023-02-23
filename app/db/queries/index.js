@@ -156,7 +156,7 @@ const writeAllBuysToDB = async(buys) => {
     transaction_link,
     transaction_chain,
     group_id,
-    token_name,
+    token_name
     )
   VALUES ($1, $2, $3, $4, $5, $6)
   `;
