@@ -310,17 +310,17 @@ const setWinnerAndEndContest = async (address, id) => {
 const getTrendingGroups = async () => {
   const query = `
   SELECT
-      group_id,
-      count(*) as transaction_number,
-      sum(buyer_amount) as transaction_volume
-  FROM all_transactions
+    group_id,
+    count(*) as transaction_number,
+    sum(buyer_amount) as transaction_volume
+  FROM public.all_transactions
   WHERE
-      at_time > (NOW() - INTERVAL 10 MINUTE)
+    all_transactions.at > (NOW() - INTERVAL '10 MINUTE')
   GROUP BY group_id
   ORDER BY
-      transaction_number DESC,
-      transaction_volume DESC
-  LIMIT 10
+    transaction_number DESC,
+    transaction_volume DESC
+  LIMIT 1
   `;
   const res = await db.query(query);
   return res.rows;
