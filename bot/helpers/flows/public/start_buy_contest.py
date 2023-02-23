@@ -3,13 +3,13 @@ from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMark
 from services.subscriptions_service import SubscriptionService
 from models import db, Campaigns
 from services.bot_service import BotService
-from services.campaign_service import CampaignService
+from services.campaign_service import CampaignService, CampaignWinners
 from helpers.utils import is_private_chat, is_group_admin, send_typing_action, reset_chat_data, not_group_admin, response_for_group
 from helpers.templates import (
     no_trackecd_tokens_template, start_biggest_buy_contest_template,
     set_start_time_template, set_end_time_template, set_min_buy_template,
     set_winner_reward_template, set_countdown_template, invalid_countdown_template, start_competition_confirmation_template,
-    biggest_buy_competition_alert_template, invalid_time_template, not_valid_value_template, active_contest_template)
+    biggest_buy_competition_alert_template, invalid_time_template, not_valid_value_template, active_contest_template, contest_winner_template)
 from datetime import datetime, timedelta
 import logging
 
@@ -303,6 +303,74 @@ class BuyContest:
                     parse_mode=ParseMode.HTML
                 )
 
+    @send_typing_action
+    def __get_contests_winner(self, update: Update, context: CallbackContext):
+        self.__extract_params(update, context)
+
+        if is_private_chat(update):
+            if not BotService().is_group_in_focus(update, context):
+                reset_chat_data(context)
+                return ConversationHandler.END
+
+            group_id = context.chat_data.get('group_id', None)
+            context.chat_data['group_title'] = context.bot.get_chat(
+                group_id).title
+
+            if not is_group_admin(update, context):
+                return not_group_admin(update)
+
+            contest_winner = CampaignService(
+            ).get_campaign_winners(group_id)
+
+            if contest_winner:
+                reply_message: str = ""
+                for winner in contest_winner:
+                    reply_message += contest_winner_template(
+                        start=winner['start'],
+                        end=winner['end'],
+                        winner=winner['winner'],
+                        prize=winner['prize'],
+                        contest=winner['contest']
+                    )
+
+                update.message.reply_text(
+                    text=reply_message,
+                    parse_mode=ParseMode.HTML
+                )
+            else:
+                update.message.reply_text(
+                    text="ℹ️ You haven't run any contest yet",
+                    parse_mode=ParseMode.HTML
+                )
+        else:
+            group_id = str(update.effective_chat.id)
+            group_title = context.bot.get_chat(
+                group_id).title
+
+            contest_winner = CampaignService(
+            ).get_campaign_winners(group_id)
+
+            if contest_winner:
+                reply_message: str = f"👥 <i>Group: <b>{group_title}</b></i>\n"
+                for winner in contest_winner:
+                    reply_message += contest_winner_template(
+                        start=winner['start'],
+                        end=winner['end'],
+                        winner=winner['winner'],
+                        prize=winner['prize'],
+                        contest=winner['contest']
+                    )
+
+                update.message.reply_text(
+                    text=reply_message,
+                    parse_mode=ParseMode.HTML
+                )
+            else:
+                update.message.reply_text(
+                    text="ℹ️ You haven't run any contest yet",
+                    parse_mode=ParseMode.HTML
+                )
+
     def __cancel_contest(self, update: Update, context: CallbackContext):
         query = update.callback_query
         query.answer()
@@ -539,6 +607,8 @@ class BuyContest:
         self.dispatcher.add_handler(self.set_cancel_handler)
         self.dispatcher.add_handler(CommandHandler(
             'active_contest', self.__get_active_contest))
+        self.dispatcher.add_handler(CommandHandler(
+            'contest_winners', self.__get_contests_winner))
         self.dispatcher.add_handler(CallbackQueryHandler(
             self.__cancel_contest, pattern='cancel_contest'))
 

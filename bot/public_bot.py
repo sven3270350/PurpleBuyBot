@@ -75,6 +75,8 @@ def start_bot():
                                            "Start a last buy contest"),
                                           ("active_contest",
                                            "Show active contest and cancel if needed"),
+                                          ("contest_winners",
+                                           "Show winners of last 5 contests"),
                                           ("subscribe",
                                            "Subscribe to premium to remove ads"),
                                           ("chains", " Show a list of supported chains"),

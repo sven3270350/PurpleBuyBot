@@ -1,3 +1,5 @@
+import datetime
+
 def start_template_private(bot_name): return f'''
 <b>Welcome to PurpleBuyBot!</b>
 
@@ -56,6 +58,7 @@ help_template = '''
 /raffle_on - Start raffle buy contest
 /start_lastbuy_contest - Start last buy contest
 /active_contest - Show active contest and cancel if needed
+/contest_winners - Show winners of last 5 contests
 /subscribe - Subscribe to premium to remove ads
 /chains - Show a list of supported chains
 /active_tracking - Toggle active buy tracking
@@ -74,7 +77,7 @@ Set minimum buy, use /set_min_usd_amount
 Biggest Buy contest, use /start_buy_contest
 Raffle contests, use /raffle_on
 Last Buy contests, use /start_lastbuy_contest
-End Contest, use /active_contest
+End Contest, use /active_contest to proceed
 
 <b>Toggle Tracking:</b>
 Use /active_tracking to toggle tracking of buys
@@ -382,6 +385,16 @@ def active_contest_template(competition_name, group_title, start_date, end_date,
 ⬇️ <b>Minimum Buy:</b> ${minimum_buy}
 🏆 <b>Winner's Reward:</b> {winner_reward}
 '''
+
+
+def contest_winner_template(start: datetime, end: datetime, winner: str, contest: str, prize: str):
+    return f'''
+🎮 <b>Contest: {contest}</b>
+
+🕣 <i>Duration: {start} - {end}</i>
+🎉 <code>{winner}</code> won <b>{prize}</b>
+--------
+    '''
 
 
 regular_buy_template = '''

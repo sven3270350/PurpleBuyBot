@@ -1,7 +1,17 @@
 from datetime import datetime
+from typing import List, TypedDict
 from models import db, Campaigns
 
-
+# Types
+class CampaignWinners(TypedDict):
+    id: int
+    start: datetime
+    end: datetime
+    winner: str
+    contest: str
+    prize: str
+   
+ 
 class CampaignService:
 
     # create a new campaigns,
@@ -48,5 +58,80 @@ class CampaignService:
     def get_campaign_transactions(self, campaign_id):
         pass
 
-    def get_campaign_winners(self, campaign_id):
-        pass
+    def get_campaign_winners(self, group_id)->List[CampaignWinners]:
+        stmt = f'''
+            UPDATE public.campaigns
+            SET
+                campaign_winner = (
+                    CASE
+                        WHEN campaigns.campaing_type = 'Biggest Buy' THEN (
+                            SELECT buyer_address
+                            FROM (
+                                    SELECT
+                                        buyer_address,
+                                        RANK() OVER (
+                                            ORDER BY
+                                                t.amount DESC
+                                        ) AS campaignRank
+                                    FROM (
+                                            SELECT
+                                                buyer_address,
+                                                SUM(buyer_amount) AS amount
+                                            FROM public.transactions
+                                            WHERE
+                                                campaign_id = campaigns.id
+                                            GROUP BY
+                                                buyer_address
+                                        ) AS t
+                                    ORDER BY campaignRank
+                                    LIMIT
+                                        1
+                                ) as w
+                        )
+                        WHEN campaing_type = 'Last Buy' THEN (
+                            SELECT buyer_address
+                            FROM
+                                public.transactions
+                            WHERE
+                                campaign_id = campaigns.id
+                            ORDER BY id DESC
+                            LIMIT
+                                1
+                        )
+                        WHEN campaing_type = 'Raffle' THEN (
+                            SELECT buyer_address
+                            FROM public.transactions
+                            WHERE
+                                campaign_id = campaigns.id
+                            ORDER BY RANDOM()
+                            LIMIT
+                                1
+                        )
+                        ELSE 'Not Available'
+                    END
+                )
+            WHERE campaigns.id IN (
+                    SELECT id
+                    From public.campaigns
+                    WHERE
+                        group_id = '-1001743891337'
+                    ORDER BY id DESC
+                    LIMIT
+                        5
+                )
+                AND campaigns.campaign_winner ISNULL;
+
+            SELECT
+                id,
+                start_time as "start",
+                end_time as "end",
+                campaign_winner as winner,
+                campaing_type as contest,
+                prize
+            FROM public.campaigns
+            WHERE
+                group_id = '{group_id}'
+            ORDER BY id DESC
+            LIMIT 5;
+        '''
+        return list(db.engine.execute(stmt))
