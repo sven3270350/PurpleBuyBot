@@ -203,7 +203,7 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
       try {
         await queries.writeAllBuysToDB({
           buyer_address: to,
-          buyer_amount: price.usdString,
+          buyer_amount: price.usdNumber,
           token_name: token_name,
           transaction_link: tx_link,
           transaction_chain: chain_name,
