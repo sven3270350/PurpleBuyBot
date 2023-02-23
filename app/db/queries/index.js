@@ -148,6 +148,28 @@ const getActiveAd = async () => {
   return res.rows;
 };
 
+const writeAllBuysToDB = async(buys) => {
+  const query = `
+  INSERT INTO public.all_transactions (
+    buyer_address,
+    buyer_amount,
+    transaction_link,
+    transaction_chain,
+    group_id
+    )
+  VALUES ($1, $2, $3, $4, $5)
+  `;
+  const params = [
+    buys.buyer_address,
+    buys.buyer_amount,
+    buys.transaction_link,
+    buys.transaction_chain,
+    buys.group_id,
+  ];
+  const res = await db.query(query, params);
+  return res.rows[0];
+}
+
 const writeBuysToDB = async (buys) => {
   const query = `
   INSERT INTO public.transactions (
@@ -379,6 +401,7 @@ module.exports = {
   getAllUpcomingCampaigns,
   getAllActivelyTrackedTokensWithActiveCampaign,
   getGroupActiveCampaign,
+  writeAllBuysToDB,
   writeBuysToDB,
   getTop5Buys,
   getRandomWinner,

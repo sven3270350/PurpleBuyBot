@@ -181,6 +181,7 @@ class Transactions(db.Model):
 class AllTransactions(db.Model):
     __tablename__ = 'all_transactions'
     id = db.Column(db.Integer, primary_key=True)
+    at = db.Column(db.DateTime, default=db.func.now())
     buyer_address = db.Column(db.String(100))
     buyer_amount = db.Column(db.Float)
     transaction_link = db.Column(db.String(100))

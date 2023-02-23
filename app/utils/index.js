@@ -199,6 +199,27 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
         marketCap = unitPrice * circulating_supply;
       }
 
+      const { group_id, token_name, chain_name } = trackedToken;
+      try {
+        await queries.writeAllBuysToDB({
+          buyer_address: to,
+          buyer_amount: price,
+          transaction_link: tx_link,
+          transaction_chain: chain_name,
+          group_id: group_id,
+        });
+      } catch (error) {
+        console.log(
+          "[Utils::swapHanlder::SaveToDB]",
+          {
+            group_id,
+            token_name,
+            chain_name,
+          },
+          error
+        );
+      }
+
       callback(
         trackedToken,
         amountIn,
