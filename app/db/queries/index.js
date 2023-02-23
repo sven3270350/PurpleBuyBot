@@ -153,20 +153,20 @@ const writeAllBuysToDB = async(buys) => {
   INSERT INTO public.all_transactions (
     buyer_address,
     buyer_amount,
-    token_name,
     transaction_link,
     transaction_chain,
-    group_id
+    group_id,
+    token_name,
     )
   VALUES ($1, $2, $3, $4, $5, $6)
   `;
   const params = [
     buys.buyer_address,
     buys.buyer_amount,
-    buys.token_name,
     buys.transaction_link,
     buys.transaction_chain,
     buys.group_id,
+    buys.token_name,
   ];
   const res = await db.query(query, params);
   return res.rows[0];
