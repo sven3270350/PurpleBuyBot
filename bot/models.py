@@ -181,17 +181,20 @@ class Transactions(db.Model):
 class AllTransactions(db.Model):
     __tablename__ = 'all_transactions'
     id = db.Column(db.Integer, primary_key=True)
-    at = db.Column(db.DateTime, default=db.func.now())
     buyer_address = db.Column(db.String(100))
+    buy_date = db.Column(db.DateTime,  nullable=False, default=db.func.now())
     buyer_amount = db.Column(db.Float)
     token_name = db.Column(db.String(100))
     transaction_link = db.Column(db.String(100))
     transaction_chain = db.Column(db.String(20))
     group_id = db.Column(db.String(80), db.ForeignKey('group.group_id'))
 
+    def __init__(self):
+        self.buy_date = db.func.now()
+
     def __repr__(self):
         return '<AllTransactions %r>' % f"{self.group_id}_{self.id}"
-    
+
 class Blacklist(db.Model):
     __tablename__ = 'blacklist'
     id = db.Column(db.Integer, primary_key=True)
@@ -199,6 +202,7 @@ class Blacklist(db.Model):
 
     def __repr__(self):
         return '<Blacklist %r>' % self.address
+
 
 class Advertisement(db.Model):
     __tablename__ = "advertisement"
