@@ -2,8 +2,13 @@ const cluster = require("cluster");
 const semver = require("semver");
 const { startMainJobs, startChildJobs } = require("./schedule");
 
-var https = require('https');
-var http = require('http');
+const allBuysListener = require("./listeners/allBuys");
+const countdownListener = require("./listeners/countdown");
+const campaignBuyListener = require("./listeners/campaingBuys");
+const winnerAnnouncer = require("./listeners/winnerAnnouncer");
+
+var https = require("https");
+var http = require("http");
 
 https.globalAgent.maxSockets = 5;
 http.globalAgent.maxSockets = 5;
@@ -21,6 +26,11 @@ const main = async () => {
       // start main jobs
       startMainJobs();
 
+      await allBuysListener.main();
+      await campaignBuyListener.main();
+      await countdownListener.main();
+      await winnerAnnouncer.main();
+
       // manage child processes
       let childProcessId;
       cluster.on("exit", (worker, code, signal) => {
@@ -37,13 +47,12 @@ const main = async () => {
       });
       cluster.fork();
     } else {
-        // start child jobs in child process
-        startChildJobs();
+      // start child jobs in child process
+      startChildJobs();
     }
   } catch (error) {
     console.log("[_app::main]", error);
   }
 };
-
 
 main();
