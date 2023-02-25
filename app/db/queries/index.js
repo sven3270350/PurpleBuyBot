@@ -158,7 +158,7 @@ const writeAllBuysToDB = async (buys) => {
     group_id,
     token_name
     )
-  VALUES ($1, $2, $3, $4, $5, $6)
+  VALUES ($1, $2, $3, $4, $5, $6);
   `;
   const params = [
     buys.buyer_address,
@@ -243,6 +243,26 @@ const deleteNonTop5Buys = async (campaign_id) => {
   return res.rows;
 };
 
+const getTrendingGroups = async () => {
+  const query = `
+  SELECT
+    group_id,
+    count(*) as transactions,
+    sum(buyer_amount) as volume,
+	RANK() OVER (ORDER BY  count(*) DESC) AS "rank"
+  FROM public.all_transactions
+  WHERE
+    all_transactions.buy_date > (NOW() - INTERVAL '1 HOUR')
+  GROUP BY group_id
+  ORDER BY
+    transactions DESC,
+    volume DESC
+  LIMIT 10;
+  `;
+  const res = await db.query(query);
+  return res.rows;
+};
+
 const getRandomWinner = async (campaign_id) => {
   const query = `
   SELECT * FROM public.transactions WHERE campaign_id = $1 ORDER BY RANDOM() LIMIT 1;
@@ -305,25 +325,6 @@ const setWinnerAndEndContest = async (address, id) => {
   const params = [address, id];
   const res = await db.query(query, params);
   return res.rows[0];
-};
-
-const getTrendingGroups = async () => {
-  const query = `
-  SELECT
-    group_id,
-    count(*) as transaction_number,
-    sum(buyer_amount) as transaction_volume
-  FROM public.all_transactions
-  WHERE
-    all_transactions.at > (NOW() - INTERVAL '10 MINUTE')
-  GROUP BY group_id
-  ORDER BY
-    transaction_number DESC,
-    transaction_volume DESC
-  LIMIT 1
-  `;
-  const res = await db.query(query);
-  return res.rows;
 };
 
 const deleteTrackedToken = async (group_id) => {
@@ -413,6 +414,22 @@ const getMinUSDBuyAmount = async (group_id) => {
   return res.rows[0];
 };
 
+const cleanDatabase = async () => {
+  try {
+    
+  } catch (err) {
+    throw new Error(err);
+  }
+  const query = `
+  DELETE FROM public.transactions WHERE buy_date < NOW() - INTERVAL '2 days';
+  DELETE FROM public.transactions 
+    WHERE transactions.campaign_id IN (SELECT id FROM public.campaigns WHERE campaigns.end_time < (NOW() - INTERVAL '1 MONTH'));
+  DELETE FROM public.campaigns WHERE campaigns.end_time < (NOW() - INTERVAL '2 MONTH');
+    `;
+  const res = await db.query(query);
+  return res.rows[0];
+};
+
 module.exports = {
   getTrackedTokensById,
   getActiveSubscriptionByGroupId,
@@ -441,4 +458,8 @@ module.exports = {
   getLastBuy,
   getGroupInviteLink,
   getMinUSDBuyAmount,
+  cleanDatabase,
 };
+
+
+// DELETE FROM `logs` WHERE `date` < DATE_SUB(NOW(), INTERVAL 1 DAY)
