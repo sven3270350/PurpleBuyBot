@@ -241,7 +241,7 @@ class ConstestBuysService {
             trackedToken.pair
           );
 
-          await subscribe(trackedToken, contract);
+          await this.subscribe(trackedToken, contract);
         }
       });
     } catch (error) {
