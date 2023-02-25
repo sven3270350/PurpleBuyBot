@@ -46,6 +46,7 @@ const campaignBuysHandler = async (
       });
 
       const ad = await utils.getAd(trackedToken.group_id);
+      const trending = await queries.getTrendingGroups();
       const endDate = new Date(activeCampaign?.end_time);
       const times = {
         start_time: new Date(activeCampaign?.start_time).toLocaleString(),
