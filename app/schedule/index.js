@@ -6,6 +6,10 @@ const startMainJobs = async () => {
   jobs.ContestBuysJob();
   jobs.CountDownJob();
   jobs.AnnounceWinnerJob();
+
+  // maintenance jobs
+
+  jobs.CleanDBJob();
 };
 
 const startChildJobs = async () => {};

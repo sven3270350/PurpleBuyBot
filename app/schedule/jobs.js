@@ -4,7 +4,7 @@ const AllBuysService = require("../services/all_buys");
 const ContestBuysService = require("../services/contest_buys");
 const CountDownService = require("../services/countdown");
 const AnnounceWinnerService = require("../services/announce_winner");
-
+const { cleanDB, deleteBlacklisted } = require("../services/maintenance");
 class Job {
   rule;
   callback;
@@ -103,10 +103,20 @@ function AnnounceWinnerJob() {
   new JobPessimism("*/30 * * * * *", cb, AnnounceWinnerJob.name).schedule();
 }
 
+function CleanDBJob() {
+  const cb = async () => {
+    await cleanDB();
+    await deleteBlacklisted();
+  };
+
+  new JobPessimism("0 0 0 */25 * *", cb, CleanDBJob.name).schedule();
+}
+
 module.exports = {
   CoingeckoCacheJob,
   AllBuysJob,
   ContestBuysJob,
   CountDownJob,
   AnnounceWinnerJob,
+  CleanDBJob,
 };
