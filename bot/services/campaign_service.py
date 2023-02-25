@@ -114,7 +114,8 @@ class CampaignService:
                     SELECT id
                     From public.campaigns
                     WHERE
-                        group_id = '-1001743891337'
+                        group_id = '{group_id}'
+                    AND end_time < NOW()
                     ORDER BY id DESC
                     LIMIT
                         5
