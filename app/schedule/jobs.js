@@ -1,5 +1,7 @@
 const schedule = require("node-schedule");
 const CoingeckoService = require("../services/coingecko");
+const AllBuysService = require("../services/all_buys");
+const ContestBuysService = require("../services/contest_buys");
 
 class Job {
   rule;
@@ -67,6 +69,23 @@ function CoingeckoCacheJob() {
   new JobPessimism("*/20 * * * * *", cb, CoingeckoCacheJob.name).schedule();
 }
 
+function AllBuysJob() {
+  const cb = async () => {
+    await new AllBuysService().main();
+  };
+
+  new JobPessimism("*/30 * * * * *", cb, AllBuysJob.name).schedule();
+}
+
+function ContestBuysJob() {
+    const cb = async () => {
+        await new ContestBuysService().main();
+    };
+    
+    new JobPessimism("*/30 * * * * *", cb, ContestBuysJob.name).schedule();
+}
+
 module.exports = {
   CoingeckoCacheJob,
+  AllBuysJob,
 };
