@@ -4,10 +4,9 @@ const UniswapV2Pair = require("./IUniswapV2Pair.json");
 const ERC20 = require("./erc20abi.json");
 const Web3 = require("web3");
 const Web3WsProvider = require("web3-providers-ws");
-const CoinGecko = require("coingecko-api");
-const CoinGeckoClient = new CoinGecko();
 const TelegramBot = require("node-telegram-bot-api");
 const TrendingQueue = require("./trending_queue");
+const CoingeckoService = require("../services/coingecko");
 
 const bot = new TelegramBot(process.env.PUBLIC_BOT_API_KEY);
 
@@ -186,7 +185,7 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
     }
 
     const to = data.returnValues.to;
-    const price = await getUsdPrice(amountIn, trackedToken.paired_with_name);
+    const price = await new CoingeckoService().getUsdPrice(amountIn, trackedToken.paired_with_name);
 
     if (
       (amountIn > 0 || amountOut > 0) &&
@@ -250,8 +249,15 @@ const setCirculatingSupply = async (trackedToken) => {
     const { id, token_address, token_decimals, chain_id, group_id } =
       trackedToken;
     const totalSupply = await getTokenTotalSupply(token_address, chain_id);
-    const circulatingSupply = convertFromWei(totalSupply, token_decimals);
-    await queries.updateTrackedTokenCircSupply(group_id, id, circulatingSupply);
+    const circulatingSupply = totalSupply
+      ? convertFromWei(totalSupply, token_decimals)
+      : 0;
+    if (circulatingSupply)
+      await queries.updateTrackedTokenCircSupply(
+        group_id,
+        id,
+        circulatingSupply
+      );
   } catch (error) {
     console.log("[Utils::setCirculatingSupply]", error);
   }
@@ -282,76 +288,6 @@ const decimalsToUnit = (decimals) => {
 
 const ellipseAddress = (address) => {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
-};
-
-const getUsdPrice = async (amount, paired_with) => {
-  const price = await getUsdPriceFromCache(paired_with);
-  return {
-    usdString: numberToUsd(Number(amount) * price),
-    usdNumber: Number(amount) * price,
-    actualPrice: price,
-  };
-};
-
-const getUSDPrices = async () => {
-  const ids = appConfig.getAllCoingeckoIds();
-  try {
-    const { data } = await CoinGeckoClient.simple.price({
-      ids: Object.values(ids),
-      vs_currencies: "usd",
-    });
-    return data;
-  } catch (error) {
-    console.log("[Utils::getUsdPrices]", error);
-    return {};
-  }
-};
-
-let prices = {};
-const cachePrices = async (interval = 1000 * 15) => {
-  return (async () => {
-    if (Object.keys(prices).length === 0) {
-      try {
-        prices = await getUSDPrices();
-        setInterval(async () => {
-          prices = await getUSDPrices();
-        }, interval);
-      } catch (error) {
-        console.log("[allBuys::cachePrices]", error);
-      }
-    }
-    return prices;
-  })();
-};
-
-const getUsdPriceFromCache = async (paired_with) => {
-  const id = paired_with.toLowerCase();
-  const pairs = {
-    eth: "ethereum",
-    bnb: "binancecoin",
-    cro: "crypto-com-chain",
-    usdt: "tether",
-    busd: "binance-usd",
-    usdc: "usd-coin",
-  };
-
-  try {
-    const cachedPrices = await cachePrices();
-    // console.log("UTILS::getUsdPriceFromCache::cachedPrices", cachedPrices);
-
-    const price = cachedPrices[pairs[id]]?.usd;
-    return price;
-  } catch (error) {
-    console.log("[Utils::getUsdPriceFromCache]", error);
-    return 0;
-  }
-};
-
-const numberToUsd = (amount) => {
-  return Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(amount);
 };
 
 const sendHTMLMessage = async (groupId, messageTemplate) => {
@@ -597,17 +533,12 @@ module.exports = {
   wss,
   fromWei: Web3.utils.fromWei,
   decimalsToUnit,
-  getUsdPrice,
   sendHTMLMessage,
   getCountdown,
   getCountdownString,
   getAd,
   ellipseAddress,
-  numberToUsd,
   rankIcon,
-  getUSDPrices,
-  cachePrices,
-  getUsdPriceFromCache,
   amountFormater,
   getBuyerLink,
   isNewBuyer,
