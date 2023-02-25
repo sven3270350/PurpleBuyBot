@@ -435,7 +435,8 @@ const getAd = async (groupId) => {
 };
 
 const rankIcon = (rank) => {
-  switch (rank) {
+  const rankNumber = Number(rank);
+  switch (rankNumber) {
     case 1:
       return "🥇";
     case 2:
