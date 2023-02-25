@@ -19,7 +19,7 @@ class CoingeckoService {
     });
 
     if (data) {
-      this.prices = data;
+      CoingeckoService.prices = data;
       console.log("[CoingeckoService::cachePrices] prices cached");
     }
   }

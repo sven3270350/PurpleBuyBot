@@ -64,7 +64,7 @@ class AllBuysService {
 
   async subscribe(trackedToken, contract) {
     const subscription = contract.events.Swap({});
-    subscriptions[
+    this.subscriptions[
       `${trackedToken.token_address.toLowerCase()}_${trackedToken.id}`
     ] = subscription;
 
@@ -87,22 +87,22 @@ class AllBuysService {
         await queries.getAllActivelyTrackedTokensNoActiveCampaign();
 
       // if no tracked tokens, and subssciptions, unsubscribe from all
-      if (trackedTokens.length === 0 && Object.keys(subscriptions).length > 0) {
-        Object.keys(subscriptions).forEach((id) => {
-          subscriptions[id].unsubscribe();
-          delete subscriptions[id];
+      if (trackedTokens.length === 0 && Object.keys(this.subscriptions).length > 0) {
+        Object.keys(this.subscriptions).forEach((id) => {
+          this.subscriptions[id].unsubscribe();
+          delete this.subscriptions[id];
         });
       }
 
       // if stop subscription if not actively tracked
-      Object.keys(subscriptions).forEach((id) => {
+      Object.keys(this.subscriptions).forEach((id) => {
         if (
           !trackedTokens.find(
             (token) => `${token.token_address.toLowerCase()}_${token.id}` === id
           )
         ) {
-          subscriptions[id].unsubscribe();
-          delete subscriptions[id];
+          this.subscriptions[id].unsubscribe();
+          delete this.subscriptions[id];
         }
       });
 
@@ -115,7 +115,7 @@ class AllBuysService {
         if (
           !utils.keyInObject(
             `${trackedToken.token_address.toLowerCase()}_${trackedToken.id}`,
-            subscriptions
+            this.subscriptions
           ) &&
           trackedToken.active_tracking
         ) {

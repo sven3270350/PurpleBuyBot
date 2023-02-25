@@ -113,19 +113,19 @@ class ConstestBuysService {
               );
               break;
             case "Last Buy":
-              clearTimeout(lastBuy.timeout);
+              clearTimeout(this.lastBuy.timeout);
               const winner = {
                 buyer_address: to,
                 buyer_amount: new_buyer.usdPrice,
               };
 
-              lastBuy.winner = winner;
+              this.lastBuy.winner = winner;
               const resetAfter =
-                lastBuy.lastTimeSet > 0
-                  ? Math.round((new Date() - lastBuy.lastTimeSet) / 1000)
+                this.lastBuy.lastTimeSet > 0
+                  ? Math.round((new Date() - this.lastBuy.lastTimeSet) / 1000)
                   : 0;
 
-              lastBuy.timeout = setTimeout(async () => {
+              this.lastBuy.timeout = setTimeout(async () => {
                 await queries.setWinnerAndEndContest(
                   to,
                   trackedToken.campaign_id
@@ -133,7 +133,7 @@ class ConstestBuysService {
 
                 // announce winner
                 let template = await winnerRaffleBuysTemplate(
-                  lastBuy.winner,
+                  this.lastBuy.winner,
                   activeCampaign,
                   ad
                 );
@@ -155,7 +155,7 @@ class ConstestBuysService {
                 lastBuyCampaign,
                 ad
               );
-              lastBuy.lastTimeSet = new Date();
+              this.lastBuy.lastTimeSet = new Date();
               break;
             default:
               break;
@@ -183,7 +183,7 @@ class ConstestBuysService {
 
   async subscribe(trackedToken, contract) {
     const subscription = contract.events.Swap({});
-    subscriptions[
+    this.subscriptions[
       `${trackedToken.token_address.toLowerCase()}_${trackedToken.id}`
     ] = subscription;
 
@@ -201,22 +201,25 @@ class ConstestBuysService {
         await queries.getAllActivelyTrackedTokensWithActiveCampaign();
 
       // if no tracked tokens, and subssciptions, unsubscribe from all
-      if (trackedTokens.length === 0 && Object.keys(subscriptions).length > 0) {
-        Object.keys(subscriptions).forEach((id) => {
-          subscriptions[id].unsubscribe();
-          delete subscriptions[id];
+      if (
+        trackedTokens.length === 0 &&
+        Object.keys(this.subscriptions).length > 0
+      ) {
+        Object.keys(this.subscriptions).forEach((id) => {
+          this.subscriptions[id].unsubscribe();
+          delete this.subscriptions[id];
         });
       }
 
       // stop subcription if there is no active campaign
-      Object.keys(subscriptions).forEach((id) => {
+      Object.keys(this.subscriptions).forEach((id) => {
         if (
           !trackedTokens.find(
             (token) => `${token.token_address.toLowerCase()}_${token.id}` === id
           )
         ) {
-          subscriptions[id].unsubscribe();
-          delete subscriptions[id];
+          this.subscriptions[id].unsubscribe();
+          delete this.subscriptions[id];
         }
       });
 
@@ -229,7 +232,7 @@ class ConstestBuysService {
         if (
           !utils.keyInObject(
             `${trackedToken.token_address.toLowerCase()}_${trackedToken.id}`,
-            subscriptions
+            this.subscriptions
           )
         ) {
           // get event from contract
