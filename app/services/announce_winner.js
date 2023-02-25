@@ -85,6 +85,7 @@ class AnnounceWinnerService {
   }
 
   async main() {
+    const maxDelayValue = 2147483647;
     try {
       const activeCampaigns = await queries.getAllActiveCampaigns();
 
