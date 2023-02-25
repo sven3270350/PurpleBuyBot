@@ -35,7 +35,6 @@ class CountDownService {
   }
 
   async main() {
-    // get all tracked tokens
     try {
       const activeCampaigns = await queries.getAllUpcomingCampaigns();
 

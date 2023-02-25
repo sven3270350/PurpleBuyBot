@@ -2,6 +2,8 @@ const schedule = require("node-schedule");
 const CoingeckoService = require("../services/coingecko");
 const AllBuysService = require("../services/all_buys");
 const ContestBuysService = require("../services/contest_buys");
+const CountDownService = require("../services/countdown");
+const AnnounceWinnerService = require("../services/announce_winner");
 
 class Job {
   rule;
@@ -78,14 +80,33 @@ function AllBuysJob() {
 }
 
 function ContestBuysJob() {
-    const cb = async () => {
-        await new ContestBuysService().main();
-    };
-    
-    new JobPessimism("*/30 * * * * *", cb, ContestBuysJob.name).schedule();
+  const cb = async () => {
+    await new ContestBuysService().main();
+  };
+
+  new JobPessimism("*/30 * * * * *", cb, ContestBuysJob.name).schedule();
+}
+
+function CountDownJob() {
+  const cb = async () => {
+    await new CountDownService().main();
+  };
+
+  new JobPessimism("*/30 * * * * *", cb, CountDownJob.name).schedule();
+}
+
+function AnnounceWinnerJob() {
+  const cb = async () => {
+    await new AnnounceWinnerService().main();
+  };
+
+  new JobPessimism("*/30 * * * * *", cb, AnnounceWinnerJob.name).schedule();
 }
 
 module.exports = {
   CoingeckoCacheJob,
   AllBuysJob,
+  ContestBuysJob,
+  CountDownJob,
+  AnnounceWinnerJob,
 };
