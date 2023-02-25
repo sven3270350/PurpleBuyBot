@@ -252,7 +252,7 @@ const getTrendingGroups = async () => {
 	RANK() OVER (ORDER BY  count(*) DESC) AS "rank"
   FROM public.all_transactions
   WHERE
-    all_transactions.buy_date > (NOW() - INTERVAL '1 HOUR')
+    all_transactions.buy_date > (NOW() - INTERVAL '4 HOUR')
   GROUP BY group_id
   ORDER BY
     transactions DESC,
@@ -329,7 +329,30 @@ const setWinnerAndEndContest = async (address, id) => {
 
 const deleteTrackedToken = async (group_id) => {
   const query = `
-  UPDATE public.tracked_token SET active_tracking=false WHERE group_id = $1;
+  DELETE FROM public.token_chains 
+	WHERE token_chains.token_id
+	IN (
+		SELECT id 
+			FROM public.tracked_token 
+			WHERE tracked_token.group_id = $1);
+
+DELETE FROM public.token_dexs
+	WHERE token_dexs.token_id
+	IN (
+		SELECT id 
+			FROM public.tracked_token 
+			WHERE tracked_token.group_id = $1);
+	
+DELETE FROM public.token_pairs
+	WHERE token_pairs.token_id
+	IN (
+		SELECT id 
+			FROM public.tracked_token 
+			WHERE tracked_token.group_id = $1
+	);
+	
+DELETE FROM public.tracked_token
+	WHERE tracked_token.group_id = $1;
     `;
   const params = [group_id];
   const res = await db.query(query, params);
@@ -415,16 +438,70 @@ const getMinUSDBuyAmount = async (group_id) => {
 };
 
 const cleanDatabase = async () => {
-  try {
-    
-  } catch (err) {
-    throw new Error(err);
-  }
   const query = `
   DELETE FROM public.transactions WHERE buy_date < NOW() - INTERVAL '2 days';
   DELETE FROM public.transactions 
     WHERE transactions.campaign_id IN (SELECT id FROM public.campaigns WHERE campaigns.end_time < (NOW() - INTERVAL '1 MONTH'));
-  DELETE FROM public.campaigns WHERE campaigns.end_time < (NOW() - INTERVAL '2 MONTH');
+  DELETE FROM public.campaigns WHERE campaigns.end_time < (NOW() - INTERVAL '1 MONTH');
+    `;
+  const res = await db.query(query);
+  return res.rows[0];
+};
+
+const deleteBlacklistedTokens = async () => {
+  const query = `
+  DELETE FROM
+      public.token_chains
+  WHERE
+      token_chains.token_id IN (
+          SELECT id
+          FROM
+              public.tracked_token
+          WHERE
+              tracked_token.token_address IN (
+                  SELECT
+                      address
+                  from
+                      public.blacklist
+              )
+      );
+
+  DELETE FROM public.token_dexs
+  WHERE token_dexs.token_id IN (
+          SELECT id
+          FROM
+              public.tracked_token
+          WHERE
+              tracked_token.token_address IN (
+                  SELECT
+                      address
+                  from
+                      public.blacklist
+              )
+      );
+
+  DELETE FROM public.token_pairs
+  WHERE token_pairs.token_id IN (
+          SELECT id
+          FROM
+              public.tracked_token
+          WHERE
+              tracked_token.token_address IN (
+                  SELECT
+                      address
+                  from
+                      public.blacklist
+              )
+      );
+
+  DELETE FROM
+      public.tracked_token
+  WHERE
+      tracked_token.token_address IN (
+          SELECT address
+          from
+              public.blacklist
+      );
     `;
   const res = await db.query(query);
   return res.rows[0];
@@ -459,7 +536,5 @@ module.exports = {
   getGroupInviteLink,
   getMinUSDBuyAmount,
   cleanDatabase,
+  deleteBlacklistedTokens
 };
-
-
-// DELETE FROM `logs` WHERE `date` < DATE_SUB(NOW(), INTERVAL 1 DAY)

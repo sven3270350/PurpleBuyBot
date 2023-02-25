@@ -1,25 +1,49 @@
-require("dotenv").config({ path: "../.env" });
+const cluster = require("cluster");
+const semver = require("semver");
+const { startMainJobs, startChildJobs } = require("./schedule");
 
-const throng = require("throng");
-const allBuysListener = require("./listeners/allBuys");
-const countdownListener = require("./listeners/countdown");
-const campaignBuyListener = require("./listeners/campaingBuys");
-const winnerAnnouncer = require("./listeners/winnerAnnouncer");
-const utils = require("./utils");
+var https = require('https');
+var http = require('http');
 
-const WORKERS = 1;
-// main function, iterates through all contracts in pairs
+https.globalAgent.maxSockets = 5;
+http.globalAgent.maxSockets = 5;
 
-async function start() {
-  await utils.cachePrices();
-  await allBuysListener.main();
-  await campaignBuyListener.main();
-  await countdownListener.main();
-  await winnerAnnouncer.main();
-}
+const main = async () => {
+  try {
+    const isPrimaryCluster = () => {
+      if (semver.gte(process.version, "v16.0.0")) {
+        return cluster.isPrimary;
+      }
+      return cluster.isMaster;
+    };
 
-throng({
-  workers: WORKERS,
-  lifetime: Infinity,
-  start: start,
-});
+    if (isPrimaryCluster()) {
+      // start main jobs
+      startMainJobs();
+
+      // manage child processes
+      let childProcessId;
+      cluster.on("exit", (worker, code, signal) => {
+        // refork
+        if (worker.process.id == childProcessId) {
+          console.log(
+            `[app::main] child process ${childProcessId} died, reforking...`
+          );
+          cluster.fork();
+        }
+      });
+      cluster.on("fork", (worker) => {
+        childProcessId = worker.process.pid;
+      });
+      cluster.fork();
+    } else {
+        // start child jobs in child process
+        startChildJobs();
+    }
+  } catch (error) {
+    console.log("[_app::main]", error);
+  }
+};
+
+
+main();
