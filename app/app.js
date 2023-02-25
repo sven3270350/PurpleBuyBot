@@ -7,8 +7,8 @@ const countdownListener = require("./listeners/countdown");
 const campaignBuyListener = require("./listeners/campaingBuys");
 const winnerAnnouncer = require("./listeners/winnerAnnouncer");
 
-var https = require("https");
-var http = require("http");
+const https = require("https");
+const http = require("http");
 
 https.globalAgent.maxSockets = 50;
 http.globalAgent.maxSockets = 50;
