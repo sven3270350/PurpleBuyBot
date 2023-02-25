@@ -3,6 +3,12 @@ const appConfig = require("../utils/app_config");
 
 class CoingeckoService {
   static prices = undefined;
+  static numberToUsd = (amount) => {
+    return Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(amount);
+  };
 
   async cachePrices() {
     const CoinGeckoClient = new CoinGecko();
@@ -18,7 +24,7 @@ class CoingeckoService {
     }
   }
 
-  async getUsdPrice(paired_with) {
+  async getPairPrice(paired_with) {
     const id = paired_with.toLowerCase();
     const pairs = {
       eth: "ethereum",
@@ -34,6 +40,15 @@ class CoingeckoService {
     }
 
     return CoingeckoService.prices[pairs[id]]?.usd;
+  }
+
+  async getUsdPrice(amount, paired_with) {
+    const price = await this.getPairPrice(paired_with);
+    return {
+      usdString: CoingeckoService.numberToUsd(Number(amount) * price),
+      usdNumber: Number(amount) * price,
+      actualPrice: price,
+    };
   }
 }
 
