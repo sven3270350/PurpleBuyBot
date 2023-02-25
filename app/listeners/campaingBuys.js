@@ -46,7 +46,7 @@ const campaignBuysHandler = async (
       });
 
       const ad = await utils.getAd(trackedToken.group_id);
-      const trending = await queries.getTrendingGroups();
+      
       const endDate = new Date(activeCampaign?.end_time);
       const times = {
         start_time: new Date(activeCampaign?.start_time).toLocaleString(),
@@ -77,6 +77,9 @@ const campaignBuysHandler = async (
         const { buy_icon, buy_media } = await utils.getGroupMedia(
           trackedToken.group_id
         );
+
+        const rank = await utils.trendingGroupRank(trackedToken.group_id);
+        
         switch (activeCampaign?.campaing_type) {
           case "Biggest Buy":
             const ranking = await queries.getTop5Buys(trackedToken.campaign_id);
@@ -89,6 +92,7 @@ const campaignBuysHandler = async (
             };
 
             templates = await campaignBiggestBuysTemplate(
+              rank,
               times,
               new_buyer,
               buy_icon,
@@ -101,6 +105,7 @@ const campaignBuysHandler = async (
           case "Raffle":
             const odds = await queries.getOdds(trackedToken.campaign_id);
             templates = await campaignRaffleBuysTemplate(
+              rank,
               times,
               new_buyer,
               buy_icon,
@@ -146,6 +151,7 @@ const campaignBuysHandler = async (
             };
 
             templates = await campaignLastBuyTemplate(
+              rank,
               times,
               new_buyer,
               buy_icon,
