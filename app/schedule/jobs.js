@@ -68,7 +68,7 @@ function CoingeckoCacheJob() {
     await new CoingeckoService().cachePrices();
   };
 
-  new JobPessimism("*/20 * * * * *", cb, CoingeckoCacheJob.name).schedule();
+  new JobPessimism("*/59 * * * * *", cb, CoingeckoCacheJob.name).schedule();
 }
 
 function AllBuysJob() {
