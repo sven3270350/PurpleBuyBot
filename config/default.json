@@ -7,6 +7,7 @@
     "etherscan": "https://etherscan.io/",
     "bscscan": "https://bscscan.com/",
     "cronoscan": "https://cronoscan.com/",
+    "arbiscan": "https://arbiscan.io/",
     "ropsten": "https://ropsten.etherscan.io/",
     "bscTestnet": "https://testnet.bscscan.com/",
     "croTest": "https://cronos.org/explorer/testnet3/"
@@ -16,6 +17,7 @@
     "ethChainId": 1,
     "bscChainId": 56,
     "croChainId": 25,
+    "arbChainId": 42161,
 
     "testnetEthChainId": 3,
     "testnetBscChainId": 97,
@@ -26,6 +28,7 @@
     "ethProvider": "wss://ws-nd-457-219-066.p2pify.com/995f42c215dd82e593dfe90b359c3d3a",
     "bscProvider": "wss://ws-nd-233-350-740.p2pify.com/827abae5a52a98b1f6439d4f359ea30b",
     "croProvider": "wss://cro.getblock.io/mainnet/?api_key=eb8c01cf-f461-41e4-9ffa-a4368d3f2294",
+    "arbProvider": "wss://ws-nd-797-966-640.p2pify.com/797e392a76c820340bfccf7ad2e809bc",
 
     "testnetEthProvider": "https://eth.getblock.io/goerli/?api_key=eb8c01cf-f461-41e4-9ffa-a4368d3f2294",
     "testnetBscProvider": "wss://bsc.getblock.io/testnet/?api_key=eb8c01cf-f461-41e4-9ffa-a4368d3f2294",
@@ -35,7 +38,8 @@
   "DEX_EXPLORERS": {
     "ethdex": "https://www.dextools.io/app/ether/pair-explorer/",
     "bscdex": "https://www.dextools.io/app/bnb/pair-explorer/",
-    "crodex": "https://www.dextools.io/app/cronos/pair-explorer/"
+    "crodex": "https://www.dextools.io/app/cronos/pair-explorer/",
+    "arbdex": "https://www.dextools.io/app/arbitrum/pair-explorer/"
   },
 
   "COINGECKO_IDS": {
