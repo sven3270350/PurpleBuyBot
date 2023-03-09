@@ -5,6 +5,7 @@ const getExploerUrl = (chainId) => {
     1: "etherscan",
     56: "bscscan",
     25: "cronoscan",
+    42161: "arbiscan",
     3: "ropsten",
     97: "bscTestnet",
     338: "croTest",
@@ -19,6 +20,7 @@ const getDexChartUrl = (chainId) => {
     1: "ethdex",
     56: "bscdex",
     25: "crodex",
+    42161: "arbdex",
   };
   const key = dexChart[chainId];
   return config.get(`DEX_EXPLORERS.${key}`);
@@ -29,6 +31,7 @@ const getChain = (chainId) => {
     1: "ETH",
     56: "BSC",
     25: "CRO",
+    42161: "Arbitrum",
     3: "Ropsten",
     97: "BSCTestnet",
     338: "CROTestnet",
@@ -41,6 +44,7 @@ const getProvider = (chainId) => {
     1: "ethProvider",
     56: "bscProvider",
     25: "croProvider",
+    42161: "arbProvider",
     3: "testnetEthProvider",
     97: "testnetBscProvider",
     338: "testnetCroProvider",
@@ -54,6 +58,7 @@ const getCoinGeckoId = (chainId) => {
     1: "ethid",
     56: "bscid",
     25: "croid",
+    42161: "ethid",
     3: "ethid",
     97: "bscid",
     338: "croid",

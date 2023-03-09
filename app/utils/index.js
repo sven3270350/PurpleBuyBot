@@ -185,7 +185,10 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
     }
 
     const to = data.returnValues.to;
-    const price = await new CoingeckoService().getUsdPrice(amountIn, trackedToken.paired_with_name);
+    const price = await new CoingeckoService().getUsdPrice(
+      amountIn,
+      trackedToken.paired_with_name
+    );
 
     if (
       (amountIn > 0 || amountOut > 0) &&
@@ -432,7 +435,8 @@ const getAd = async (groupId) => {
 };
 
 const rankIcon = (rank) => {
-  switch (rank) {
+  const rankNumber = Number(rank);
+  switch (rankNumber) {
     case 1:
       return "🥇";
     case 2:
@@ -444,7 +448,7 @@ const rankIcon = (rank) => {
     case 5:
       return "5️⃣";
     default:
-      return "😎";
+      return "🔥";
   }
 };
 
@@ -494,6 +498,15 @@ const getGroupMedia = async (groupId) => {
   let { buy_icon, buy_media } = await queries.getGroupIconAndMedia(groupId);
   buy_media = buy_media ? JSON.parse(buy_media) : "";
   return { buy_icon, buy_media };
+};
+
+const trendingGroupRank = async (groupId) => {
+  const trending = await queries.getTrendingGroups(); // [{group_id: 123, rank: 1}]
+  if (trending.some((group) => group.group_id === groupId)) {
+    return trending.find((group) => group.group_id === groupId).rank;
+  } else {
+    return 0;
+  }
 };
 
 const handleSendError = (error, groupId) => {
@@ -549,4 +562,5 @@ module.exports = {
   amountFormater2,
   percentageFormatter,
   handleSendError,
+  trendingGroupRank,
 };

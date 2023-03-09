@@ -12,6 +12,7 @@ const {
 } = require(".");
 
 async function generalBuyTemplate(
+  rank,
   trackedToken,
   amounts,
   buyer,
@@ -71,6 +72,8 @@ ${
   }
 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 ${ad ? "\n\n——\n\n" + ad : ""}
+
+${rank ? rankIcon(rank) + " Trending #"+rank: ""}
 `;
 }
 
@@ -95,6 +98,7 @@ ${ad ? "\n\n——\n\n" + ad : ""}
 };
 
 async function campaignBiggestBuysTemplate(
+  rank,
   times,
   new_buyer,
   group_icon,
@@ -162,10 +166,13 @@ ${
   }
 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 ${ad ? "\n\n——\n\n" + ad : ""}
+
+${rank ? rankIcon(rank) + " Trending #"+rank: ""}
 `;
 }
 
 async function campaignRaffleBuysTemplate(
+  rank,
   times,
   new_buyer,
   group_icon,
@@ -217,10 +224,13 @@ ${
   }
 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 ${ad ? "\n\n——\n\n" + ad : ""}
+
+${rank ? rankIcon(rank) + " Trending #"+rank: ""}
 `;
 }
 
 async function campaignLastBuyTemplate(
+  rank,
   times,
   new_buyer,
   group_icon,
@@ -273,6 +283,8 @@ ${
   }
 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 ${ad ? "\n\n——\n\n" + ad : ""}
+
+${rank ? rankIcon(rank) + " Trending #"+rank: ""}
   `;
 }
 

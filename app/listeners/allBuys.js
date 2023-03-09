@@ -16,6 +16,7 @@ const allBuysHandler = async (
   try {
     const { usdString: usdPrice, usdNumber: multiplier } = price;
     const ad = await utils.getAd(trackedToken.group_id);
+    
     const { buy_icon, buy_media } = await utils.getGroupMedia(
       trackedToken.group_id
     );
@@ -43,7 +44,10 @@ const allBuysHandler = async (
       tx_link,
     };
 
+
+    const rank = await utils.trendingGroupRank(trackedToken.group_id);
     const templates = await generalBuyTemplate(
+      rank,
       trackedToken,
       amounts,
       buyer,
