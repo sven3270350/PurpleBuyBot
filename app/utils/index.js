@@ -143,63 +143,71 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
   const token_address = trackedToken.token_address.toLowerCase();
   const decimals = trackedToken.token_decimals;
   const chainId = trackedToken.chain_id;
-  console.info("before quering min usd buy amount - trackedToken.group_id", trackedToken.group_id)
   const { min_usd_amount } = await queries.getMinUSDBuyAmount(
     trackedToken.group_id
   );
   const explorer = appConfig.getExploerUrl(chainId);
   const tx_link = `${explorer}tx/${tx_hash}`;
-  console.info(
-    "before quering token circ supply - min_usd_amount, trackedToken.id",
-    min_usd_amount,
-    trackedToken.id
-  )
   const { circulating_supply } = await queries.getTokenCircSupply(
     trackedToken.id
   );
-    console.info("----step1----")
+
   try {
     if (!circulating_supply) {
       await setCirculatingSupply(trackedToken);
     }
-    console.info("----step2----")
+
     const selectedTrackedToken = await selectTrackedToken(
       token_address,
       contract
     );
 
-    let amountIn = 0;
-    let amountOut = 0;
+    let amountIn = 10;
+    let amountOut = 10;
 
-    if (selectedTrackedToken.token === 1) {
-      const token1Decimals = await getTokenDecimals(
-        trackedToken.paired_with,
-        chainId
-      );
+    // const pairedTokenDecimals = await getTokenDecimals(
+    //   trackedToken.paired_with,
+    //   chainId
+    // );
 
-      amountOut = convertFromWei(data.returnValues.amount1Out, decimals);
-      amountIn = convertFromWei(data.returnValues.amount0In, token1Decimals);
-    } else {
-      const token0Decimals = await getTokenDecimals(
-        trackedToken.paired_with,
-        chainId
-      );
+    // if (Number(data.returnValues.amount0In) > 0) {
+    //   amountOut = convertFromWei(data.returnValues.amount1Out, decimals);
+    //   amountIn = convertFromWei(data.returnValues.amount0In, pairedTokenDecimals);
+    // } else {
+    //   amountOut = convertFromWei(data.returnValues.amount0Out, decimals);
+    //   amountIn = convertFromWei(data.returnValues.amount1In, pairedTokenDecimals);
+    // }
 
-      amountOut = convertFromWei(data.returnValues.amount0Out, decimals);
+    // if (selectedTrackedToken.token === 1) {
+    //   console.log("---------step amount----------", selectedTrackedToken.token, data.returnValues)
 
-      amountIn = convertFromWei(data.returnValues.amount1In, token0Decimals);
-    }
+    //   const token1Decimals = await getTokenDecimals(
+    //     trackedToken.paired_with,
+    //     chainId
+    //   );
+    //   console.log('before token 1 decimal')
+    //   amountOut = convertFromWei(data.returnValues.amount1Out, decimals);
+    //   amountIn = convertFromWei(data.returnValues.amount0In, token1Decimals);
+    //   console.log("------token 1 Decimal-------", token1Decimals)
+    // } else {
+    //   console.log("---------step amount----------", selectedTrackedToken.token, data.returnValues)
 
-    console.log("trackedToken.paired_with_name",trackedToken.paired_with_name)
+    //   const token0Decimals = await getTokenDecimals(
+    //     trackedToken.paired_with,
+    //     chainId
+    //   );
+
+    //   console.log('before token 0 decimal')
+    //   amountOut = convertFromWei(data.returnValues.amount0Out, decimals);
+    //   amountIn = convertFromWei(data.returnValues.amount1In, token0Decimals);
+    //   console.log("------token 0 Decimal-------", token0Decimals)
+    // }
 
     const to = data.returnValues.to;
-    // const price = await new CoingeckoService().getUsdPrice(
-    //   amountIn,
-    //   trackedToken.paired_with_name
-    // );
-    const price = { usdString: '$2.00', usdNumber: 2, actualPrice: 270.46 }
-    console.log("----------Coingecko Price-------",price,"*********",token_address);
-    console.info("selectedTrackedToken.token",selectedTrackedToken.token)
+    const price = await new CoingeckoService().getUsdPrice(
+      amountIn,
+      trackedToken.paired_with_name
+    );
     console.info("(amountIn > 0 || amountOut > 0)",(amountIn > 0 || amountOut > 0))
     console.info("price.usdNumber >= (min_usd_amount ?? 1)",price.usdNumber >= (min_usd_amount ?? 1))
 
