@@ -74,6 +74,7 @@ const subscribe = async (trackedToken, contract) => {
 
   // subscribe to event
   subscription.on("data", (data) => {
+    console.info("---------Subscription Data-------------",data);
     utils.swapHanlder(contract, trackedToken, data, allBuysHandler);
   });
 

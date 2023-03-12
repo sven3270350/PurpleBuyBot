@@ -70,6 +70,7 @@ class AllBuysService {
 
     // subscribe to event
     subscription.on("data", (data) => {
+      console.info("-------------service-------------",data)
       utils.swapHanlder(
         contract,
         trackedToken,

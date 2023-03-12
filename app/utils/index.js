@@ -143,20 +143,26 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
   const token_address = trackedToken.token_address.toLowerCase();
   const decimals = trackedToken.token_decimals;
   const chainId = trackedToken.chain_id;
+  console.info("before quering min usd buy amount - trackedToken.group_id", trackedToken.group_id)
   const { min_usd_amount } = await queries.getMinUSDBuyAmount(
     trackedToken.group_id
   );
   const explorer = appConfig.getExploerUrl(chainId);
   const tx_link = `${explorer}tx/${tx_hash}`;
+  console.info(
+    "before quering token circ supply - min_usd_amount, trackedToken.id",
+    min_usd_amount,
+    trackedToken.id
+  )
   const { circulating_supply } = await queries.getTokenCircSupply(
     trackedToken.id
   );
-
+    console.info("----step1----")
   try {
     if (!circulating_supply) {
       await setCirculatingSupply(trackedToken);
     }
-
+    console.info("----step2----")
     const selectedTrackedToken = await selectTrackedToken(
       token_address,
       contract
@@ -184,18 +190,25 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
       amountIn = convertFromWei(data.returnValues.amount1In, token0Decimals);
     }
 
+    console.log("trackedToken.paired_with_name",trackedToken.paired_with_name)
+
     const to = data.returnValues.to;
-    const price = await new CoingeckoService().getUsdPrice(
-      amountIn,
-      trackedToken.paired_with_name
-    );
+    // const price = await new CoingeckoService().getUsdPrice(
+    //   amountIn,
+    //   trackedToken.paired_with_name
+    // );
+    const price = { usdString: '$2.00', usdNumber: 2, actualPrice: 270.46 }
+    console.log("----------Coingecko Price-------",price,"*********",token_address);
+    console.info("selectedTrackedToken.token",selectedTrackedToken.token)
+    console.info("(amountIn > 0 || amountOut > 0)",(amountIn > 0 || amountOut > 0))
+    console.info("price.usdNumber >= (min_usd_amount ?? 1)",price.usdNumber >= (min_usd_amount ?? 1))
 
     if (
       (amountIn > 0 || amountOut > 0) &&
       price.usdNumber >= (min_usd_amount ?? 1)
     ) {
       let marketCap = 0;
-
+      console.info("----step3----")
       if (circulating_supply) {
         const unitPrice = price.actualPrice / (amountOut / amountIn);
         marketCap = unitPrice * circulating_supply;
@@ -203,6 +216,7 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
 
       const { group_id, token_name, chain_name } = trackedToken;
       try {
+        console.info("--------write to DB----------");
         await queries.writeAllBuysToDB({
           buyer_address: to,
           buyer_amount: price.usdNumber,
