@@ -162,8 +162,8 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
       contract
     );
 
-    let amountIn = 10;
-    let amountOut = 10;
+    let amountIn = 2;
+    let amountOut = 2;
 
     // const pairedTokenDecimals = await getTokenDecimals(
     //   trackedToken.paired_with,
@@ -204,10 +204,11 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
     // }
 
     const to = data.returnValues.to;
-    const price = await new CoingeckoService().getUsdPrice(
-      amountIn,
-      trackedToken.paired_with_name
-    );
+    // const price = await new CoingeckoService().getUsdPrice(
+    //   amountIn,
+    //   trackedToken.paired_with_name
+    // );
+    const price = { usdString: '$2.00', usdNumber: 1, actualPrice: 270.46 };
     console.info("(amountIn > 0 || amountOut > 0)",(amountIn > 0 || amountOut > 0))
     console.info("price.usdNumber >= (min_usd_amount ?? 1)",price.usdNumber >= (min_usd_amount ?? 1))
 
