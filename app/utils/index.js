@@ -162,8 +162,8 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
       contract
     );
 
-    let amountIn = 2;
-    let amountOut = 2;
+    let amountIn = 0;
+    let amountOut = 0;
 
     // const pairedTokenDecimals = await getTokenDecimals(
     //   trackedToken.paired_with,
@@ -178,37 +178,37 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
     //   amountIn = convertFromWei(data.returnValues.amount1In, pairedTokenDecimals);
     // }
 
-    // if (selectedTrackedToken.token === 1) {
-    //   console.log("---------step amount----------", selectedTrackedToken.token, data.returnValues)
+    if (selectedTrackedToken.token === 1) {
+      console.log("---------step amount----------", selectedTrackedToken.token, data.returnValues)
 
-    //   const token1Decimals = await getTokenDecimals(
-    //     trackedToken.paired_with,
-    //     chainId
-    //   );
-    //   console.log('before token 1 decimal')
-    //   amountOut = convertFromWei(data.returnValues.amount1Out, decimals);
-    //   amountIn = convertFromWei(data.returnValues.amount0In, token1Decimals);
-    //   console.log("------token 1 Decimal-------", token1Decimals)
-    // } else {
-    //   console.log("---------step amount----------", selectedTrackedToken.token, data.returnValues)
+      const token1Decimals = await getTokenDecimals(
+        trackedToken.paired_with,
+        chainId
+      );
+      console.log('before token 1 decimal')
+      amountOut = convertFromWei(data.returnValues.amount1Out, decimals);
+      amountIn = convertFromWei(data.returnValues.amount0In, token1Decimals);
+      console.log("------token 1 Decimal-------", token1Decimals)
+    } else {
+      console.log("---------step amount----------", selectedTrackedToken.token, data.returnValues)
 
-    //   const token0Decimals = await getTokenDecimals(
-    //     trackedToken.paired_with,
-    //     chainId
-    //   );
+      const token0Decimals = await getTokenDecimals(
+        trackedToken.paired_with,
+        chainId
+      );
 
-    //   console.log('before token 0 decimal')
-    //   amountOut = convertFromWei(data.returnValues.amount0Out, decimals);
-    //   amountIn = convertFromWei(data.returnValues.amount1In, token0Decimals);
-    //   console.log("------token 0 Decimal-------", token0Decimals)
-    // }
+      console.log('before token 0 decimal')
+      amountOut = convertFromWei(data.returnValues.amount0Out, decimals);
+      amountIn = convertFromWei(data.returnValues.amount1In, token0Decimals);
+      console.log("------token 0 Decimal-------", token0Decimals)
+    }
 
     const to = data.returnValues.to;
-    // const price = await new CoingeckoService().getUsdPrice(
-    //   amountIn,
-    //   trackedToken.paired_with_name
-    // );
-    const price = { usdString: '$2.00', usdNumber: 1, actualPrice: 270.46 };
+    const price = await new CoingeckoService().getUsdPrice(
+      amountIn,
+      trackedToken.paired_with_name
+    );
+    // const price = { usdString: '$2.00', usdNumber: 1, actualPrice: 270.46 };
     console.info("(amountIn > 0 || amountOut > 0)",(amountIn > 0 || amountOut > 0))
     console.info("price.usdNumber >= (min_usd_amount ?? 1)",price.usdNumber >= (min_usd_amount ?? 1))
 
