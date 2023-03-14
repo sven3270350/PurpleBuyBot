@@ -8,6 +8,8 @@ const TelegramBot = require("node-telegram-bot-api");
 const TrendingQueue = require("./trending_queue");
 const CoingeckoService = require("../services/coingecko");
 
+const Coingecko = new CoingeckoService();
+
 const bot = new TelegramBot(process.env.PUBLIC_BOT_API_KEY);
 
 const wss = (provider) => {
@@ -204,7 +206,7 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
     }
 
     const to = data.returnValues.to;
-    const price = await new CoingeckoService().getUsdPrice(
+    const price = await Coingecko.getUsdPrice(
       amountIn,
       trackedToken.paired_with_name
     );

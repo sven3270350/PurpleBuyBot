@@ -439,7 +439,7 @@ const updateTrackedTokenCircSupply = async (
 
 const getTokenCircSupply = async (tracked_token_id) => {
   const query = `
-  SELECT circulating_supply FROM public.tracked_token WHERE id = $1;
+  SELECT circulating_supply FROM public.tracked_token WHERE id = $1 ORDER BY id DESC LIMIT 1;
     `;
   const params = [tracked_token_id];
   const res = await db.query(query, params);
@@ -449,9 +449,9 @@ const getTokenCircSupply = async (tracked_token_id) => {
 const getMinUSDBuyAmount = async (group_id) => {
   const query = `
   SELECT
-  MAX(min_usd_amount) as min_usd_amount
+  min_usd_amount as min_usd_amount
   FROM public.tracked_token
-  WHERE group_id = $1;
+  WHERE group_id = $1 ORDER BY id DESC LIMIT 1;
     `;
   const params = [group_id];
   const res = await db.query(query, params);
