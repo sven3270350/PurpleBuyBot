@@ -167,42 +167,21 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
     let amountIn = 0;
     let amountOut = 0;
 
-    // const pairedTokenDecimals = await getTokenDecimals(
-    //   trackedToken.paired_with,
-    //   chainId
-    // );
-
-    // if (Number(data.returnValues.amount0In) > 0) {
-    //   amountOut = convertFromWei(data.returnValues.amount1Out, decimals);
-    //   amountIn = convertFromWei(data.returnValues.amount0In, pairedTokenDecimals);
-    // } else {
-    //   amountOut = convertFromWei(data.returnValues.amount0Out, decimals);
-    //   amountIn = convertFromWei(data.returnValues.amount1In, pairedTokenDecimals);
-    // }
-
     if (selectedTrackedToken.token === 1) {
-      console.log("---------step amount----------", selectedTrackedToken.token, data.returnValues)
-
       const token1Decimals = await getTokenDecimals(
         trackedToken.paired_with,
         chainId
       );
-      console.log('before token 1 decimal')
       amountOut = convertFromWei(data.returnValues.amount1Out, decimals);
       amountIn = convertFromWei(data.returnValues.amount0In, token1Decimals);
-      console.log("------token 1 Decimal-------", token1Decimals)
     } else {
-      console.log("---------step amount----------", selectedTrackedToken.token, data.returnValues)
-
       const token0Decimals = await getTokenDecimals(
         trackedToken.paired_with,
         chainId
       );
 
-      console.log('before token 0 decimal')
       amountOut = convertFromWei(data.returnValues.amount0Out, decimals);
       amountIn = convertFromWei(data.returnValues.amount1In, token0Decimals);
-      console.log("------token 0 Decimal-------", token0Decimals)
     }
 
     const to = data.returnValues.to;
@@ -210,16 +189,9 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
       amountIn,
       trackedToken.paired_with_name
     );
-    // const price = { usdString: '$2.00', usdNumber: 1, actualPrice: 270.46 };
-    console.info("(amountIn > 0 || amountOut > 0)",(amountIn > 0 || amountOut > 0))
-    console.info("price.usdNumber >= (min_usd_amount ?? 1)",price.usdNumber >= (min_usd_amount ?? 1))
 
-    if (
-      (amountIn > 0 || amountOut > 0) &&
-      price.usdNumber >= (min_usd_amount ?? 1)
-    ) {
+    if (amountIn > 0 || amountOut > 0) {
       let marketCap = 0;
-      console.info("----step3----")
       if (circulating_supply) {
         const unitPrice = price.actualPrice / (amountOut / amountIn);
         marketCap = unitPrice * circulating_supply;
@@ -227,7 +199,6 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
 
       const { group_id, token_name, chain_name } = trackedToken;
       try {
-        console.info("--------write to DB----------");
         await queries.writeAllBuysToDB({
           buyer_address: to,
           buyer_amount: price.usdNumber,
