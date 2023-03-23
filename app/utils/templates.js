@@ -41,7 +41,15 @@ async function generalBuyTemplate(
   const maxIcons = has_media ? 100 : 3667;
 
   return `
- <b>${trackedToken.token_name} Buy!</b>
+  ${
+    group_link
+      ? "<a href='" +
+        group_link +
+        "'><b>" +
+        trackedToken.token_name +
+        " Buy!</b></a> "
+      : "<b>" + trackedToken.token_name + " Buy!</b>"
+  }
 
 ${buy_icon.repeat((multiplier > maxIcons ? maxIcons : multiplier) | 1)}
 
@@ -67,13 +75,13 @@ ${
       "</b>\n"
     : ""
 }
-📊 <a href='${getChart(trackedToken.chain_id, trackedToken.pair)}'>Chart</a> ${
-    group_link ? "| 👥 <a href='" + group_link + "'>Group</a> " : ""
-  }
-📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
+  <a href="https://t.me/PurpleBuyBotTrending">${
+    rank ? rankIcon(rank) + " Trending" : "Trending"
+  }</a> | 📊 <a href='${getChart(
+    trackedToken.chain_id,
+    trackedToken.pair
+  )}'>Chart</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 ${ad ? "\n\n——\n\n" + ad : ""}
-
-${rank ? rankIcon(rank) + " Trending #"+rank: ""}
 `;
 }
 
@@ -167,7 +175,7 @@ ${
 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 ${ad ? "\n\n——\n\n" + ad : ""}
 
-${rank ? rankIcon(rank) + " Trending #"+rank: ""}
+${rank ? rankIcon(rank) + " Trending #" + rank : ""}
 `;
 }
 
@@ -225,7 +233,7 @@ ${
 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 ${ad ? "\n\n——\n\n" + ad : ""}
 
-${rank ? rankIcon(rank) + " Trending #"+rank: ""}
+${rank ? rankIcon(rank) + " Trending #" + rank : ""}
 `;
 }
 
@@ -284,7 +292,7 @@ ${
 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 ${ad ? "\n\n——\n\n" + ad : ""}
 
-${rank ? rankIcon(rank) + " Trending #"+rank: ""}
+${rank ? rankIcon(rank) + " Trending #" + rank : ""}
   `;
 }
 
