@@ -47,7 +47,7 @@ async function generalBuyTemplate(
         group_link +
         "'><b>" +
         trackedToken.token_name +
-        " Buy!</b></a> "
+        "</b></a> Buy!"
       : "<b>" + trackedToken.token_name + " Buy!</b>"
   }
 
@@ -74,9 +74,8 @@ ${
       contest?.prize +
       "</b>\n"
     : ""
-}
-  <a href="https://t.me/PurpleBuyBotTrending">${
-    rank ? rankIcon(rank) + " Trending" : "Trending"
+}<a href="https://t.me/PurpleBuyBotTrending">${
+    rank ? rankIcon(rank) + " Trending" : "📈 Trending"
   }</a> | 📊 <a href='${getChart(
     trackedToken.chain_id,
     trackedToken.pair
