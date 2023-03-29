@@ -23,8 +23,8 @@ const wss = (provider) => {
 
     reconnect: {
       auto: true,
-      delay: 1000, // ms
-      maxAttempts: 10,
+      delay: 2000, // ms
+      maxAttempts: 100,
       onTimeout: false,
     },
   };
@@ -191,6 +191,7 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
     );
 
     if (amountIn > 0 || amountOut > 0) {
+      console.log("~~~~~step 3~~~~~~~~~");
       let marketCap = 0;
       if (circulating_supply) {
         const unitPrice = price.actualPrice / (amountOut / amountIn);
@@ -314,6 +315,7 @@ const sendHTMLMessage = async (groupId, messageTemplate) => {
         messageTemplate,
       });
     } else {
+      console.log("~~~~~~~~Sending message~~~~~~~~~");
       bot
         .sendMessage(groupId, messageTemplate, {
           parse_mode: "HTML",
