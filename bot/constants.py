@@ -1,2 +1,0 @@
-ADD_BOT_TO_GROUP = "add_bot_to_group"
-TRENDING_GROUP_ID = "-1001778462627"

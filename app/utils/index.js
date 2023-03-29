@@ -23,8 +23,8 @@ const wss = (provider) => {
 
     reconnect: {
       auto: true,
-      delay: 5000, // ms
-      maxAttempts: 20,
+      delay: 1000, // ms
+      maxAttempts: 10,
       onTimeout: false,
     },
   };

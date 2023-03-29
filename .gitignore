@@ -5,4 +5,5 @@ __pycache__
 .DS_Store
 staticfiles
 local_test.py
+python
 node_modules
