@@ -49,5 +49,44 @@
     "busdid": "binance-usd",
     "usdtid": "tether",
     "usdcid": "usd-coin"
+  },
+
+  "MORALIS_IDS": {
+    "ethid": {
+      "name": "ethereum",
+      "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "chain": "0x1",
+      "exchange": "uniswap-v3"
+    },
+    "bscid": {
+      "name": "binancecoin",
+      "address": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+      "chain": "0x38",
+      "exchange": "pancakeswap-v2"
+    },
+    "croid": {
+      "name": "crypto-com-chain",
+      "address": "0xa0b73e1ff0b80914ab6fe0444e65848c4c34450b",
+      "chain": "0x1",
+      "exchange": "uniswap-v3"
+    },
+    "busdid": {
+      "name": "binance-usd",
+      "address": "0xe9e7cea3dedca5984780bafc599bd69add087d56",
+      "chain": "0x38",
+      "exchange": "pancakeswap-v2"
+    },
+    "usdtid": {
+      "name": "tether",
+      "address": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+      "chain": "0x1",
+      "exchange": "uniswap-v3"
+    },
+    "usdcid": {
+      "name": "usd-coin",
+      "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "chain": "0x1",
+      "exchange": "uniswap-v3"
+    }
   }
 }

@@ -10,8 +10,8 @@ const winnerAnnouncer = require("./listeners/winnerAnnouncer");
 const https = require("https");
 const http = require("http");
 
-https.globalAgent.maxSockets = 50;
-http.globalAgent.maxSockets = 50;
+https.globalAgent.maxSockets = 100;
+http.globalAgent.maxSockets = 100;
 
 const main = async () => {
   try {

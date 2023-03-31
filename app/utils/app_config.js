@@ -71,6 +71,10 @@ const getAllCoingeckoIds = () => {
   return config.get(`COINGECKO_IDS`);
 };
 
+const getAllMoralisIds = () => {
+  return config.get("MORALIS_IDS");
+};
+
 const trending_group_id = "-1001778462627";
 
 module.exports = {
@@ -80,5 +84,6 @@ module.exports = {
   getCoinGeckoId,
   getAllCoingeckoIds,
   getDexChartUrl,
+  getAllMoralisIds,
   trending_group_id,
 };
