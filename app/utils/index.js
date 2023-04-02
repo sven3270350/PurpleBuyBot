@@ -23,8 +23,8 @@ const wss = (provider) => {
 
     reconnect: {
       auto: true,
-      delay: 2000, // ms
-      maxAttempts: 100,
+      delay: 5000, // ms
+      maxAttempts: 10,
       onTimeout: false,
     },
   };
@@ -95,6 +95,7 @@ const hasActiveSubscription = async (groupId) => {
 const getTokenDecimals = async (address, chain) => {
   const web3 = wss(appConfig.getProvider(chain));
   const token = new web3.eth.Contract(ERC20, address);
+  console.log("~~~~~~~~token~~~~~~~", token.methods.decimals().call());
   return token.methods.decimals().call();
 };
 
@@ -128,6 +129,7 @@ const isNewBuyer = async (address, token, decimals, amountOut, chainId) => {
 };
 
 const convertFromWei = (amount, decimals) => {
+  console.log("~~~~~~~~~ConvertFromWei~~~~~~~~~~");
   return new Web3.utils.BN(amount) / 10 ** decimals;
 };
 
@@ -145,9 +147,6 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
   const token_address = trackedToken.token_address.toLowerCase();
   const decimals = trackedToken.token_decimals;
   const chainId = trackedToken.chain_id;
-  const { min_usd_amount } = await queries.getMinUSDBuyAmount(
-    trackedToken.group_id
-  );
   const explorer = appConfig.getExploerUrl(chainId);
   const tx_link = `${explorer}tx/${tx_hash}`;
   const { circulating_supply } = await queries.getTokenCircSupply(
@@ -166,6 +165,7 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
 
     let amountIn = 0;
     let amountOut = 0;
+    console.log("~~~~~selectedTrackedToken~~~~~~", selectedTrackedToken);
 
     if (selectedTrackedToken.token === 1) {
       const token1Decimals = await getTokenDecimals(
@@ -189,6 +189,7 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
       amountIn,
       trackedToken.paired_with_name
     );
+    console.log("~~~~~~~~condition~~~~~~~~~", amountIn > 0 || amountOut > 0);
 
     if (amountIn > 0 || amountOut > 0) {
       console.log("~~~~~step 3~~~~~~~~~");

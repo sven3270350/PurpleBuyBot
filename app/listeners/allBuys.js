@@ -16,7 +16,7 @@ const allBuysHandler = async (
   try {
     const { usdString: usdPrice, usdNumber: multiplier } = price;
     const ad = await utils.getAd(trackedToken.group_id);
-    
+
     const { buy_icon, buy_media } = await utils.getGroupMedia(
       trackedToken.group_id
     );
@@ -43,7 +43,6 @@ const allBuysHandler = async (
       address: utils.ellipseAddress(to),
       tx_link,
     };
-
 
     const rank = await utils.trendingGroupRank(trackedToken.group_id);
     const templates = await generalBuyTemplate(
@@ -74,13 +73,14 @@ const subscribe = async (trackedToken, contract) => {
 
   // subscribe to event
   subscription.on("data", (data) => {
+    console.info("-------------listener-------------", data);
     utils.swapHanlder(contract, trackedToken, data, allBuysHandler);
   });
 
   subscription.on("error", (error) => console.log(error));
 };
 
-const main = async (interval = 1000 * 30) => {
+const main = async (interval = 1000 * 60) => {
   // get all tracked tokens
   const maxDelayValue = 2147483647;
 

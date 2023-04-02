@@ -33,7 +33,7 @@ const countdownHandler = async (activeCampaign) => {
   }
 };
 
-const main = async (interval = 1000 * 30) => {
+const main = async (interval = 1000 * 60) => {
   // get all tracked tokens
   const maxDelayValue = 2147483647;
 

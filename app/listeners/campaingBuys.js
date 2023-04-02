@@ -46,7 +46,7 @@ const campaignBuysHandler = async (
       });
 
       const ad = await utils.getAd(trackedToken.group_id);
-      
+
       const endDate = new Date(activeCampaign?.end_time);
       const times = {
         start_time: new Date(activeCampaign?.start_time).toLocaleString(),
@@ -79,7 +79,7 @@ const campaignBuysHandler = async (
         );
 
         const rank = await utils.trendingGroupRank(trackedToken.group_id);
-        
+
         switch (activeCampaign?.campaing_type) {
           case "Biggest Buy":
             const ranking = await queries.getTop5Buys(trackedToken.campaign_id);
@@ -199,7 +199,7 @@ const subscribe = async (trackedToken, contract) => {
   subscription.on("error", (error) => console.log(error));
 };
 
-const main = async (interval = 1000 * 30) => {
+const main = async (interval = 1000 * 60) => {
   // get all tracked tokens
   const maxDelayValue = 2147483647;
 

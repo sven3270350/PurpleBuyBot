@@ -1,7 +1,7 @@
 const Moralis = require("moralis").default;
 const appConfig = require("../utils/app_config");
 const moralis_key =
-  "yh7eNtVqRRVf6s8ftrT4RY10k2FBG9YeghrsJuhkyx7unp6PDK7y3IDAZQvCsQpg";
+  "NKAoIIcALuNc5VCZierAVLuQDT2YHGHaBJsvovtJp5xrzboSgwMBFh1AVYTN42WR";
 let isStarted = true;
 
 const start = async () => {
@@ -34,13 +34,15 @@ class CoingeckoService {
         })
       );
       const data = {};
+      const idsArray = Object.values(ids);
+      console.log("~~~~~~~~~~~~~~~~~~", response);
       response.map(
         (value, index) =>
-          (data[ids[index].name] = value.ResponseAdapter.jsonResponse.usdPrice)
+          (data[idsArray[index].name] = value.jsonResponse.usdPrice)
       );
 
       CoingeckoService.prices = data;
-      console.log("[CoingeckoService::cachePrices] prices cached");
+      console.log("[MoralisService::cachePrices] prices cached");
     } catch (e) {
       console.error(e);
     }
@@ -77,6 +79,7 @@ class CoingeckoService {
 
   async getUsdPrice(amount, paired_with) {
     const price = await this.getPairPrice(paired_with);
+    console.log("~~~~~~~~~~getUsdPrice~~~~~~~~~~~");
     return {
       usdString: CoingeckoService.numberToUsd(Number(amount) * price),
       usdNumber: Number(amount) * price,
