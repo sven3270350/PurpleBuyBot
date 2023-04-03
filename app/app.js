@@ -31,7 +31,7 @@ const main = async () => {
       // await countdownListener.main();
       // await winnerAnnouncer.main();
 
-      Promise.all([
+      await Promise.all([
         allBuysListener.main(),
         campaignBuyListener.main(),
         countdownListener.main(),

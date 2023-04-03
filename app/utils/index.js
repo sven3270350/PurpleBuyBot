@@ -14,7 +14,7 @@ const bot = new TelegramBot(process.env.PUBLIC_BOT_API_KEY);
 
 const wss = (provider) => {
   const options = {
-    timeout: 60000,
+    timeout: 100000,
 
     clientConfig: {
       keepalive: true,
@@ -24,7 +24,7 @@ const wss = (provider) => {
     reconnect: {
       auto: true,
       delay: 10000, // ms
-      maxAttempts: 5,
+      maxAttempts: 10,
       onTimeout: false,
     },
   };
