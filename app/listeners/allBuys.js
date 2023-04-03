@@ -115,27 +115,31 @@ const main = async (interval = 1000 * 60) => {
         });
 
         // for each tracked token, subscribe to the event
-        trackedTokens.forEach(async (trackedToken) => {
-          const provider = utils.getProvider(trackedToken.chain_id);
-          const wss = utils.wss(provider);
+        await Promise.all(
+          trackedTokens.forEach(async (trackedToken) => {
+            const provider = utils.getProvider(trackedToken.chain_id);
+            const wss = utils.wss(provider);
 
-          // check if event is not in subscriptions
-          if (
-            !utils.keyInObject(
-              `${trackedToken.token_address.toLowerCase()}_${trackedToken.id}`,
-              subscriptions
-            ) &&
-            trackedToken.active_tracking
-          ) {
-            // get event from contract
-            const contract = new wss.eth.Contract(
-              utils.UniswapV2Pair.abi,
-              trackedToken.pair
-            );
+            // check if event is not in subscriptions
+            if (
+              !utils.keyInObject(
+                `${trackedToken.token_address.toLowerCase()}_${
+                  trackedToken.id
+                }`,
+                subscriptions
+              ) &&
+              trackedToken.active_tracking
+            ) {
+              // get event from contract
+              const contract = new wss.eth.Contract(
+                utils.UniswapV2Pair.abi,
+                trackedToken.pair
+              );
 
-            await subscribe(trackedToken, contract);
-          }
-        });
+              return subscribe(trackedToken, contract);
+            }
+          })
+        ).catch((err) => console.log("[AllBuysPromiseAll:Error]", err));
       },
       interval > maxDelayValue ? maxDelayValue : interval
     );
