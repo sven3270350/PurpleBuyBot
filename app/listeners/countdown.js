@@ -5,6 +5,7 @@ const { countdowToStartTemplate } = require("../utils/templates");
 const countdowns = {};
 
 const countdownHandler = async (activeCampaign) => {
+  console.log("~~~~~Campaign~~~~~", activeCampaign);
   const startDate = new Date(activeCampaign.start_time);
   const endDate = new Date(activeCampaign.end_time);
 

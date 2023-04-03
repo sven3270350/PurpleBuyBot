@@ -26,10 +26,17 @@ const main = async () => {
       // start main jobs
       startMainJobs();
 
-      await allBuysListener.main();
-      await campaignBuyListener.main();
-      await countdownListener.main();
-      await winnerAnnouncer.main();
+      // await allBuysListener.main();
+      // await campaignBuyListener.main();
+      // await countdownListener.main();
+      // await winnerAnnouncer.main();
+
+      Promise.all([
+        allBuysListener.main(),
+        campaignBuyListener.main(),
+        countdownListener.main(),
+        winnerAnnouncer.main(),
+      ]).catch((err) => console.log("[All::PromiseError] : ", err));
 
       // manage child processes
       let childProcessId;

@@ -14,17 +14,17 @@ const bot = new TelegramBot(process.env.PUBLIC_BOT_API_KEY);
 
 const wss = (provider) => {
   const options = {
-    timeout: 30000,
+    timeout: 60000,
 
     clientConfig: {
       keepalive: true,
-      keepaliveInterval: 60000,
+      keepaliveInterval: 120000,
     },
 
     reconnect: {
       auto: true,
-      delay: 5000, // ms
-      maxAttempts: 10,
+      delay: 10000, // ms
+      maxAttempts: 5,
       onTimeout: false,
     },
   };
@@ -152,10 +152,11 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
   const { circulating_supply } = await queries.getTokenCircSupply(
     trackedToken.id
   );
+  let converted = true;
 
   try {
     if (!circulating_supply) {
-      await setCirculatingSupply(trackedToken);
+      converted = await setCirculatingSupply(trackedToken);
     }
 
     const selectedTrackedToken = await selectTrackedToken(
@@ -167,7 +168,7 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
     let amountOut = 0;
     console.log("~~~~~selectedTrackedToken~~~~~~", selectedTrackedToken);
 
-    if (selectedTrackedToken.token === 1) {
+    if (selectedTrackedToken.token === 1 && converted) {
       const token1Decimals = await getTokenDecimals(
         trackedToken.paired_with,
         chainId
@@ -259,8 +260,10 @@ const setCirculatingSupply = async (trackedToken) => {
         id,
         circulatingSupply
       );
+    return true;
   } catch (error) {
     console.log("[Utils::setCirculatingSupply]", error);
+    return false;
   }
 };
 
