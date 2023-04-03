@@ -23,8 +23,8 @@ const wss = (provider) => {
 
     reconnect: {
       auto: true,
-      delay: 10000, // ms
-      maxAttempts: 10,
+      delay: 2000, // ms
+      maxAttempts: 50,
       onTimeout: false,
     },
   };
@@ -96,7 +96,7 @@ const getTokenDecimals = async (address, chain) => {
   const web3 = wss(appConfig.getProvider(chain));
   const token = new web3.eth.Contract(ERC20, address);
   console.log("~~~~~~~~token~~~~~~~", token.methods.decimals().call());
-  return token.methods.decimals().call();
+  return await token.methods.decimals().call();
 };
 
 const getTokenTotalSupply = async (tokenAddress, chainId) => {
@@ -168,7 +168,13 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
     let amountOut = 0;
     console.log("~~~~~selectedTrackedToken~~~~~~", selectedTrackedToken);
 
-    if (selectedTrackedToken.token === 1 && converted) {
+    if (!converted) {
+      selectedTrackedToken.token == 1
+        ? (selectedTrackedToken.token = 0)
+        : (selectedTrackedToken.token = 1);
+    }
+
+    if (selectedTrackedToken.token === 1) {
       const token1Decimals = await getTokenDecimals(
         trackedToken.paired_with,
         chainId

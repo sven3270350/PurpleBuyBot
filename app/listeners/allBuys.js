@@ -80,7 +80,7 @@ const subscribe = async (trackedToken, contract) => {
   subscription.on("error", (error) => console.log(error));
 };
 
-const main = async (interval = 1000 * 60) => {
+const main = async (interval = 1000 * 30) => {
   // get all tracked tokens
   const maxDelayValue = 2147483647;
 

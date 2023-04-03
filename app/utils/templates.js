@@ -92,12 +92,10 @@ const countdowToStartTemplate = (
   ad
 ) => {
   return `
-🕐🕐🕐🕐🕐🕐🕐🕐🕐🕐🕐
+🕐 Countdown to ${contestname} Contest 🕐
 
-<b>Countdown to ${contestname} Contest</b>
-
-<b>Starts: <i>${startCountdown}</i></b>
-<b>Ends: <i>${EndCountdown}</i></b>
+Starts: <i>${startCountdown}</i>
+Ends: <i>${EndCountdown}</i>
  ${groupLink ? "\n👥 <a href='" + groupLink + "'>Group</a> " : ""}
 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 ${ad ? "\n\n——\n\n" + ad : ""}
