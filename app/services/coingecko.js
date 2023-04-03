@@ -35,7 +35,6 @@ class CoingeckoService {
       );
       const data = {};
       const idsArray = Object.values(ids);
-      console.log("~~~~~~~~~~~~~~~~~~", response);
       response.map(
         (value, index) =>
           (data[idsArray[index].name] = value.jsonResponse.usdPrice)
