@@ -193,10 +193,11 @@ async function campaignRaffleBuysTemplate(
   const maxIcons = has_media ? 100 : 3667;
 
   return `
-<b>🎉 ${campaign.type} Competition Entry</b>
+${campaign.trackedToken.token_name} Buy!
+
 ${buy_icon.repeat((multiplier > maxIcons ? maxIcons : multiplier) | 1)}
 
-🕓 Started at: <b>${times.start_time}</b>
+<b>🎉 ${campaign.type} Competition Entry</b>
 ⏳ Ends in: <b>${times.count_down}</b>
 ⬇️ Minimum Buy: <b>${Intl.NumberFormat("en-US", {
     style: "currency",
@@ -225,12 +226,9 @@ ${
     campaign?.trackedToken?.chain_id,
     campaign?.trackedToken?.pair
   )}'>Chart</a> ${
-    group_link ? "| 👥 <a href='" + group_link + "'>Group</a> " : ""
-  }
-📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
+    group_link ? "| 👥 <a href='" + group_link + "'>Group</a> " : "|"
+  } 📈 <a href="https://t.me/PurpleBuyBotTrending">Trending</a> | 👨‍💻 <a href="https://t.me/PurpleBuyBotSupport">Support</a>
 ${ad ? "\n\n——\n\n" + ad : ""}
-
-${rank ? rankIcon(rank) + " Trending #" + rank : ""}
 `;
 }
 
