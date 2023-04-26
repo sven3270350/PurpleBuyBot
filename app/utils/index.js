@@ -12,7 +12,7 @@ const Coingecko = new CoingeckoService();
 
 const bot = new TelegramBot(process.env.PUBLIC_BOT_API_KEY);
 
-const wsse = (provider) => {
+const wss = (provider) => {
   const options = {
     timeout: 100000,
 
