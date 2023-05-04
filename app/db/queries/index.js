@@ -28,59 +28,40 @@ const getTrackedTokensById = async (group_id) => {
   const res = await db.query(query, params);
   return res.rows;
 };
-//try-catch for above
-try {
-  const trackedTokens = await getTrackedTokensById(someGroupId);
-  console.log(trackedTokens);
-} catch (error) {
-  console.error("Error getting tracked tokens by id:", error);
-}
 
 const getAllActivelyTrackedTokensNoActiveCampaign = async () => {
-  try {
-    const query = `
-      SELECT
-      DISTINCT 
-      gp.buy_icon, gp.buy_media, tk.id, tk.group_id, tk.circulating_supply,  tk.token_name, tk.token_address,
-      tk.token_symbol, tk.token_decimals, tk.pair_address as pair, tk.active_tracking, tk.min_usd_amount,
-      sc.chain_name, sc.chain_id,
-      sp.pair_name as paired_with_name, sp.pair_address as paired_with
-      FROM public.tracked_token tk
-      JOIN public.group gp
-      ON tk.group_id = gp.group_id
-      JOIN public.token_chains tc
-      ON tk.id = tc.token_id
-      JOIN public.supported_chain sc
-      ON sc.id = tc.chain_id
-      JOIN public.token_pairs tp
-      ON tk.id = tp.token_id
-      JOIN public.supported_pairs sp
-      ON sp.id = tp.pair_id
-      WHERE 
-      (
-          SELECT COUNT(*) 
-           FROM public.campaigns 
-          WHERE public.campaigns.start_time <= NOW() 
-          AND  
-          public.campaigns.end_time >= NOW() 
-          AND tk.group_id =  public.campaigns.group_id
-      ) < 1
-      AND tk.active_tracking = true;
-        `;
-    const res = await db.query(query);
-    return res.rows;
-  } catch (error) {
-    console.error("Error getting all actively tracked tokens with no active campaign:", error);
-    throw error;
-  }
+  const query = `
+  SELECT
+  DISTINCT 
+  gp.buy_icon, gp.buy_media, tk.id, tk.group_id, tk.circulating_supply,  tk.token_name, tk.token_address,
+  tk.token_symbol, tk.token_decimals, tk.pair_address as pair, tk.active_tracking, tk.min_usd_amount,
+  sc.chain_name, sc.chain_id,
+  sp.pair_name as paired_with_name, sp.pair_address as paired_with
+  FROM public.tracked_token tk
+  JOIN public.group gp
+  ON tk.group_id = gp.group_id
+  JOIN public.token_chains tc
+  ON tk.id = tc.token_id
+  JOIN public.supported_chain sc
+  ON sc.id = tc.chain_id
+  JOIN public.token_pairs tp
+  ON tk.id = tp.token_id
+  JOIN public.supported_pairs sp
+  ON sp.id = tp.pair_id
+  WHERE 
+  (
+      SELECT COUNT(*) 
+       FROM public.campaigns 
+      WHERE public.campaigns.start_time <= NOW() 
+      AND  
+      public.campaigns.end_time >= NOW() 
+      AND tk.group_id =  public.campaigns.group_id
+  ) < 1
+  AND tk.active_tracking = true;
+    `;
+  const res = await db.query(query);
+  return res.rows;
 };
-//try-catch for above
-try {
-  const results = await getAllActivelyTrackedTokensNoActiveCampaign();
-  console.log(results);
-} catch (error) {
-  console.error("Error getting tracked tokens with no active campaigns:", error);
-}
 
 const getAllActivelyTrackedTokensWithActiveCampaign = async () => {
   const query = `
@@ -106,13 +87,6 @@ const getAllActivelyTrackedTokensWithActiveCampaign = async () => {
   const res = await db.query(query);
   return res.rows;
 };
-//try-catch for above
-try {
-  const results = await getAllActivelyTrackedTokensWithActiveCampaign();
-  console.log(results);
-} catch (error) {
-  console.error("Error getting all actively tracked tokens with active campaigns:", error);
-}
 
 const getActiveSubscriptionByGroupId = async (group_id) => {
   const query = `
@@ -134,13 +108,6 @@ const getActiveSubscriptionByGroupId = async (group_id) => {
   const res = await db.query(query, params);
   return res.rows;
 };
-//try-catch for above
-try {
-  const activeSubscriptions = await getActiveSubscriptionByGroupId(someGroupId);
-  console.log(activeSubscriptions);
-} catch (error) {
-  console.error("Error getting active subscription by group id:", error);
-}
 
 const getAllActiveCampaigns = async () => {
   const query = `
@@ -150,13 +117,6 @@ const getAllActiveCampaigns = async () => {
   const res = await db.query(query);
   return res.rows;
 };
-//try-catch for above
-try {
-  const activeCampaigns = await getAllActiveCampaigns();
-  console.log(activeCampaigns);
-} catch (error) {
-  console.error("Error getting all active campaigns:", error);
-}
 
 const getAllUpcomingCampaigns = async () => {
   const query = `
@@ -165,46 +125,28 @@ const getAllUpcomingCampaigns = async () => {
   const res = await db.query(query);
   return res.rows;
 };
-//try-catch for above
-try {
-  const upcomingCampaigns = await getAllUpcomingCampaigns();
-  console.log(upcomingCampaigns);
-} catch (error) {
-  console.error("Error getting all upcoming campaigns:", error);
-}
 
-//function will try and catch error in the function itself due to the nature of the queries
 const getGroupActiveCampaign = async (group_id) => {
-  try {
-    const query = `
-      SELECT * 
-      FROM public.campaigns 
-      WHERE public.campaigns.start_time <= NOW() 
-      AND  
-      public.campaigns.end_time >= NOW() 
-      AND public.campaigns.group_id = $1;
+  const query = `
+  SELECT * 
+    FROM public.campaigns 
+    WHERE public.campaigns.start_time <= NOW() 
+    AND  
+    public.campaigns.end_time >= NOW() 
+    AND public.campaigns.group_id = $1;
     `;
-    const params = [group_id];
-    const res = await db.query(query, params);
+  const params = [group_id];
+  const res = await db.query(query, params);
 
-    return res.rows[0];
-  } catch (error) {
-    console.error("Error getting active campaign for groupid:", error);
-    throw error;
-  }
+  return res.rows[0];
 };
 
 const getActiveAd = async () => {
-  try {
-    const query = `
-      SELECT advert FROM public.advertisement WHERE "isActive" = true;
+  const query = `
+  SELECT advert FROM public.advertisement WHERE "isActive" = true;
     `;
-    const res = await db.query(query);
-    return res.rows;
-  } catch (error) {
-    console.error("Error getting active ads:", error);
-    throw error;
-  }
+  const res = await db.query(query);
+  return res.rows;
 };
 
 const writeAllBuysToDB = async (buys) => {
