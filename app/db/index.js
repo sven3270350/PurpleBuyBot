@@ -3,7 +3,7 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   max: 3,
   ssl: {
-    rejectUnauthorized: true, //this has to be set true in production -s
+    rejectUnauthorized: false, //this has to be set true in production -s
   },
 });
 
