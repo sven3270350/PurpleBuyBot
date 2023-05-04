@@ -70,7 +70,7 @@ const getAllActivelyTrackedTokensWithActiveCampaign = async () => {
   tk.token_symbol, tk.token_decimals, tk.pair_address as pair,
   sc.chain_name, sc.chain_id,
   sp.pair_name as paired_with_name, sp.pair_address as paired_with,
-  cp.id as campaign_id, cp.start_time, cp.end_time, cp.campaing_type, cp.min_amount, cp.prize 
+  cp.id as campaign_id, cp.start_time, cp.end_time, cp.campaign_type, cp.min_amount, cp.prize 
   FROM public.tracked_token tk
   JOIN public.token_chains tc
   ON tk.id = tc.token_id
@@ -182,7 +182,7 @@ const writeBuysToDB = async (buys) => {
     buyer_amount,
     transaction_link,
     transaction_chain,
-    cmapaign_type
+    campaign_type
   )
   VALUES ($1, $2, $3, $4, $5, $6, $7)
   RETURNING *;
