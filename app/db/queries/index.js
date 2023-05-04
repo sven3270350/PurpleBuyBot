@@ -1,6 +1,5 @@
 const db = require("../index");
 
-
 const getTrackedTokensById = async (group_id) => {
   const query = `
     SELECT
@@ -342,7 +341,7 @@ const deleteTrackedToken = async (group_id) => {
         WHERE tracked_token.group_id = $1)
     `;
     const deleteTokenDex = `
-    DDELETE FROM public.token_dexs
+    DELETE FROM public.token_dexs
     WHERE token_dexs.token_id
     IN (
       SELECT id 
