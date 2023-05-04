@@ -3,8 +3,12 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   max: 3,
   ssl: {
-    rejectUnauthorized: false, //this has to be set true in production -s
+    rejectUnauthorized: true, //this has to be set true in production -s
   },
+});
+
+pool.on('connect', (client) => {
+  console.log('!!Database connection successful!!');
 });
 
 pool.on('error', (err) => {
