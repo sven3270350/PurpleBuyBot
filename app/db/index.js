@@ -2,6 +2,7 @@ const { Pool } = require("pg");
 console.log("Database env var test:", process.env.DATABASE_URL);
 
 let pool;
+let isPoolCreated = false;
 
 function createPool() {
   pool = new Pool({
@@ -13,7 +14,10 @@ function createPool() {
   });
 
   pool.on('connect', (client) => {
-    console.log('!!Database connection successful!!');
+    if (!isPoolCreated) {
+      console.log('!!Database connection successful!!');
+      isPoolCreated = true;
+    }
   });
 
   pool.on('error', (err) => {
