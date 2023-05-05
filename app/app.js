@@ -22,6 +22,7 @@ const main = async () => {
       return cluster.isMaster;
     };
 
+    //remove clustering
     if (isPrimaryCluster()) {
       // start main jobs
       startMainJobs();
