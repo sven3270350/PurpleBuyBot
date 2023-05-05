@@ -1,6 +1,6 @@
 const queries = require("../db/queries");
 const utils = require("../utils");
-const {
+let {
   winnerBiggestBuysTemplate,
   winnerRaffleBuysTemplate,
 } = require("../utils/templates");

@@ -218,7 +218,7 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
         });
       } catch (error) {
         console.log(
-          "[Utils::swapHanlder::SaveToDB]",
+          "[Utils::swapHandler::SaveToDB]",
           {
             group_id,
             token_name,
@@ -241,7 +241,7 @@ const swapHanlder = async (contract, trackedToken, data, callback) => {
   } catch (error) {
     const { group_id, token_name, chain_name } = trackedToken;
     console.log(
-      "[Utils::swapHanlder]",
+      "[Utils::swapHandler]",
       {
         group_id,
         token_name,

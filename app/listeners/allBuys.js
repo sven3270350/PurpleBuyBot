@@ -116,16 +116,14 @@ const main = async (interval = 1000 * 30) => {
 
         // for each tracked token, subscribe to the event
         await Promise.all(
-          trackedTokens.forEach(async (trackedToken) => {
+          trackedTokens.map(async (trackedToken) => {
             const provider = utils.getProvider(trackedToken.chain_id);
             const wss = utils.wss(provider);
-
+        
             // check if event is not in subscriptions
             if (
               !utils.keyInObject(
-                `${trackedToken.token_address.toLowerCase()}_${
-                  trackedToken.id
-                }`,
+                `${trackedToken.token_address.toLowerCase()}_${trackedToken.id}`,
                 subscriptions
               ) &&
               trackedToken.active_tracking
@@ -135,11 +133,16 @@ const main = async (interval = 1000 * 30) => {
                 utils.UniswapV2Pair.abi,
                 trackedToken.pair
               );
-
+        
               return subscribe(trackedToken, contract);
             }
           })
         ).catch((err) => console.log("[AllBuysPromiseAll:Error]", err));
+        // [AllBuysPromiseAll:Error] TypeError: undefined is not iterable (cannot read property Symbol(Symbol.iterator))
+        //at Function.all (<anonymous>)
+        //at Timeout._onTimeout (/app/app/listeners/allBuys.js:118:23)
+        //at runMicrotasks (<anonymous>)
+        //at processTicksAndRejections (node:internal/process/task_queues:96:5)
       },
       interval > maxDelayValue ? maxDelayValue : interval
     );

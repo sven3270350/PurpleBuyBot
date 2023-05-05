@@ -235,16 +235,14 @@ const main = async (interval = 1000 * 60) => {
 
         // for each tracked token, subscribe to the event
         await Promise.all(
-          trackedTokens.forEach(async (trackedToken) => {
+          trackedTokens.map(async (trackedToken) => {
             const provider = utils.getProvider(trackedToken.chain_id);
             const wss = utils.wss(provider);
 
             // check if event is not in subscriptions
             if (
               !utils.keyInObject(
-                `${trackedToken.token_address.toLowerCase()}_${
-                  trackedToken.id
-                }`,
+                `${trackedToken.token_address.toLowerCase()}_${trackedToken.id}`,
                 subscriptions
               )
             ) {
@@ -254,7 +252,7 @@ const main = async (interval = 1000 * 60) => {
                 trackedToken.pair
               );
 
-              return subscribe(trackedToken, contract);
+              await subscribe(trackedToken, contract);
             }
           })
         ).catch((err) => console.log("[CampaignBuyPromiseAll:Error]", err));

@@ -182,7 +182,7 @@ const writeBuysToDB = async (buys) => {
     buyer_amount,
     transaction_link,
     transaction_chain,
-    cmapaign_type
+    campaing_type
   )
   VALUES ($1, $2, $3, $4, $5, $6, $7)
   RETURNING *;
@@ -194,7 +194,7 @@ const writeBuysToDB = async (buys) => {
     buys.buyer_amount,
     buys.transaction_link,
     buys.transaction_chain,
-    buys.campaign_type,
+    buys.campaing_type,
   ];
   const res = await db.query(query, params);
   return res.rows[0];
