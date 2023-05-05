@@ -1,5 +1,5 @@
 const { startMainJobs, startChildJobs } = require("./schedule");
-// scheduler issue (discarded commit)
+
 const allBuysListener = require("./listeners/allBuys");
 const countdownListener = require("./listeners/countdown");
 const campaignBuyListener = require("./listeners/campaingBuys");
